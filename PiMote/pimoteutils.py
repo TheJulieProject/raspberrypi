@@ -276,13 +276,9 @@ class ControllerPhone():
 		self.pollrate = rate
 
 class Button():
-	id = None
-	name = None
-	type = None
 	REGULAR = 1
 	BUTTON_WITH_TEXT = 2
 	TOGGLE_BUTTON = 3
-	PRESET_CONTROL = 4
 	def __init__(self, type, id, name):
 		self.id = id
 		self.name = name
