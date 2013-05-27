@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 
 from imgproc import *
-from PIL import Image
 from time import sleep
 
 # open the webcam
@@ -9,11 +8,23 @@ from time import sleep
 camera = Camera(320, 240)
 #camera = Camera(160, 120)
 
-while True:
+#while True:
 	
 	# grab an image from the camera
-	frame = camera.grabImage()
+frame = camera.grabImage()
 
+print frame[x,y]
+
+	# open a view, setting the view to the size of the captured image
+	#view = Viewer(frame.width, frame.height, "Basic image processing")
+
+	# display the image on the screen
+	#view.displayImage(frame)
+
+
+
+
+"""
 	width, height = 320, 240
 	#HUD = Image.new()
 	HUD = Image.open("HUDs/preview_320x240.png")
@@ -26,9 +37,4 @@ while True:
 			
 			if red2 != 0 and green2 != 0 and blue2 != 0:
 				frame[x,y] = red2, green2, blue2
-
-	# open a view, setting the view to the size of the captured image
-	view = Viewer(frame.width, frame.height, "Basic image processing")
-
-	# display the image on the screen
-	view.displayImage(frame)
+"""
