@@ -1,4 +1,13 @@
+"""
+An example application using pimoteutils
+To run: python app.py 0.0.0.0 8080
+
+Needs porting into python3 for use with PiFace
+
+"""
+
 import sys
+# Import PhoneServer and Phone classes from pimoteutils
 from pimoteutils import PhoneServer, Phone
 
 
@@ -12,20 +21,21 @@ class MyPhone(Phone):
   def buttonPressed(self, id):
     for button in Phone.buttons:
       if button.id == id:
-        print(button.name)
+        print(button.name) #Print the name of the button that was pressed
 
 # Create the phone object
 thisphone = MyPhone()
+
+
 # Use the Phone method addButton(self, id, name) to add buttons
 #    "id" - the ID you want the button to send back for parsing (int)
 #    "name" - the name to be displayed on the button
 thisphone.addButton(1, "This is button")
 thisphone.addButton(2, "This is another")
-thisphone.addButton(3, "And another?!")
-thisphone.addButton(4, "This is getting silly..")
-thisphone.addButton(5, "Hello world")
 
+#Create the server
 myserver = PhoneServer()
+#Add the phone
 myserver.addPhone(thisphone)
 # Start server
 myserver.start(ip, port)

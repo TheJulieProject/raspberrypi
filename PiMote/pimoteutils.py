@@ -1,7 +1,10 @@
 """
 
 ex3.py - Module for ex3 - David Thorne / AIG / 15-01-2009 
-Renamed and used as pimoteutils by Tom Richardson - 14/06/2013 """
+Renamed and used as pimoteutils by Tom Richardson - 14/06/2013 
+
+
+"""
 
 
 import threading
@@ -229,7 +232,7 @@ class PhoneServer(Server):
 		return True
 
 	def onDisconnect(self, socket):
-		print("Someone disconnected")
+		print("Phone disconnected")
 		return True
 
 
