@@ -233,10 +233,11 @@ class PhoneServer(Server):
 	def onConnect(self, socket):
 		print("Phone connected")
 		if PhoneServer.phone.controltype == Phone.NORMAL:
+			socket.send(str(PhoneServer.phone.controltype))
 			for i in PhoneServer.phone.getButtons():
-				socket.send(str(0) +","+ str(i.type) +","+ str(i.id) + "," + str(i.name))
+				socket.send(str(i.type) + "," + str(i.id) + "," + str(i.name))
 		elif PhoneServer.phone.controltype == Phone.CONTROLLER:
-			socket.send(str(1))
+			socket.send(str(PhoneServer.phone.controltype) + "," + str(PhoneServer.phone.pollrate))
 		return True
 
 	def onDisconnect(self, socket):
@@ -249,6 +250,7 @@ class Phone():
 	CONTROLLER = 1
 	buttons = []
 	controltype = None
+	pollrate = 5
 	def __init__(self, type):
 		self.controltype = type
 	def addButton(self, type, id, name):
@@ -265,7 +267,19 @@ class Phone():
 	def getButtons(self):
 		return Phone.buttons
 	def controlPress(self, type):
+		'''
+		0 - Forward
+		1 - Forward and left
+		2 - Forward and right
+		3 - Backwards
+		4 - Backwards and left
+		5 - Backwards and right
+		6 - Right
+		7 - Left
+		'''
 		pass
+	def setPollRate(self, rate):
+		Phone.pollrate = rate
 
 
 class Button():
