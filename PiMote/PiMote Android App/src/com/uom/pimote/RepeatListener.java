@@ -1,4 +1,4 @@
-package com.example.pimote;
+package com.uom.pimote;
 
 import android.os.Handler;
 import android.view.MotionEvent;

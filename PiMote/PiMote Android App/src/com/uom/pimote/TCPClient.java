@@ -1,4 +1,4 @@
-package com.example.pimote;
+package com.uom.pimote;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;

@@ -1,4 +1,4 @@
-package com.example.pimote;
+package com.uom.pimote;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -8,7 +8,10 @@ import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.LinearLayout.LayoutParams;
+import android.widget.TableRow;
 
 import com.uom.pimote.R;
 
@@ -66,27 +69,60 @@ public class Communicator extends Activity {
 			super.onProgressUpdate(values);
 			final String[] info = values[0].split(",");
 			Log.d("pi", info[0] + ", " + info[1]);
-			Button button = new Button(Communicator.this);
-			button.setText(info[1]);
-			//button.setOnClickListener(new OnClickListener() {
-				//public void onClick(View v) {
-					//if (tcp != null)
-						//tcp.sendMessage(info[0]);
-				//}
-			//});
-			button.setOnTouchListener(new RepeatListener(100, 100, new OnClickListener() {
-				  @Override
-				  public void onClick(View view) {
-				    // the code to execute repeatedly
-					  if(tcp!=null)
-						  tcp.sendMessage(info[0]);
-				  }
-				}));
-
-			layout.addView(button);
+			
+			addButtons(info);
+			// button.setOnTouchListener(new RepeatListener(100, 100, new
+			// OnClickListener() {
+			// @Override
+			// public void onClick(View view) {
+			// the code to execute repeatedly
+			// if(tcp!=null)
+			// tcp.sendMessage(info[0]);
+			// }
+			// }));
 
 			// output.append("\nPi: "+values[0]);
 		}
+	}
+	
+	public void addButtons(final String[] setup){
+		if (Integer.parseInt(setup[0]) == 1) {
+			Button button = new Button(Communicator.this);
+			button.setText(setup[2]);
+			button.setOnClickListener(new OnClickListener() {
+				public void onClick(View v) {
+					if (tcp != null)
+						tcp.sendMessage(setup[1] + "," + " ");
+				}
+			});
+			layout.addView(button);
+		}else if(Integer.parseInt(setup[0]) == 2){
+			LinearLayout textButtonLayout = new LinearLayout(Communicator.this);
+			LayoutParams params = new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.WRAP_CONTENT);
+			textButtonLayout.setLayoutParams(params);
+			final EditText addText = new EditText(Communicator.this);
+			addText.setHint(setup[2]);
+			LayoutParams params2 = new TableRow.LayoutParams(0, LayoutParams.WRAP_CONTENT, 1f);
+			addText.setLayoutParams(params2);
+			Button button = new Button(Communicator.this);
+			button.setText("Send");
+			button.setGravity(3);
+			button.setOnClickListener(new OnClickListener() {
+				public void onClick(View v) {
+					if (tcp != null)
+						tcp.sendMessage(setup[1] + "," + addText.getText().toString());
+					addText.setText("");
+				}
+			});
+			textButtonLayout.addView(addText);
+			textButtonLayout.addView(button);
+			layout.addView(textButtonLayout);
+		}
+	}
+	
+	protected void onPause(){
+		super.onPause();
+		finish();
 	}
 
 	@Override
@@ -105,9 +141,9 @@ public class Communicator extends Activity {
 		startActivity(i);
 		finish();
 	}
-	
+
 	@Override
-	public void onBackPressed(){
+	public void onBackPressed() {
 		endActivity("");
 	}
 }
