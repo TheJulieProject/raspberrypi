@@ -221,14 +221,15 @@ class PhoneServer(Server):
 		#     'socket' can be used to send a message string back over the wire.
 		#     'message' holds the incoming message string (minus the line-return).
 		#Currently, message holds the id of the button pressed
-		PhoneServer.phone.buttonPressed(int(message))
+		(id, sep, msg) = message.strip().partition(",")
+		PhoneServer.phone.buttonPressed(int(id), msg)
 		
 		# Signify all is well
 		return True
 	def onConnect(self, socket):
 		print("Phone connected")
 		for i in PhoneServer.phone.getButtons():
-			socket.send(str(i.id) + "," + str(i.name))
+			socket.send(str(i.type) +","+ str(i.id) + "," + str(i.name))
 		return True
 
 	def onDisconnect(self, socket):
@@ -238,9 +239,9 @@ class PhoneServer(Server):
 
 class Phone():
 	buttons = []
-	def addButton(self, id, name):
+	def addButton(self, type, id, name):
 		button = [""]
-		button[0] = Button(id, name)
+		button[0] = Button(type, id, name)
 		Phone.buttons.append(button[0]);
 		return True
 	def buttonPressed(self, id):
@@ -252,6 +253,12 @@ class Phone():
 class Button():
 	id = None
 	name = None
-	def __init__(self, id, name):
+	type = None
+	REGULAR = 1
+	BUTTON_WITH_TEXT = 2
+	TOGGLE_BUTTON = 3
+	PRESET_CONTROL = 4
+	def __init__(self, type, id, name):
 		self.id = id
 		self.name = name
+		self.type = type
