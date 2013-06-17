@@ -49,7 +49,6 @@
         android:layout_alignParentRight="true"
         android:layout_below="@+id/control_back"
         android:layout_marginTop="53dp"
-        android:text="Medium Text"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
 </RelativeLayout>
