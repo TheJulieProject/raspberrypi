@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
+
+    <ImageView
+        android:id="@+id/control_forward"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="22dp"
+        android:layout_marginTop="32dp"
+        android:src="@drawable/ic_action_forward" />
+
+    <ImageView
+        android:id="@+id/control_back"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_alignLeft="@+id/control_forward"
+        android:layout_below="@+id/control_forward"
+        android:layout_marginTop="47dp"
+        android:src="@drawable/ic_action_backwards" />
+
+    <ImageView
+        android:id="@+id/control_right"
+        android:layout_width="75dp"
+        android:layout_height="75dp"
+        android:layout_alignParentRight="true"
+        android:layout_alignTop="@+id/control_forward"
+        android:layout_marginTop="83dp"
+        android:src="@drawable/ic_action_right" />
+
+    <ImageView
+        android:id="@+id/control_left"
+        android:layout_width="75dp"
+        android:layout_height="75dp"
+        android:layout_alignTop="@+id/control_right"
+        android:layout_marginRight="17dp"
+        android:layout_toLeftOf="@+id/control_right"
+        android:src="@drawable/ic_action_left" />
+
+    <TextView
+        android:id="@+id/debugText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/control_back"
+        android:layout_marginTop="53dp"
+        android:text="Medium Text"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
+
+</RelativeLayout>
