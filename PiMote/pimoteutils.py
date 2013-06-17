@@ -6,7 +6,7 @@ Renamed and used as pimoteutils by Tom Richardson - 14/06/2013
 
 """
 
-
+import sys
 import threading
 import time
 import socket as socketlib
@@ -217,19 +217,26 @@ class PhoneServer(Server):
 		print("Server has started")
 		
 	def onMessage(self, socket, message):
+		if PhoneServer.phone.controltype == Phone.NORMAL:
 		# This function takes two arguments: 'socket' and 'message'.
 		#     'socket' can be used to send a message string back over the wire.
 		#     'message' holds the incoming message string (minus the line-return).
 		#Currently, message holds the id of the button pressed
-		(id, sep, msg) = message.strip().partition(",")
-		PhoneServer.phone.buttonPressed(int(id), msg)
+			(id, sep, msg) = message.strip().partition(",")
+			PhoneServer.phone.buttonPressed(int(id), msg)
+		elif PhoneServer.phone.controltype == Phone.CONTROLLER:
+			print("Incoming")
+			PhoneServer.phone.controlPress(int(message))
 		
 		# Signify all is well
 		return True
 	def onConnect(self, socket):
 		print("Phone connected")
-		for i in PhoneServer.phone.getButtons():
-			socket.send(str(i.type) +","+ str(i.id) + "," + str(i.name))
+		if PhoneServer.phone.controltype == Phone.NORMAL:
+			for i in PhoneServer.phone.getButtons():
+				socket.send(str(0) +","+ str(i.type) +","+ str(i.id) + "," + str(i.name))
+		elif PhoneServer.phone.controltype == Phone.CONTROLLER:
+			socket.send(str(1))
 		return True
 
 	def onDisconnect(self, socket):
@@ -238,16 +245,27 @@ class PhoneServer(Server):
 
 
 class Phone():
+	NORMAL = 0
+	CONTROLLER = 1
 	buttons = []
+	controltype = None
+	def __init__(self, type):
+		self.controltype = type
 	def addButton(self, type, id, name):
-		button = [""]
-		button[0] = Button(type, id, name)
-		Phone.buttons.append(button[0]);
+		if self.controltype == Phone.NORMAL:
+			button = [""]
+			button[0] = Button(type, id, name)
+			Phone.buttons.append(button[0]);
+		elif self.controltype == Phone.CONTROLLER:
+			print("Can't add buttons to controller")
+			sys.exit()
 		return True
 	def buttonPressed(self, id):
 		pass
 	def getButtons(self):
 		return Phone.buttons
+	def controlPress(self, type):
+		pass
 
 
 class Button():
