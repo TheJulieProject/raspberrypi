@@ -9,7 +9,7 @@ Needs porting into python3 for use with PiFace
 import sys
 # Import PhoneServer and Phone classes from pimoteutils.
 # Button only imported so we can access the variables
-from pimoteutils import *
+from pimoteutils import PhoneServer, Phone, Button
 
 
 # Parse the IP address and port you wish to listen on.
@@ -29,17 +29,22 @@ class MyPhone(Phone):
 				elif button.type == button.BUTTON_WITH_TEXT: #text input
 					if message != "": #blank message means no text input + button press
 						print(message)
+				elif button.type == button.TOGGLE_BUTTON:
+					print(button.name + " toggles to: " + message)
+
 # Create the phone object
 thisphone = MyPhone()
 
 # Use the Phone method addButton(self, id, name) to add buttons
 #    "id" - the ID you want the button to send back for parsing (int)
 #    "name" - the name to be displayed on the button
-thisphone.addNewButton(Button.BUTTON_WITH_TEXT, 1, "This is a text field")
-b = Button(Button.REGULAR, 4, "Random button")
+# thisphone.addNewButton(Button.BUTTON_WITH_TEXT, 1, "This is a text field")
+# b = Button(Button.REGULAR, 4, "Random button")
+# thisphone.addButton(b)
+# thisphone.addNewButton(Button.REGULAR, 2, "This is another")
+# thisphone.addNewButton(Button.BUTTON_WITH_TEXT, 3, "More text")
+b = Button(Button.TOGGLE_BUTTON, 1, "Hello World")
 thisphone.addButton(b)
-thisphone.addNewButton(Button.REGULAR, 2, "This is another")
-thisphone.addNewButton(Button.BUTTON_WITH_TEXT, 3, "More text")
 
 #Create the server
 myserver = PhoneServer()

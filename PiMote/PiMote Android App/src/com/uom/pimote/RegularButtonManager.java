@@ -1,13 +1,16 @@
 package com.uom.pimote;
 
 import android.content.Context;
+import android.content.pm.ActivityInfo;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
 import android.widget.TableRow;
+import android.widget.ToggleButton;
 
 public class RegularButtonManager {
 	
@@ -19,6 +22,7 @@ public class RegularButtonManager {
 		this.c = c;
 		this.tcp = tcp;
 		this.layout = layout;
+        ((Communicator) c).setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
 	}
 	
 	public void addButtons(final String[] setup) {
@@ -56,6 +60,16 @@ public class RegularButtonManager {
 			textButtonLayout.addView(addText);
 			textButtonLayout.addView(button);
 			layout.addView(textButtonLayout);
-		}
+		} else if (Integer.parseInt(setup[0]) == 3){
+            ToggleButton button = new ToggleButton(c);
+            button.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    int tf = ((ToggleButton)view).isChecked() ? 1 : 0;
+                    tcp.sendMessage(setup[1] + "," + tf);
+                }
+            });
+            layout.addView(button);
+        }
 	}
 }

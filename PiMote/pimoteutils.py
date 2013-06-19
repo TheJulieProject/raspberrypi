@@ -292,16 +292,19 @@ class Button():
 		self.id = id
 		self.name = name
 		self.type = type
+		if type == Button.TOGGLE_BUTTON:
+			self = ToggleButton(id, name, False)
 	def getId(self):
 		return self.id
 	def getName(self):
 		return self.name
 	def getType(self):
 		return self.type
-	def setInitialValue(self, value):
-		if self.type == TOGGLE_BUTTON:
-			self.value = value
-		else:
-			print("Not possible Dave")
+
+class ToggleButton(Button):
+	def __init__(self, id, name, initialvalue):
+		self.id = id
+		self.name = name
+		self.value = initialvalue
 	def getValue(self):
 		return self.value
