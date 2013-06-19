@@ -212,32 +212,29 @@ class Client(Receiver):
 class PhoneServer(Server):
 	phone = None
 	def addPhone(self, thephone):
-		PhoneServer.phone = thephone
+		self.phone = thephone
 	def onStart(self):
 		print("Server has started")
 		
 	def onMessage(self, socket, message):
-		if PhoneServer.phone.controltype == Phone.NORMAL:
-		# This function takes two arguments: 'socket' and 'message'.
-		#     'socket' can be used to send a message string back over the wire.
-		#     'message' holds the incoming message string (minus the line-return).
-		#Currently, message holds the id of the button pressed
+		if isinstance(self.phone, Phone):
 			(id, sep, msg) = message.strip().partition(",")
-			PhoneServer.phone.buttonPressed(int(id), msg)
-		elif PhoneServer.phone.controltype == Phone.CONTROLLER:
-			print("Incoming")
-			PhoneServer.phone.controlPress(int(message))
+			self.phone.buttonPressed(int(id), msg)
+		elif isinstance(self.phone, ControllerPhone):
+			self.phone.controlPress(int(message))
 		
 		# Signify all is well
 		return True
+
 	def onConnect(self, socket):
 		print("Phone connected")
-		if PhoneServer.phone.controltype == Phone.NORMAL:
-			socket.send(str(PhoneServer.phone.controltype))
-			for i in PhoneServer.phone.getButtons():
+		if isinstance(self.phone, Phone):
+			socket.send(str(self.phone.controltype))
+			for i in self.phone.getButtons():
 				socket.send(str(i.type) + "," + str(i.id) + "," + str(i.name))
-		elif PhoneServer.phone.controltype == Phone.CONTROLLER:
-			socket.send(str(PhoneServer.phone.controltype) + "," + str(PhoneServer.phone.pollrate))
+
+		elif isinstance(self.phone, ControllerPhone):
+			socket.send(str(self.phone.controltype) + "," + str(self.phone.pollrate))
 		return True
 
 	def onDisconnect(self, socket):
@@ -246,26 +243,23 @@ class PhoneServer(Server):
 
 
 class Phone():
-	NORMAL = 0
-	CONTROLLER = 1
 	buttons = []
-	controltype = None
-	pollrate = 5
-	def __init__(self, type):
-		self.controltype = type
+	controltype = 0
 	def addButton(self, type, id, name):
-		if self.controltype == Phone.NORMAL:
-			button = [""]
-			button[0] = Button(type, id, name)
-			Phone.buttons.append(button[0]);
-		elif self.controltype == Phone.CONTROLLER:
-			print("Can't add buttons to controller")
-			sys.exit()
+		button = [""]
+		button[0] = Button(type, id, name)
+		self.buttons.append(button[0]);
 		return True
 	def buttonPressed(self, id):
 		pass
 	def getButtons(self):
-		return Phone.buttons
+		return self.buttons
+	
+
+
+class ControllerPhone():
+	pollrate = 5
+	controltype = 1
 	def controlPress(self, type):
 		'''
 		0 - Forward
@@ -279,17 +273,12 @@ class Phone():
 		'''
 		pass
 	def setPollRate(self, rate):
-		Phone.pollrate = rate
-
+		self.pollrate = rate
 
 class Button():
-	id = None
-	name = None
-	type = None
 	REGULAR = 1
 	BUTTON_WITH_TEXT = 2
 	TOGGLE_BUTTON = 3
-	PRESET_CONTROL = 4
 	def __init__(self, type, id, name):
 		self.id = id
 		self.name = name
