@@ -2,6 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="1d686c0e-989c-4d28-9541-235519b80b77" name="Default" comment="">
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/uom/pimote/Communicator.java" afterPath="$PROJECT_DIR$/src/com/uom/pimote/Communicator.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/uom/pimote/RegularButtonManager.java" afterPath="$PROJECT_DIR$/src/com/uom/pimote/RegularButtonManager.java" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../app.py" afterPath="$PROJECT_DIR$/../app.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../pimoteutils.py" afterPath="$PROJECT_DIR$/../pimoteutils.py" />
@@ -69,58 +70,13 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="Communicator.java" pinned="false" current="false" current-in-tab="false">
+      <file leaf-file-name="Communicator.java" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/com/uom/pimote/Communicator.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="40" column="40" selection-start="925" selection-end="925" vertical-scroll-proportion="0.0" vertical-offset="1" max-vertical-offset="1875">
+            <state line="119" column="84" selection-start="3809" selection-end="3809" vertical-scroll-proportion="0.72337276" vertical-offset="1296" max-vertical-offset="1995">
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="ControllerManager.java" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/com/uom/pimote/ControllerManager.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="23" column="44" selection-start="769" selection-end="769" vertical-scroll-proportion="0.0" vertical-offset="2126" max-vertical-offset="2610">
-              <folding>
-                <element signature="imports" expanded="true" />
-                <element signature="e#1620#2084#0" expanded="true" />
-                <element signature="e#2072#2073#0" expanded="true" />
-                <element signature="e#2128#2592#0" expanded="true" />
-                <element signature="e#2580#2581#0" expanded="true" />
-                <element signature="e#2635#3099#0" expanded="true" />
-                <element signature="e#3087#3088#0" expanded="true" />
-                <element signature="e#3144#3608#0" expanded="true" />
-                <element signature="e#3596#3597#0" expanded="true" />
-                <element signature="e#3671#5201#0" expanded="true" />
-                <element signature="e#3785#4137#0" expanded="true" />
-                <element signature="e#4114#4115#0" expanded="true" />
-                <element signature="e#5190#5191#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="RegularButtonManager.java" pinned="false" current="true" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/com/uom/pimote/RegularButtonManager.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="68" column="32" selection-start="2783" selection-end="2783" vertical-scroll-proportion="0.28719008" vertical-offset="821" max-vertical-offset="1350">
-              <folding>
-                <element signature="imports" expanded="true" />
-                <element signature="e#3142#3402#0" expanded="true" />
-                <element signature="e#3387#3388#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="AndroidManifest.xml" pinned="false" current="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/AndroidManifest.xml">
-          <provider selected="true" editor-type-id="text-editor">
-            <state line="25" column="60" selection-start="930" selection-end="930" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="525">
-              <folding />
             </state>
           </provider>
         </entry>
@@ -143,8 +99,11 @@
   <component name="IdeDocumentHistory">
     <option name="changedFiles">
       <list>
-        <option value="$PROJECT_DIR$/src/com/uom/pimote/ControllerManager.java" />
         <option value="$PROJECT_DIR$/AndroidManifest.xml" />
+        <option value="$PROJECT_DIR$/src/com/uom/pimote/ControllerManager.java" />
+        <option value="$PROJECT_DIR$/src/com/uom/pimote/Pair.java" />
+        <option value="$PROJECT_DIR$/src/com/uom/pimote/MyTextView.java" />
+        <option value="$PROJECT_DIR$/src/com/uom/pimote/Communicator.java" />
         <option value="$PROJECT_DIR$/src/com/uom/pimote/RegularButtonManager.java" />
       </list>
     </option>
@@ -153,10 +112,8 @@
     <treeState />
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="46" />
-    <option name="y" value="22" />
-    <option name="width" value="1234" />
-    <option name="height" value="760" />
+    <option name="width" value="1280" />
+    <option name="height" value="800" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true">
     <OptionsSetting value="true" id="Add" />
@@ -184,8 +141,8 @@
       <sortByType />
     </navigator>
     <panes>
-      <pane id="PackagesPane" />
       <pane id="Scope" />
+      <pane id="PackagesPane" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -231,15 +188,16 @@
     <property name="options.splitter.main.proportions" value="0.3" />
     <property name="recentsLimit" value="5" />
     <property name="MemberChooser.sorted" value="false" />
-    <property name="options.lastSelected" value="project.propVCSSupport.Mappings" />
+    <property name="options.lastSelected" value="appearance" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$" />
     <property name="MemberChooser.copyJavadoc" value="false" />
     <property name="GoToClass.toSaveIncludeLibraries" value="false" />
     <property name="restartRequiresConfirmation" value="true" />
     <property name="MemberChooser.showClasses" value="true" />
-    <property name="FullScreen" value="false" />
+    <property name="FullScreen" value="true" />
     <property name="GoToClass.includeLibraries" value="false" />
-    <property name="options.splitter.details.proportions" value="0.2" />
     <property name="options.searchVisible" value="true" />
+    <property name="options.splitter.details.proportions" value="0.2" />
   </component>
   <component name="RunManager" selected="Android Application.PiMote">
     <configuration default="true" type="AndroidTestRunConfigurationType" factoryName="Android Tests">
@@ -393,30 +351,30 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="46" y="22" width="1234" height="760" extended-state="0" />
-    <editor active="true" />
+    <frame x="0" y="0" width="1280" height="800" extended-state="0" />
+    <editor active="false" />
     <layout>
       <window_info id="Palette&#9;" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Changes" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.22274144" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Build Variants" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Android" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Android" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.27414772" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.24959481" sideWeight="0.70028406" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32996634" sideWeight="0.7984375" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="SLIDING" type="SLIDING" visible="false" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.25" sideWeight="0.8" order="0" side_tool="false" content_ui="combo" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.2" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="true" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.1871961" sideWeight="0.72507125" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.1994302" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32905984" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
     </layout>
@@ -484,6 +442,47 @@
   <component name="editorHistoryManager">
     <entry file="file://$PROJECT_DIR$/src/com/uom/pimote/Communicator.java">
       <provider selected="true" editor-type-id="text-editor">
+        <state line="119" column="84" selection-start="3809" selection-end="3809" vertical-scroll-proportion="0.0" vertical-offset="1349" max-vertical-offset="1995">
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/uom/pimote/Communicator.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="40" column="40" selection-start="925" selection-end="925" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1875">
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/uom/pimote/ControllerManager.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="23" column="44" selection-start="769" selection-end="769" vertical-scroll-proportion="0.0" vertical-offset="2126" max-vertical-offset="2610">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/uom/pimote/RegularButtonManager.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="68" column="32" selection-start="2783" selection-end="2783" vertical-scroll-proportion="0.0" vertical-offset="150" max-vertical-offset="1350">
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/AndroidManifest.xml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="25" column="60" selection-start="930" selection-end="930" vertical-scroll-proportion="0.0" vertical-offset="360" max-vertical-offset="525">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/uom/pimote/Communicator.java">
+      <provider selected="true" editor-type-id="text-editor">
         <state line="40" column="40" selection-start="925" selection-end="925" vertical-scroll-proportion="0.0" vertical-offset="510" max-vertical-offset="1800">
           <folding>
             <element signature="imports" expanded="true" />
@@ -532,15 +531,6 @@
         <state line="0" column="0" selection-start="0" selection-end="0" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="612" />
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/uom/pimote/Communicator.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="40" column="40" selection-start="925" selection-end="925" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1800">
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/AndroidManifest.xml">
       <provider selected="true" editor-type-id="text-editor">
         <state line="25" column="60" selection-start="930" selection-end="930" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="525">
@@ -550,32 +540,30 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/com/uom/pimote/ControllerManager.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="23" column="44" selection-start="769" selection-end="769" vertical-scroll-proportion="0.0" vertical-offset="2126" max-vertical-offset="2610">
-          <folding>
-            <element signature="imports" expanded="true" />
-            <element signature="e#1620#2084#0" expanded="true" />
-            <element signature="e#2072#2073#0" expanded="true" />
-            <element signature="e#2128#2592#0" expanded="true" />
-            <element signature="e#2580#2581#0" expanded="true" />
-            <element signature="e#2635#3099#0" expanded="true" />
-            <element signature="e#3087#3088#0" expanded="true" />
-            <element signature="e#3144#3608#0" expanded="true" />
-            <element signature="e#3596#3597#0" expanded="true" />
-            <element signature="e#3671#5201#0" expanded="true" />
-            <element signature="e#3785#4137#0" expanded="true" />
-            <element signature="e#4114#4115#0" expanded="true" />
-            <element signature="e#5190#5191#0" expanded="true" />
-          </folding>
+        <state line="17" column="13" selection-start="454" selection-end="454" vertical-scroll-proportion="0.3118503" vertical-offset="0" max-vertical-offset="2145">
+          <folding />
         </state>
+      </provider>
+    </entry>
+    <entry file="jar://$APPLICATION_HOME_DIR$/sdk/platforms/android-17/android.jar!/java/util/ArrayList.class">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="58" column="0" selection-start="2033" selection-end="2033" vertical-scroll-proportion="0.8076923" vertical-offset="477" max-vertical-offset="945" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/com/uom/pimote/RegularButtonManager.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="68" column="32" selection-start="2783" selection-end="2783" vertical-scroll-proportion="0.28719008" vertical-offset="821" max-vertical-offset="1350">
+        <state line="78" column="43" selection-start="2572" selection-end="2572" vertical-scroll-proportion="2.2162163" vertical-offset="59" max-vertical-offset="1890">
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#3142#3402#0" expanded="true" />
-            <element signature="e#3387#3388#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/uom/pimote/Communicator.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="119" column="84" selection-start="3809" selection-end="3809" vertical-scroll-proportion="0.72337276" vertical-offset="1296" max-vertical-offset="1995">
+          <folding>
+            <element signature="imports" expanded="true" />
           </folding>
         </state>
       </provider>
