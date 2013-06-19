@@ -27,206 +27,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="1d686c0e-989c-4d28-9541-235519b80b77" name="Default" comment="">
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/jdosabcc.obj" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/jdosamsc.obj" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/libs/armeabi/libImageProc.so" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/libs/armeabi-v7a/libImageProc.so" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/libs/mips/libImageProc.so" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/libs/x86/libImageProc.so" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/makeadsw.vc6" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/makecdep.vc6" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/makecdsp.vc6" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/makecmak.vc6" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/makeddep.vc6" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/makeddsp.vc6" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/makedmak.vc6" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/makejdep.vc6" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/makejdsp.vc6" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/makejdsw.vc6" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/makejmak.vc6" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/makerdep.vc6" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/makerdsp.vc6" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/makermak.vc6" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/maketdep.vc6" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/maketdsp.vc6" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/maketmak.vc6" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/makewdep.vc6" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/makewdsp.vc6" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/makewmak.vc6" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/testimg.bmp" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/testimg.jpg" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/testimg.ppm" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/testimgp.jpg" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/testorig.jpg" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/testprog.jpg" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/Android.mk" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/ImageProc/Android.mk" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/Android.mk" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/Application.mk" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/ImageProc/ImageProc.c" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/ImageProc/ImageProc.h" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/Makefile.am" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/Makefile.in" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/README" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/aclocal.m4" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/ansi2knr.1" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/ansi2knr.c" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/cderror.h" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/cdjpeg.c" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/cdjpeg.h" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/change.log" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/cjpeg.1" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/cjpeg.c" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/ckconfig.c" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/coderules.txt" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/config.guess" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/config.sub" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/configure.ac" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/configure" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/depcomp" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/djpeg.1" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/djpeg.c" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/example.c" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/filelist.txt" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/install-sh" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/install.txt" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/jaricom.c" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/jcapimin.c" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/jcapistd.c" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/jcarith.c" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/jccoefct.c" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/jccolor.c" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/jcdctmgr.c" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/jchuff.c" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/jcinit.c" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/jcmainct.c" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/jcmarker.c" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/jcmaster.c" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/jcomapi.c" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/jconfig.bcc" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/jconfig.cfg" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/jconfig.dj" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/jconfig.h" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/jconfig.mac" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/jconfig.manx" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/jconfig.mc6" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/jconfig.sas" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/jconfig.st" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/jconfig.txt" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/jconfig.vc" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/jconfig.vms" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/jconfig.wat" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/jcparam.c" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/jcprepct.c" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/jcsample.c" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/jctrans.c" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/jdapimin.c" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/jdapistd.c" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/jdarith.c" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/jdatadst.c" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/jdatasrc.c" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/jdcoefct.c" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/jdcolor.c" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/jdct.h" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/jddctmgr.c" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/jdhuff.c" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/jdinput.c" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/jdmainct.c" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/jdmarker.c" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/jdmaster.c" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/jdmerge.c" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/jdosaobj.txt" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/jdpostct.c" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/jdsample.c" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/jdtrans.c" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/jerror.c" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/jerror.h" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/jfdctflt.c" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/jfdctfst.c" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/jfdctint.c" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/jidctflt.c" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/jidctfst.c" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/jidctint.c" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/jinclude.h" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/jmemansi.c" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/jmemdos.c" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/jmemdosa.asm" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/jmemmac.c" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/jmemmgr.c" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/jmemname.c" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/jmemnobs.c" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/jmemsys.h" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/jmorecfg.h" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/jpegint.h" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/jpeglib.h" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/jpegtran.1" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/jpegtran.c" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/jquant1.c" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/jquant2.c" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/jutils.c" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/jversion.h" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/libjpeg.map" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/libjpeg.txt" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/ltmain.sh" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/makcjpeg.st" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/makdjpeg.st" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/makeasln.v10" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/makecfil.v10" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/makecvcx.v10" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/makedfil.v10" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/makedvcx.v10" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/makefile.ansi" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/makefile.bcc" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/makefile.dj" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/makefile.manx" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/makefile.mc6" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/makefile.mms" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/makefile.sas" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/makefile.unix" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/makefile.vc" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/makefile.vms" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/makefile.wat" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/makejfil.v10" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/makejsln.v10" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/makejvcx.v10" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/makeproj.mac" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/makerfil.v10" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/makervcx.v10" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/maketfil.v10" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/maketvcx.v10" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/makewfil.v10" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/makewvcx.v10" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/makljpeg.st" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/maktjpeg.st" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/makvms.opt" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/missing" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/rdbmp.c" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/rdcolmap.c" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/rdgif.c" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/rdjpgcom.1" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/rdjpgcom.c" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/rdppm.c" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/rdrle.c" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/rdswitch.c" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/rdtarga.c" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/readme.dos" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/structure.txt" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/transupp.c" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/transupp.h" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/usage.txt" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/wizard.txt" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/wrbmp.c" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/wrgif.c" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/wrjpgcom.1" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/wrjpgcom.c" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/wrppm.c" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/wrrle.c" />
-      <change type="NEW" beforePath="" afterPath="$PROJECT_DIR$/jni/jpeg8d/wrtarga.c" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/uom/pimote/Communicator.java" afterPath="$PROJECT_DIR$/src/com/uom/pimote/Communicator.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/uom/pimote/Main.java" afterPath="$PROJECT_DIR$/src/com/uom/pimote/Main.java" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/compiler.xml" afterPath="$PROJECT_DIR$/.idea/compiler.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/res/layout/controllayout.xml" afterPath="$PROJECT_DIR$/res/layout/controllayout.xml" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/project.properties" afterPath="$PROJECT_DIR$/project.properties" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/uom/pimote/ControllerManager.java" afterPath="$PROJECT_DIR$/src/com/uom/pimote/ControllerManager.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/src/com/uom/pimote/RegularButtonManager.java" afterPath="$PROJECT_DIR$/src/com/uom/pimote/RegularButtonManager.java" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../app.py" afterPath="$PROJECT_DIR$/../app.py" />
+      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../pimoteutils.py" afterPath="$PROJECT_DIR$/../pimoteutils.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="PiMote.iws" />
@@ -291,19 +96,19 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file leaf-file-name="Communicator.java" pinned="false" current="true" current-in-tab="true">
+      <file leaf-file-name="Communicator.java" pinned="false" current="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/com/uom/pimote/Communicator.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="128" column="50" selection-start="3626" selection-end="3626" vertical-scroll-proportion="-0.20437956" vertical-offset="1749" max-vertical-offset="3015">
+            <state line="28" column="18" selection-start="838" selection-end="838" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="2715">
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="ControllerManager.java" pinned="false" current="false" current-in-tab="false">
+      <file leaf-file-name="ControllerManager.java" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/com/uom/pimote/ControllerManager.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="23" column="44" selection-start="769" selection-end="769" vertical-scroll-proportion="0.0" vertical-offset="330" max-vertical-offset="2610">
+            <state line="16" column="4" selection-start="444" selection-end="444" vertical-scroll-proportion="0.21565495" vertical-offset="0" max-vertical-offset="2145">
               <folding />
             </state>
           </provider>
@@ -357,13 +162,13 @@
   <component name="IdeDocumentHistory">
     <option name="changedFiles">
       <list>
-        <option value="$PROJECT_DIR$/src/com/uom/pimote/ControllerManager.java" />
         <option value="$PROJECT_DIR$/AndroidManifest.xml" />
         <option value="$PROJECT_DIR$/src/com/uom/pimote/RegularButtonManager.java" />
         <option value="$PROJECT_DIR$/src/com/uom/pimote/MjpegView.java" />
         <option value="$PROJECT_DIR$/res/layout/controllayout.xml" />
         <option value="$PROJECT_DIR$/src/com/uom/pimote/MjpegInputStream.java" />
         <option value="$PROJECT_DIR$/src/com/uom/pimote/Communicator.java" />
+        <option value="$PROJECT_DIR$/src/com/uom/pimote/ControllerManager.java" />
       </list>
     </option>
   </component>
@@ -612,7 +417,7 @@
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Build Variants" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
-      <window_info id="Android" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" weight="0.32874617" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
+      <window_info id="Android" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32874617" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Maven Projects" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" weight="0.32996634" sideWeight="0.7984375" order="3" side_tool="false" content_ui="tabs" />
@@ -736,13 +541,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/uom/pimote/ControllerManager.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state line="23" column="44" selection-start="769" selection-end="769" vertical-scroll-proportion="0.0" vertical-offset="2126" max-vertical-offset="2610">
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/com/uom/pimote/MjpegView.java">
       <provider selected="true" editor-type-id="text-editor">
         <state line="140" column="56" selection-start="4869" selection-end="4869" vertical-scroll-proportion="0.0" vertical-offset="1714" max-vertical-offset="4305">
@@ -797,7 +595,14 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/com/uom/pimote/Communicator.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="128" column="50" selection-start="3626" selection-end="3626" vertical-scroll-proportion="-0.20437956" vertical-offset="1749" max-vertical-offset="3015">
+        <state line="28" column="18" selection-start="838" selection-end="838" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="2715">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/uom/pimote/ControllerManager.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state line="16" column="4" selection-start="444" selection-end="444" vertical-scroll-proportion="0.21565495" vertical-offset="0" max-vertical-offset="2145">
           <folding />
         </state>
       </provider>
