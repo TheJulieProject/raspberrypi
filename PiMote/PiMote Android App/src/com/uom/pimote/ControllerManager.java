@@ -20,24 +20,24 @@ public class ControllerManager {
 		((Communicator) c).setContentView(R.layout.controllayout);
 		this.tcp = tcp;
 		final int sleepTime = 1000/pollRate;
-		final ImageView forward;
-		final ImageView backwards;
-		final ImageView left;
-		final ImageView right;
+		final ImageView leftForward;
+		final ImageView leftBackwards;
+		final ImageView rightForward;
+		final ImageView rightBackwards;
 		final TextView debug;
-		forward = (ImageView) ((Communicator) c)
-				.findViewById(R.id.control_forward);
-		backwards = (ImageView) ((Communicator) c)
-				.findViewById(R.id.control_back);
-		left = (ImageView) ((Communicator) c).findViewById(R.id.control_left);
-		right = (ImageView) ((Communicator) c).findViewById(R.id.control_right);
-		debug = (TextView) ((Communicator) c).findViewById(R.id.debugText);
-		forward.setClickable(true);
-		backwards.setClickable(true);
-		left.setClickable(true);
-		right.setClickable(true);
 
-		forward.setOnTouchListener(new OnTouchListener() {
+		leftForward    = (ImageView) ((Communicator) c).findViewById(R.id.left_motor_forward);
+		leftBackwards  = (ImageView) ((Communicator) c).findViewById(R.id.left_motor_backwards);
+		rightForward   = (ImageView) ((Communicator) c).findViewById(R.id.right_motor_forward);
+		rightBackwards = (ImageView) ((Communicator) c).findViewById(R.id.right_motor_backwards);
+		debug          = (TextView)  ((Communicator) c).findViewById(R.id.debugText);
+
+        leftForward.setClickable(true);
+		leftBackwards.setClickable(true);
+		rightForward.setClickable(true);
+		rightBackwards.setClickable(true);
+
+		leftForward.setOnTouchListener(new OnTouchListener() {
 
 			@Override
 			public boolean onTouch(View v, MotionEvent event) {
@@ -50,7 +50,7 @@ public class ControllerManager {
 			}
 
 		});
-		backwards.setOnTouchListener(new OnTouchListener() {
+		leftBackwards.setOnTouchListener(new OnTouchListener() {
 
 			@Override
 			public boolean onTouch(View v, MotionEvent event) {
@@ -63,7 +63,7 @@ public class ControllerManager {
 			}
 
 		});
-		left.setOnTouchListener(new OnTouchListener() {
+		rightForward.setOnTouchListener(new OnTouchListener() {
 
 			@Override
 			public boolean onTouch(View v, MotionEvent event) {
@@ -76,7 +76,7 @@ public class ControllerManager {
 			}
 
 		});
-		right.setOnTouchListener(new OnTouchListener() {
+		rightBackwards.setOnTouchListener(new OnTouchListener() {
 
 			@Override
 			public boolean onTouch(View v, MotionEvent event) {
@@ -131,21 +131,30 @@ public class ControllerManager {
 			}
 		};
 
-		t.start();
+		//t.start();
 	}
 
 	public void toggleControl(int position, boolean value) {
+        int flag = value ? 1 : 0;
 		switch (position) {
 		case 1:
+            if(forwardPress != value)
+                tcp.sendMessage("" + (0 + flag));
 			forwardPress = value;
 			break;
 		case 2:
+            if(backPress != value)
+                tcp.sendMessage("" + (2 + flag));
 			backPress = value;
 			break;
 		case 3:
+            if(leftPress != value)
+                tcp.sendMessage("" + (4 + flag));
 			leftPress = value;
 			break;
 		case 4:
+            if(rightPress != value)
+                tcp.sendMessage("" + (6 + flag));
 			rightPress = value;
 			break;
 		}
