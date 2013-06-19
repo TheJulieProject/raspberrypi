@@ -215,6 +215,7 @@ class Client(Receiver):
 
 class PhoneServer(Server):
 	phone = None
+
 	def addPhone(self, thephone):
 		self.phone = thephone
 	def onStart(self):
@@ -223,6 +224,7 @@ class PhoneServer(Server):
 	def onMessage(self, socket, message):
 		if isinstance(self.phone, Phone):
 			(id, sep, msg) = message.strip().partition(",")
+			self.phone.updateButtons(int(id), msg)
 			self.phone.buttonPressed(int(id), msg)
 		elif isinstance(self.phone, ControllerPhone):
 			self.phone.controlPress(int(message))
@@ -243,24 +245,30 @@ class PhoneServer(Server):
 class Phone():
 	buttons = []
 	controltype = 0
-	def addNewButton(self, type, id, name):
-		button = [""]
-		button[0] = Button(type, id, name)
-		self.buttons.append(button[0]);
-		return True
 	def addButton(self, button):
 		if isinstance(button, Button):
 			self.buttons.append(button)
 		else:
 			print("Button not provided")
-	def buttonPressed(self, id):
+	def buttonPressed(self, id, msg):
 		pass
 	def getButtons(self):
 		return self.buttons
 	def setup(self, socket):
+		self.socket = socket
 		socket.send(str(self.controltype))
 		for i in self.getButtons():
-			socket.send(str(i.type) + "," + str(i.id) + "," + str(i.name))
+			i.setup(socket)
+	def updateButtons(self, id, message):
+		for b in self.getButtons():
+			if b.id == id:
+				if isinstance(b, ToggleButton):
+					value = False
+					if(int(message) == 1):
+						value = True
+					b.setValue(value)
+	def send(self, msg):
+		self.socket.send(msg)
 	
 
 
@@ -286,25 +294,41 @@ class ControllerPhone():
 
 class Button():
 	REGULAR = 1
-	BUTTON_WITH_TEXT = 2
+	INPUT_TEXT = 2
 	TOGGLE_BUTTON = 3
-	def __init__(self, type, id, name):
+	def __init__(self, id, name):
 		self.id = id
 		self.name = name
-		self.type = type
-		if type == Button.TOGGLE_BUTTON:
-			self = ToggleButton(id, name, False)
+		self.type = Button.REGULAR
 	def getId(self):
 		return self.id
 	def getName(self):
 		return self.name
 	def getType(self):
 		return self.type
+	def setup(self, socket):
+		socket.send(str(Button.REGULAR) + "," + str(self.id) + "," + str(self.name))
+
+class InputText(Button):
+	def __init__(self, id, name):
+		self.id = id
+		self.name = name
+		self.type = Button.INPUT_TEXT
+	def setup(self, socket):
+		socket.send(str(self.type) + "," + str(self.id) + "," + str(self.name))
 
 class ToggleButton(Button):
 	def __init__(self, id, name, initialvalue):
 		self.id = id
 		self.name = name
 		self.value = initialvalue
+		self.type = Button.TOGGLE_BUTTON
 	def getValue(self):
 		return self.value
+	def setValue(self, value):
+		self.value = value
+	def setup(self, socket):
+		tf = 0
+		if self.value == True:
+			tf=1
+		socket.send(str(self.type) + "," + str(self.id) + "," + str(self.name) + "," + str(tf))
