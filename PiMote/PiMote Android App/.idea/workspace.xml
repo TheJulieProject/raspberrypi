@@ -4,7 +4,6 @@
     <list default="true" id="1d686c0e-989c-4d28-9541-235519b80b77" name="Default" comment="">
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../app.py" afterPath="$PROJECT_DIR$/../app.py" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/../pimoteutils.py" afterPath="$PROJECT_DIR$/../pimoteutils.py" />
-      <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/vcs.xml" afterPath="$PROJECT_DIR$/.idea/vcs.xml" />
       <change type="MODIFICATION" beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
     </list>
     <ignored path="PiMote.iws" />
@@ -72,7 +71,7 @@
       <file leaf-file-name="Communicator.java" pinned="false" current="true" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/com/uom/pimote/Communicator.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state line="40" column="40" selection-start="925" selection-end="925" vertical-scroll-proportion="0.024429968" vertical-offset="510" max-vertical-offset="1800">
+            <state line="40" column="40" selection-start="925" selection-end="925" vertical-scroll-proportion="0.85504884" vertical-offset="0" max-vertical-offset="1800">
               <folding />
             </state>
           </provider>
@@ -128,6 +127,7 @@
       <sortByType />
     </navigator>
     <panes>
+      <pane id="PackagesPane" />
       <pane id="ProjectPane">
         <subPane>
           <PATH>
@@ -166,7 +166,6 @@
           </PATH>
         </subPane>
       </pane>
-      <pane id="PackagesPane" />
       <pane id="Scope" />
     </panes>
   </component>
@@ -442,6 +441,13 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/com/uom/pimote/Communicator.java">
       <provider selected="true" editor-type-id="text-editor">
+        <state line="40" column="40" selection-start="925" selection-end="925" vertical-scroll-proportion="0.0" vertical-offset="510" max-vertical-offset="1800">
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/uom/pimote/Communicator.java">
+      <provider selected="true" editor-type-id="text-editor">
         <state line="22" column="40" selection-start="488" selection-end="488" vertical-scroll-proportion="0.0" vertical-offset="0" max-vertical-offset="1800">
           <folding />
         </state>
@@ -454,7 +460,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/com/uom/pimote/Communicator.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state line="40" column="40" selection-start="925" selection-end="925" vertical-scroll-proportion="0.024429968" vertical-offset="510" max-vertical-offset="1800">
+        <state line="40" column="40" selection-start="925" selection-end="925" vertical-scroll-proportion="0.85504884" vertical-offset="0" max-vertical-offset="1800">
           <folding />
         </state>
       </provider>

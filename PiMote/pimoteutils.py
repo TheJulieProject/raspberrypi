@@ -209,6 +209,10 @@ class Client(Receiver):
 	def onJoin(self):
 		self.stop()
 
+
+###################################################################################################################################
+
+
 class PhoneServer(Server):
 	phone = None
 	def addPhone(self, thephone):
@@ -228,13 +232,7 @@ class PhoneServer(Server):
 
 	def onConnect(self, socket):
 		print("Phone connected")
-		if isinstance(self.phone, Phone):
-			socket.send(str(self.phone.controltype))
-			for i in self.phone.getButtons():
-				socket.send(str(i.type) + "," + str(i.id) + "," + str(i.name))
-
-		elif isinstance(self.phone, ControllerPhone):
-			socket.send(str(self.phone.controltype) + "," + str(self.phone.pollrate))
+		self.phone.setup(socket)
 		return True
 
 	def onDisconnect(self, socket):
@@ -245,15 +243,24 @@ class PhoneServer(Server):
 class Phone():
 	buttons = []
 	controltype = 0
-	def addButton(self, type, id, name):
+	def addNewButton(self, type, id, name):
 		button = [""]
 		button[0] = Button(type, id, name)
 		self.buttons.append(button[0]);
 		return True
+	def addButton(self, button):
+		if isinstance(button, Button):
+			self.buttons.append(button)
+		else:
+			print("Button not provided")
 	def buttonPressed(self, id):
 		pass
 	def getButtons(self):
 		return self.buttons
+	def setup(self, socket):
+		socket.send(str(self.controltype))
+		for i in self.getButtons():
+			socket.send(str(i.type) + "," + str(i.id) + "," + str(i.name))
 	
 
 
@@ -274,6 +281,8 @@ class ControllerPhone():
 		pass
 	def setPollRate(self, rate):
 		self.pollrate = rate
+	def setup(self, socket):
+		socket.send(str(self.controltype) + "," + str(self.pollrate))
 
 class Button():
 	REGULAR = 1
@@ -283,3 +292,16 @@ class Button():
 		self.id = id
 		self.name = name
 		self.type = type
+	def getId(self):
+		return self.id
+	def getName(self):
+		return self.name
+	def getType(self):
+		return self.type
+	def setInitialValue(self, value):
+		if self.type == TOGGLE_BUTTON:
+			self.value = value
+		else:
+			print("Not possible Dave")
+	def getValue(self):
+		return self.value
