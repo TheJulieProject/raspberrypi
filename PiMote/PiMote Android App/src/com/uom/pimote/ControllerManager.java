@@ -106,7 +106,7 @@ public class ControllerManager {
         });
 
 
-        URL = new String("http://" + "192.168.1.106" + ":8080/?action=stream");
+        URL = new String("http://" + ip + ":8080/?action=stream");
 
         mv = (MjpegView) ((Communicator) c).findViewById(R.id.mv);
 
