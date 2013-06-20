@@ -10,7 +10,6 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
@@ -22,35 +21,31 @@ import java.net.URI;
 
 public class ControllerManager {
 
-    boolean running = true;
-    boolean forwardPress, backPress, leftPress, rightPress = false;
-    TCPClient tcp;
-
     // Mjpeg streamer variables
     private static final String TAG = "MJPEG";
-    private static final int REQUEST_SETTINGS = 0;
+    boolean forwardPress, backPress, leftPress, rightPress = false;
+    TCPClient tcp;
     String URL;
+    AsyncTask<String, Void, MjpegInputStream> read = null;
     private MjpegView mv = null;
-    private int width = 320;
-    private int height = 240;
-    private boolean suspending = false;
+    ImageView hud;
 
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-    public ControllerManager(Context c, final TCPClient tcp, final int pollRate, String ip, boolean video) {
+    public ControllerManager(Context c, final TCPClient tcp, final int pollRate, String ip, int videoV) {
+        ((Communicator)c).setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         ((Communicator) c).setContentView(R.layout.controllayout);
-        ((Communicator) c).setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         this.tcp = tcp;
-        final int sleepTime = 1000 / pollRate;
         final ImageView leftForward;
         final ImageView leftBackwards;
         final ImageView rightForward;
         final ImageView rightBackwards;
-        final TextView debug;
 
+        boolean video = videoV == 0 ? false : true;
         leftForward = (ImageView) ((Communicator) c).findViewById(R.id.left_motor_forward);
         leftBackwards = (ImageView) ((Communicator) c).findViewById(R.id.left_motor_backwards);
         rightForward = (ImageView) ((Communicator) c).findViewById(R.id.right_motor_forward);
         rightBackwards = (ImageView) ((Communicator) c).findViewById(R.id.right_motor_backwards);
+        hud = (ImageView)((Communicator)c).findViewById(R.id.HUD);
 
         leftForward.setClickable(true);
         leftBackwards.setClickable(true);
@@ -110,20 +105,27 @@ public class ControllerManager {
 
         });
 
+
         URL = new String("http://" + "192.168.1.106" + ":8080/?action=stream");
 
-        //String URL = "http://trackfield.webcam.oregonstate.edu/axis-cgi/mjpg/video.cgi?resolution=800x600&amp%3bdummy=1333689998337";
+        mv = (MjpegView) ((Communicator) c).findViewById(R.id.mv);
 
-        mv = (MjpegView) ((Communicator)c).findViewById(R.id.mv);
+        if (video) {
+            mv.setVisibility(View.VISIBLE);
+            hud.setVisibility(View.VISIBLE);
+            read = new DoRead().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, URL);
+        }else{
+            mv.setVisibility(View.INVISIBLE);
+            hud.setVisibility(View.INVISIBLE);
+        }
 
-        new DoRead().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, URL);
+    }
 
-        //mv = (MjpegView) ((Communicator)c).findViewById(R.id.mv);
-//        if (mv != null) {
-//            mv.setResolution(width, height);
-//            Log.e("TCPClient", "Got here");
-//            new DoRead().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, URL);
-//        }
+    public void stopPlayback() {
+        if (read != null) {
+            mv.stopPlayback();
+            read.cancel(true);
+        }
     }
 
     public void toggleControl(int position, boolean value) {
@@ -152,10 +154,6 @@ public class ControllerManager {
         }
     }
 
-    public void stop() {
-        running = false;
-    }
-
     public class DoRead extends AsyncTask<String, Void, MjpegInputStream> {
         protected MjpegInputStream doInBackground(String... url) {
             //TODO: if camera has authentication deal with it and don't just not work
@@ -165,7 +163,7 @@ public class ControllerManager {
             try {
                 res = httpclient.execute(new HttpGet(URI.create(url[0])));
                 Log.d(TAG, "2. Request finished, status = " + res.getStatusLine().getStatusCode());
-                if(res.getStatusLine().getStatusCode()==401){
+                if (res.getStatusLine().getStatusCode() == 401) {
                     //You must turn off camera User Access Control before this will work
                     return null;
                 }

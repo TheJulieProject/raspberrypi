@@ -2,17 +2,18 @@ package com.uom.pimote;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.LinearLayout;
+import android.widget.TextView;
 
 public class Communicator extends Activity {
 
 
     private static final int NORMAL_CONTROL = 0;
     private static final int JOYSTICK_CONTROL = 1;
-
     private static int controlType = -1;
     TCPClient tcp;
     String ip;
@@ -22,7 +23,6 @@ public class Communicator extends Activity {
     RegularButtonManager regular = null;
     ControllerManager cm = null;
     boolean setup = false;
-
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -45,6 +45,8 @@ public class Communicator extends Activity {
     @Override
     protected void onPause() {
         super.onPause();
+        task.cancel(true);
+        if(cm!=null) cm.stopPlayback();
         finish();
     }
 
@@ -53,10 +55,10 @@ public class Communicator extends Activity {
         super.onStop();
         Log.d("pi", "Ending");
         tcp.stopClient();
-        task.cancel(true);
     }
 
     public void endActivity(String msg) {
+        if(cm!=null) cm.stopPlayback();
         Intent i = new Intent(this, Main.class);
         Bundle b = new Bundle();
         b.putString("pr", msg);
@@ -70,7 +72,10 @@ public class Communicator extends Activity {
         endActivity("");
     }
 
+    @Override
+    public void onConfigurationChanged(Configuration newConfig){
 
+    }
 
     public class connectTask extends AsyncTask<String, String, TCPClient> {
 
@@ -104,30 +109,32 @@ public class Communicator extends Activity {
             if (!setup) {
                 Log.e("TCPClient", "Setting up");
                 controlType = Integer.parseInt(info[0]);
-                if (controlType == JOYSTICK_CONTROL)
+                if (controlType == JOYSTICK_CONTROL) {
+
                     cm = new ControllerManager(Communicator.this, tcp,
-                            Integer.parseInt(info[1]), ip, true);
-                else
+                            Integer.parseInt(info[1]), ip, Integer.parseInt(info[2]));
+                } else {
                     regular = new RegularButtonManager(Communicator.this, tcp,
                             layout);
+                }
                 setup = true;
-//            } else {
-//                int type = Integer.parseInt(info[0]);
-//                String[] setup = new String[info.length - 1];
-//                for (int i = 1; i < info.length; i++) {
-//                    setup[i - 1] = info[i];
-//                }
-//                if (type == 0) {
-//                    if (controlType == NORMAL_CONTROL) {
-//
-//                        regular.addButtons(setup);
-//                    }
-//                } else if (type == 1) { //request to change text on a textview
-//                    Log.e("TCPClient", "Text is to be changed to: " + setup[1]);
-//                    TextView output = regular.getTextView(Integer.parseInt(setup[0]));
-//                    output.setText(setup[1]);
-//                }
-//
+            } else {
+                int type = Integer.parseInt(info[0]);
+                String[] setup = new String[info.length - 1];
+                for (int i = 1; i < info.length; i++) {
+                    setup[i - 1] = info[i];
+                }
+                if (type == 0) {
+                    if (controlType == NORMAL_CONTROL) {
+
+                        regular.addButtons(setup);
+                    }
+                } else if (type == 1) { //request to change text on a textview
+                    Log.e("TCPClient", "Text is to be changed to: " + setup[1]);
+                    TextView output = regular.getTextView(Integer.parseInt(setup[0]));
+                    output.setText(setup[1]);
+                }
+
             }
         }
     }

@@ -19,14 +19,14 @@ port = int(sys.argv[2])
 # Override Phone so you can control what you do with the messages
 #   "id" - the ID of the button that has been pressed
 #   "message" - the message sent by the phone. If no message it will be ""
-class MyPhone(ControllerPhone):
+class MyPhone(Phone):
 	#Override
-	def controlPress(self, direction):
-		print(str(direction))
+	def ButtonPressed(self, id, message):
+		print(message)
 
 # Create the phone object
 thisphone = MyPhone()
-
+thisphone.addButton(Button("Hello"))
 #Create the server
 myserver = PhoneServer()
 #Add the phone

@@ -65,6 +65,7 @@
             android:layout_alignParentTop="true"
             android:layout_toRightOf="@+id/left_motor_forward"
             android:layout_alignParentBottom="true"
-            android:layout_toLeftOf="@+id/right_motor_forward"/>
+            android:layout_toLeftOf="@+id/right_motor_forward"
+            android:alpha="1"/>
 
 </RelativeLayout>

@@ -288,6 +288,7 @@ class Phone():
 class ControllerPhone():
 	pollrate = 5
 	controltype = 1
+	video = False
 	def controlPress(self, type):
 		'''
 		0 - Forward
@@ -302,8 +303,13 @@ class ControllerPhone():
 		pass
 	def setPollRate(self, rate):
 		self.pollrate = rate
+	def setVideo(self, value):
+		self.video = value
 	def setup(self, socket):
-		socket.send(str(self.controltype) + "," + str(self.pollrate))
+		value = 0
+		if self.video == True:
+			value = 1
+		socket.send(str(self.controltype) + "," + str(self.pollrate)+","+str(value))
 
 class Button():
 	def __init__(self, name):

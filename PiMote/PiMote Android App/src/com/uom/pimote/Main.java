@@ -1,7 +1,5 @@
 package com.uom.pimote;
 
-import java.net.Socket;
-
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -10,6 +8,8 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+
+import java.net.Socket;
 
 public class Main extends Activity implements OnClickListener {
 
@@ -35,8 +35,8 @@ public class Main extends Activity implements OnClickListener {
 
 		ipField = (EditText) findViewById(R.id.ipAddress);
 		portField = (EditText) findViewById(R.id.portNo);
-		ipField.setText("192.168.1.10");
-		portField.setText("800");
+		ipField.setText("192.168.1.103");
+		portField.setText("8090");
 		connect = (Button) findViewById(R.id.connectBtn);
 		connect.setOnClickListener(this);
 	}
