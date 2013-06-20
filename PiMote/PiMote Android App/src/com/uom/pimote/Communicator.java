@@ -6,17 +6,6 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
 import android.widget.LinearLayout;
-import android.widget.TextView;
-
-import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.params.HttpConnectionParams;
-import org.apache.http.params.HttpParams;
-
-import java.io.IOException;
-import java.net.URI;
 
 public class Communicator extends Activity {
 
@@ -122,23 +111,23 @@ public class Communicator extends Activity {
                     regular = new RegularButtonManager(Communicator.this, tcp,
                             layout);
                 setup = true;
-            } else {
-                int type = Integer.parseInt(info[0]);
-                String[] setup = new String[info.length - 1];
-                for (int i = 1; i < info.length; i++) {
-                    setup[i - 1] = info[i];
-                }
-                if (type == 0) {
-                    if (controlType == NORMAL_CONTROL) {
-
-                        regular.addButtons(setup);
-                    }
-                } else if (type == 1) { //request to change text on a textview
-                    Log.e("TCPClient", "Text is to be changed to: " + setup[1]);
-                    TextView output = regular.getTextView(Integer.parseInt(setup[0]));
-                    output.setText(setup[1]);
-                }
-
+//            } else {
+//                int type = Integer.parseInt(info[0]);
+//                String[] setup = new String[info.length - 1];
+//                for (int i = 1; i < info.length; i++) {
+//                    setup[i - 1] = info[i];
+//                }
+//                if (type == 0) {
+//                    if (controlType == NORMAL_CONTROL) {
+//
+//                        regular.addButtons(setup);
+//                    }
+//                } else if (type == 1) { //request to change text on a textview
+//                    Log.e("TCPClient", "Text is to be changed to: " + setup[1]);
+//                    TextView output = regular.getTextView(Integer.parseInt(setup[0]));
+//                    output.setText(setup[1]);
+//                }
+//
             }
         }
     }

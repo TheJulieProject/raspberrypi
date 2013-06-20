@@ -61,7 +61,7 @@
             android:id="@+id/HUD"
             android:src="@drawable/preview_hud"
             android:contentDescription=""
-            android:visibility="invisible"
+            android:visibility="visible"
             android:layout_alignParentTop="true"
             android:layout_toRightOf="@+id/left_motor_forward"
             android:layout_alignParentBottom="true"

@@ -1,22 +1,21 @@
 package com.uom.pimote;
 
+import android.annotation.TargetApi;
 import android.content.Context;
+import android.content.pm.ActivityInfo;
 import android.os.AsyncTask;
-import android.os.Handler;
+import android.os.Build;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.content.pm.ActivityInfo;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.params.HttpConnectionParams;
-import org.apache.http.params.HttpParams;
 
 import java.io.IOException;
 import java.net.URI;
@@ -36,6 +35,7 @@ public class ControllerManager {
     private int height = 240;
     private boolean suspending = false;
 
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     public ControllerManager(Context c, final TCPClient tcp, final int pollRate, String ip, boolean video) {
         ((Communicator) c).setContentView(R.layout.controllayout);
         ((Communicator) c).setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
@@ -110,13 +110,20 @@ public class ControllerManager {
 
         });
 
-        URL = new String("http://" + ip + ":8080/?action=stream");
+        URL = new String("http://" + "192.168.1.106" + ":8080/?action=stream");
+
+        //String URL = "http://trackfield.webcam.oregonstate.edu/axis-cgi/mjpg/video.cgi?resolution=800x600&amp%3bdummy=1333689998337";
 
         mv = (MjpegView) ((Communicator)c).findViewById(R.id.mv);
-        if (mv != null) {
-            mv.setResolution(width, height);
-            new DoRead().execute(URL);
-        }
+
+        new DoRead().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, URL);
+
+        //mv = (MjpegView) ((Communicator)c).findViewById(R.id.mv);
+//        if (mv != null) {
+//            mv.setResolution(width, height);
+//            Log.e("TCPClient", "Got here");
+//            new DoRead().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, URL);
+//        }
     }
 
     public void toggleControl(int position, boolean value) {
@@ -149,19 +156,16 @@ public class ControllerManager {
         running = false;
     }
 
-
     public class DoRead extends AsyncTask<String, Void, MjpegInputStream> {
         protected MjpegInputStream doInBackground(String... url) {
             //TODO: if camera has authentication deal with it and don't just not work
             HttpResponse res = null;
             DefaultHttpClient httpclient = new DefaultHttpClient();
-            HttpParams httpParams = httpclient.getParams();
-            HttpConnectionParams.setConnectionTimeout(httpParams, 5 * 1000);
             Log.d(TAG, "1. Sending http request");
             try {
                 res = httpclient.execute(new HttpGet(URI.create(url[0])));
                 Log.d(TAG, "2. Request finished, status = " + res.getStatusLine().getStatusCode());
-                if (res.getStatusLine().getStatusCode() == 401) {
+                if(res.getStatusLine().getStatusCode()==401){
                     //You must turn off camera User Access Control before this will work
                     return null;
                 }
@@ -175,14 +179,14 @@ public class ControllerManager {
                 Log.d(TAG, "Request failed-IOException", e);
                 //Error connecting to camera
             }
+
             return null;
         }
 
         protected void onPostExecute(MjpegInputStream result) {
             mv.setSource(result);
-            if (result != null) result.setSkip(1);
             mv.setDisplayMode(MjpegView.SIZE_BEST_FIT);
-            mv.showFps(false);
+            mv.showFps(true);
         }
     }
 }
