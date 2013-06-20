@@ -14,7 +14,7 @@ public class ControllerManager {
     boolean running = true;
     boolean forwardPress, backPress, leftPress, rightPress = false;
     TCPClient tcp;
-    
+
     Thread t;
 
     public ControllerManager(Context c, final TCPClient tcp, final int pollRate) {
