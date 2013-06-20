@@ -21,13 +21,13 @@
             android:layout_alignParentRight="true"/>
 
     <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="300dp"
+            android:layout_width="200dp"
+            android:layout_height="wrap_content"
             android:id="@+id/debugText"
-            android:layout_below="@+id/left_motor_forward"
             android:layout_alignParentLeft="true"
-            android:layout_marginTop="12dp"
-            android:layout_alignParentRight="true"/>
+            android:layout_alignParentRight="true"
+            android:layout_above="@+id/left_motor_backwards"
+            android:layout_below="@+id/left_motor_forward"/>
 
     <ImageView
             android:layout_width="100dp"
@@ -44,4 +44,22 @@
             android:layout_alignParentBottom="true"
             android:layout_alignParentRight="true"
             android:src="@drawable/ic_action_backwards"/>
+
+    <com.uom.pimote.MjpegView
+            android:id="@+id/mv"
+            android:layout_width="320dp"
+            android:layout_height="240dp"
+            android:layout_weight="1"
+            android:layout_centerVertical="true"
+            android:layout_alignLeft="@+id/HUD"/>
+
+    <ImageView
+            android:layout_width="320dp"
+            android:layout_height="240dp"
+            android:id="@+id/HUD"
+            android:src="@drawable/preview_hud"
+            android:contentDescription=""
+            android:layout_centerVertical="true"
+            android:layout_centerHorizontal="true"/>
+
 </RelativeLayout>
