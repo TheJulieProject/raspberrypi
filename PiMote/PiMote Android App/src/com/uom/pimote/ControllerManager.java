@@ -1,7 +1,9 @@
 package com.uom.pimote;
 
 import android.content.Context;
+import android.os.AsyncTask;
 import android.os.Handler;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
@@ -9,15 +11,32 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.content.pm.ActivityInfo;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.client.ClientProtocolException;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.params.HttpConnectionParams;
+import org.apache.http.params.HttpParams;
+
+import java.io.IOException;
+import java.net.URI;
+
 public class ControllerManager {
 
     boolean running = true;
     boolean forwardPress, backPress, leftPress, rightPress = false;
     TCPClient tcp;
 
-    Thread t;
+    // Mjpeg streamer variables
+    private static final String TAG = "MJPEG";
+    private static final int REQUEST_SETTINGS = 0;
+    String URL;
+    private MjpegView mv = null;
+    private int width = 320;
+    private int height = 240;
+    private boolean suspending = false;
 
-    public ControllerManager(Context c, final TCPClient tcp, final int pollRate) {
+    public ControllerManager(Context c, final TCPClient tcp, final int pollRate, String ip, boolean video) {
         ((Communicator) c).setContentView(R.layout.controllayout);
         ((Communicator) c).setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         this.tcp = tcp;
@@ -32,7 +51,6 @@ public class ControllerManager {
         leftBackwards = (ImageView) ((Communicator) c).findViewById(R.id.left_motor_backwards);
         rightForward = (ImageView) ((Communicator) c).findViewById(R.id.right_motor_forward);
         rightBackwards = (ImageView) ((Communicator) c).findViewById(R.id.right_motor_backwards);
-        debug = (TextView) ((Communicator) c).findViewById(R.id.debugText);
 
         leftForward.setClickable(true);
         leftBackwards.setClickable(true);
@@ -92,48 +110,13 @@ public class ControllerManager {
 
         });
 
-        final Handler handler = new Handler();
-        t = new Thread() {
-            public void run() {
-                while (running) {
-                    handler.post(new Runnable() {
-                        public void run() {
-                            debug.setText("DEBUG\n\nPoll Rate: " + pollRate + "/s\nF: " + forwardPress
-                                    + "\nB: " + backPress + "\nL: " + leftPress
-                                    + "\nR: " + rightPress);
-                        }
-                    });
-                    if (forwardPress) {
-                        if (rightPress) {
-                            tcp.sendMessage("2");
-                        } else if (leftPress) {
-                            tcp.sendMessage("1");
-                        } else {
-                            tcp.sendMessage("0");
-                        }
-                    } else if (backPress) {
-                        if (rightPress) {
-                            tcp.sendMessage("5");
-                        } else if (leftPress) {
-                            tcp.sendMessage("4");
-                        } else {
-                            tcp.sendMessage("3");
-                        }
-                    } else if (rightPress) {
-                        tcp.sendMessage("6");
-                    } else if (leftPress) {
-                        tcp.sendMessage("7");
-                    }
+        URL = new String("http://" + ip + ":8080/?action=stream");
 
-                    try {
-                        sleep(sleepTime);
-                    } catch (Exception e) {
-                    }
-                }
-            }
-        };
-
-        //t.start();
+        mv = (MjpegView) ((Communicator)c).findViewById(R.id.mv);
+        if (mv != null) {
+            mv.setResolution(width, height);
+            new DoRead().execute(URL);
+        }
     }
 
     public void toggleControl(int position, boolean value) {
@@ -164,5 +147,42 @@ public class ControllerManager {
 
     public void stop() {
         running = false;
+    }
+
+
+    public class DoRead extends AsyncTask<String, Void, MjpegInputStream> {
+        protected MjpegInputStream doInBackground(String... url) {
+            //TODO: if camera has authentication deal with it and don't just not work
+            HttpResponse res = null;
+            DefaultHttpClient httpclient = new DefaultHttpClient();
+            HttpParams httpParams = httpclient.getParams();
+            HttpConnectionParams.setConnectionTimeout(httpParams, 5 * 1000);
+            Log.d(TAG, "1. Sending http request");
+            try {
+                res = httpclient.execute(new HttpGet(URI.create(url[0])));
+                Log.d(TAG, "2. Request finished, status = " + res.getStatusLine().getStatusCode());
+                if (res.getStatusLine().getStatusCode() == 401) {
+                    //You must turn off camera User Access Control before this will work
+                    return null;
+                }
+                return new MjpegInputStream(res.getEntity().getContent());
+            } catch (ClientProtocolException e) {
+                e.printStackTrace();
+                Log.d(TAG, "Request failed-ClientProtocolException", e);
+                //Error connecting to camera
+            } catch (IOException e) {
+                e.printStackTrace();
+                Log.d(TAG, "Request failed-IOException", e);
+                //Error connecting to camera
+            }
+            return null;
+        }
+
+        protected void onPostExecute(MjpegInputStream result) {
+            mv.setSource(result);
+            if (result != null) result.setSkip(1);
+            mv.setDisplayMode(MjpegView.SIZE_BEST_FIT);
+            mv.showFps(false);
+        }
     }
 }
