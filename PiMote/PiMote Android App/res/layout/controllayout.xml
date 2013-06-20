@@ -50,8 +50,10 @@
             android:layout_width="320dp"
             android:layout_height="240dp"
             android:layout_weight="1"
-            android:layout_centerVertical="true"
-            android:layout_alignLeft="@+id/HUD"/>
+            android:layout_alignParentBottom="true"
+            android:layout_toLeftOf="@+id/right_motor_forward"
+            android:layout_alignParentTop="true"
+            android:layout_toRightOf="@+id/left_motor_forward"/>
 
     <ImageView
             android:layout_width="320dp"
@@ -59,7 +61,10 @@
             android:id="@+id/HUD"
             android:src="@drawable/preview_hud"
             android:contentDescription=""
-            android:layout_centerVertical="true"
-            android:layout_centerHorizontal="true"/>
+            android:visibility="visible"
+            android:layout_alignParentTop="true"
+            android:layout_toRightOf="@+id/left_motor_forward"
+            android:layout_alignParentBottom="true"
+            android:layout_toLeftOf="@+id/right_motor_forward"/>
 
 </RelativeLayout>

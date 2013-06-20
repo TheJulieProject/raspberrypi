@@ -1,2 +1,9 @@
-.DS_Store
+*.DS_Store
+PiMote/PiMote Android App/.idea/workspace.xml
+*.class
+*.pyc
+PiMote/PiMote Android App/.idea/workspace.xml
+
+PiMote/PiMote Android App/project.properties
+
 PiMote/PiMote Android App/.idea/workspace.xml
