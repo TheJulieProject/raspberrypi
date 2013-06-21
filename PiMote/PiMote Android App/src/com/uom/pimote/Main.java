@@ -9,16 +9,10 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
-import java.net.Socket;
-
 public class Main extends Activity implements OnClickListener {
 
 	EditText ipField, portField;
 	Button connect;
-
-	Socket socket;
-
-	TCPClient tcp;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -35,8 +29,8 @@ public class Main extends Activity implements OnClickListener {
 
 		ipField = (EditText) findViewById(R.id.ipAddress);
 		portField = (EditText) findViewById(R.id.portNo);
-		ipField.setText("192.168.1.103");
-		portField.setText("8090");
+        ipField.setText("192.168.0.5");
+        portField.setText("8090");
 		connect = (Button) findViewById(R.id.connectBtn);
 		connect.setOnClickListener(this);
 	}
