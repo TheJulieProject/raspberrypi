@@ -20,7 +20,7 @@ public class Communicator extends Activity {
     private static final int REQUEST_CODE = 1234;
     private static int controlType = -1;
     TCPClient tcp;
-    String ip;
+    String ip, password;
     int port;
     AsyncTask<String, String, TCPClient> task = null;
     RegularButtonManager regular = null;
@@ -35,6 +35,7 @@ public class Communicator extends Activity {
 
         try {
             Bundle b = getIntent().getExtras();
+            password = b.getString("password");
             port = b.getInt("port");
             ip = b.getString("ip");
         } catch (Exception e) {
@@ -43,8 +44,6 @@ public class Communicator extends Activity {
 
         if (task == null)
             task = new connectTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, "");
-
-
     }
 
     /* Fire an intent to start the voice recognition activity. */

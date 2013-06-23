@@ -11,3 +11,13 @@ PiMote/PiMote Android App/.idea/workspace.xml
 *.pyc
 
 .DS_Store
+
+PiMote/PiMote Android App/out/production/PiMote/PiMote.apk.res
+
+*.dex
+
+PiMote/PiMote Android App/out/production/PiMote/classes.dex
+
+PiMote/PiMote Android App/out/production/PiMote/classes.dex
+
+.DS_Store

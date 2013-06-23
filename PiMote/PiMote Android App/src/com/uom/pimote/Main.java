@@ -11,7 +11,7 @@ import android.widget.Toast;
 
 public class Main extends Activity implements OnClickListener {
 
-    EditText ipField, portField;
+    EditText ipField, portField, passwordField;
     Button connect;
 
     @Override
@@ -29,9 +29,11 @@ public class Main extends Activity implements OnClickListener {
 
         ipField = (EditText) findViewById(R.id.ipAddress);
         portField = (EditText) findViewById(R.id.portNo);
+        passwordField = (EditText) findViewById(R.id.passwordText);
 
         ipField.setText("10.0.2.7");
         portField.setText("8090");
+        passwordField.setText("");
 
         connect = (Button) findViewById(R.id.connectBtn);
         connect.setOnClickListener(this);
@@ -42,17 +44,20 @@ public class Main extends Activity implements OnClickListener {
         try {
             String ip = ipField.getText().toString();
             String portNo = portField.getText().toString();
-            if (ip == null || portNo == null) throw new Exception();
+            String password = passwordField.getText().toString();
+
+            if (ip == null || portNo == null || password == null) throw new Exception();
             int port = Integer.parseInt(portField.getText().toString());
             Intent i = new Intent(this, Communicator.class);
             Bundle b = new Bundle();
             b.putString("ip", ip);
             b.putInt("port", port);
+            b.putString("password", password);
             i.putExtras(b);
             startActivity(i);
             finish();
         } catch (Exception e) {
-            Toast.makeText(this, "Please input a valid IP and Port Number",
+            Toast.makeText(this, "Please input a valid IP, Port Number, and Password",
                     Toast.LENGTH_LONG).show();
         }
     }
