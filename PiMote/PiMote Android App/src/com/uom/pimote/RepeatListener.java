@@ -11,18 +11,16 @@ import android.view.View.OnTouchListener;
  * It cyclically runs a clickListener, emulating keyboard-like behaviour. First
  * click is fired immediately, next after initialInterval, and subsequent after
  * normalInterval.
- *
+ * <p/>
  * <p>Interval is scheduled after the onClick completes, so it has to run fast.
  * If it runs slow, it does not generate skipped onClicks.
  */
 public class RepeatListener implements OnTouchListener {
 
-    private Handler handler = new Handler();
-
-    private int initialInterval;
     private final int normalInterval;
     private final OnClickListener clickListener;
-
+    private Handler handler = new Handler();
+    private int initialInterval;
     private Runnable handlerRunnable = new Runnable() {
         @Override
         public void run() {
@@ -30,18 +28,17 @@ public class RepeatListener implements OnTouchListener {
             clickListener.onClick(downView);
         }
     };
-
     private View downView;
 
     /**
      * @param initialInterval The interval after first click event
-     * @param normalInterval The interval after second and subsequent click 
-     *       events
-     * @param clickListener The OnClickListener, that will be called
-     *       periodically
+     * @param normalInterval  The interval after second and subsequent click
+     *                        events
+     * @param clickListener   The OnClickListener, that will be called
+     *                        periodically
      */
-    public RepeatListener(int initialInterval, int normalInterval, 
-            OnClickListener clickListener) {
+    public RepeatListener(int initialInterval, int normalInterval,
+                          OnClickListener clickListener) {
         if (clickListener == null)
             throw new IllegalArgumentException("null runnable");
         if (initialInterval < 0 || normalInterval < 0)
@@ -54,16 +51,16 @@ public class RepeatListener implements OnTouchListener {
 
     public boolean onTouch(View view, MotionEvent motionEvent) {
         switch (motionEvent.getAction()) {
-        case MotionEvent.ACTION_DOWN:
-            handler.removeCallbacks(handlerRunnable);
-            handler.postDelayed(handlerRunnable, initialInterval);
-            downView = view;
-            clickListener.onClick(view);
-            break;
-        case MotionEvent.ACTION_UP:
-            handler.removeCallbacks(handlerRunnable);
-            downView = null;
-            break;
+            case MotionEvent.ACTION_DOWN:
+                handler.removeCallbacks(handlerRunnable);
+                handler.postDelayed(handlerRunnable, initialInterval);
+                downView = view;
+                clickListener.onClick(view);
+                break;
+            case MotionEvent.ACTION_UP:
+                handler.removeCallbacks(handlerRunnable);
+                downView = null;
+                break;
         }
         return false;
     }

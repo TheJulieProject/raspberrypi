@@ -1,10 +1,7 @@
 package com.uom.pimote;
 
-import android.annotation.TargetApi;
 import android.content.Context;
-import android.content.pm.ActivityInfo;
 import android.os.AsyncTask;
-import android.os.Build;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -27,13 +24,11 @@ public class ControllerManager {
     TCPClient tcp;
     String URL;
     AsyncTask<String, Void, MjpegInputStream> read = null;
-    private MjpegView mv = null;
     ImageView hud;
+    private MjpegView mv = null;
 
-    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     public ControllerManager(final Context c, final TCPClient tcp, final int pollRate, String ip, int videoV, int voiceV) {
-        ((Communicator) c).setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-        ((Communicator) c).setContentView(R.layout.controllayout);
+
         this.tcp = tcp;
         final ImageView leftForward;
         final ImageView leftBackwards;
@@ -48,7 +43,7 @@ public class ControllerManager {
         rightForward = (ImageView) ((Communicator) c).findViewById(R.id.right_motor_forward);
         rightBackwards = (ImageView) ((Communicator) c).findViewById(R.id.right_motor_backwards);
         microphone = (ImageView) ((Communicator) c).findViewById(R.id.microphone);
-        hud = (ImageView)((Communicator)c).findViewById(R.id.HUD);
+        hud = (ImageView) ((Communicator) c).findViewById(R.id.HUD);
 
         leftForward.setClickable(true);
         leftBackwards.setClickable(true);
@@ -113,11 +108,11 @@ public class ControllerManager {
             microphone.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    ((Communicator)c).startVoiceRecognition();
+                    ((Communicator) c).startVoiceRecognition();
                 } // onClick()
             });
             microphone.setVisibility(View.VISIBLE);
-        }else{
+        } else {
             microphone.setVisibility(View.INVISIBLE);
         } // if - else
 
@@ -129,7 +124,7 @@ public class ControllerManager {
             mv.setVisibility(View.VISIBLE);
             hud.setVisibility(View.VISIBLE);
             read = new DoRead().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, URL);
-        }else{
+        } else {
             mv.setVisibility(View.INVISIBLE);
             hud.setVisibility(View.INVISIBLE);
         }

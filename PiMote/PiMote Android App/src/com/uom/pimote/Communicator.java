@@ -17,23 +17,20 @@ public class Communicator extends Activity {
 
     private static final int NORMAL_CONTROL = 0;
     private static final int JOYSTICK_CONTROL = 1;
+    private static final int REQUEST_CODE = 1234;
     private static int controlType = -1;
     TCPClient tcp;
     String ip;
     int port;
-    LinearLayout layout;
-    AsyncTask<String, String, TCPClient> task;
+    AsyncTask<String, String, TCPClient> task = null;
     RegularButtonManager regular = null;
     ControllerManager cm = null;
     boolean setup = false;
 
-    private static final int REQUEST_CODE = 1234;
-
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+        //setContentView(R.layout.activity_main);
 
         try {
             Bundle b = getIntent().getExtras();
@@ -42,8 +39,9 @@ public class Communicator extends Activity {
         } catch (Exception e) {
             endActivity("Bad Arguments");
         }
-        layout = (LinearLayout) findViewById(R.id.mainlayout);
-        task = new connectTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, "");
+
+        if (task == null)
+            task = new connectTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, "");
 
 
     }
@@ -59,10 +57,8 @@ public class Communicator extends Activity {
 
     /* Handle the results from the voice recognition activity. */
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data)
-    {
-        if (requestCode == REQUEST_CODE && resultCode == RESULT_OK)
-        {
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REQUEST_CODE && resultCode == RESULT_OK) {
             // Populate the wordsList with the String values the recognition engine thought it heard
             ArrayList<String> matches = data.getStringArrayListExtra(
                     RecognizerIntent.EXTRA_RESULTS);
@@ -75,16 +71,16 @@ public class Communicator extends Activity {
     protected void onStop() {
         super.onStop();
         task.cancel(true);
-        if(cm!=null) cm.stopPlayback();
-        if(regular!=null)regular.stop();
+        if (cm != null) cm.stopPlayback();
+        if (regular != null) regular.stop();
         finish();
-        Log.d("pi", "Ending");
+        Log.e("pi", "Ending");
         tcp.stopClient();
     }
 
     public void endActivity(String msg) {
-        if(cm!=null) cm.stopPlayback();
-        if(regular!=null)regular.stop();
+        if (cm != null) cm.stopPlayback();
+        if (regular != null) regular.stop();
         Intent i = new Intent(this, Main.class);
         Bundle b = new Bundle();
         b.putString("pr", msg);
@@ -131,16 +127,21 @@ public class Communicator extends Activity {
                 Log.e("TCPClient", "Setting up");
                 controlType = Integer.parseInt(info[0]);
                 if (controlType == JOYSTICK_CONTROL) {
+                    getActionBar().hide();
+                    setContentView(R.layout.controllayout);
                     setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
                     cm = new ControllerManager(Communicator.this, tcp,
                             Integer.parseInt(info[1]), ip, Integer.parseInt(info[2]), Integer.parseInt(info[3]));
                 } else {
+                    getActionBar().show();
                     setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+                    setContentView(R.layout.activity_main);
+                    LinearLayout layout = (LinearLayout) findViewById(R.id.mainlayout);
                     regular = new RegularButtonManager(Communicator.this, tcp,
                             layout);
                 }
                 setup = true;
-            } else {
+            } else { //setup was done
                 int type = Integer.parseInt(info[0]);
                 String[] setup = new String[info.length - 1];
                 for (int i = 1; i < info.length; i++) {
@@ -151,7 +152,6 @@ public class Communicator extends Activity {
                         regular.addButtons(setup);
                     }
                 } else if (type == 1) { //request to change text on a textview
-                    Log.e("TCPClient", "Text is to be changed to: " + setup[1]);
                     TextView output = regular.getTextView(Integer.parseInt(setup[0]));
                     output.setText(setup[1]);
                 }

@@ -1,7 +1,6 @@
 package com.uom.pimote;
 
 import android.content.Context;
-import android.content.pm.ActivityInfo;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.view.View;
@@ -25,8 +24,6 @@ import java.util.ArrayList;
 
 public class RegularButtonManager {
 
-
-    //TextView[] outputs;
     TCPClient tcp;
     Context c;
     LinearLayout layout;
@@ -38,7 +35,7 @@ public class RegularButtonManager {
         this.c = c;
         this.tcp = tcp;
         this.layout = layout;
-        ((Communicator) c).setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        //((Communicator) c).setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         outputs = new ArrayList<TextView>();
     }
 
@@ -137,8 +134,8 @@ public class RegularButtonManager {
         TextView text = new TextView(c);
         text.setTextSize(18);
         text.setLayoutParams(params);
-        if(setup.length == 3)
-        text.setText(setup[2]);
+        if (setup.length == 3)
+            text.setText(setup[2]);
         layout.addView(text);
         outputs.add(text);
     }
@@ -150,10 +147,10 @@ public class RegularButtonManager {
     public void addNewFeed(String[] setup) {
         Log.e("MJPG", setup[1]);
         String URL = "http://" + setup[1] + ":8080/?action=stream";
-        mv = (MjpegView)((Communicator)c).findViewById(R.id.mv2);
+        mv = (MjpegView) ((Communicator) c).findViewById(R.id.mv2);
         read = new DoRead().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, URL);
-        LayoutParams params = new LayoutParams(Integer.parseInt(setup[2]),Integer.parseInt(setup[3]));
-        params.setMargins(0,10,0,10);
+        LayoutParams params = new LayoutParams(Integer.parseInt(setup[2]), Integer.parseInt(setup[3]));
+        params.setMargins(0, 10, 0, 10);
         mv.setLayoutParams(params);
         mv.setVisibility(View.VISIBLE);
         Log.e("MJPG", mv.getMeasuredWidth() + "," + mv.getMeasuredHeight());
