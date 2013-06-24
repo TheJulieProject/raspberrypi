@@ -37,7 +37,7 @@ public class Communicator extends Activity {
             endActivity("Bad Arguments");
         }
         layout = (LinearLayout) findViewById(R.id.mainlayout);
-        task = new connectTask().execute("");
+        task = new connectTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, "");
 
 
     }
@@ -47,6 +47,7 @@ public class Communicator extends Activity {
         super.onPause();
         task.cancel(true);
         if(cm!=null) cm.stopPlayback();
+        if(regular!=null) regular.stop();
         finish();
     }
 
@@ -126,7 +127,6 @@ public class Communicator extends Activity {
                 }
                 if (type == 0) {
                     if (controlType == NORMAL_CONTROL) {
-
                         regular.addButtons(setup);
                     }
                 } else if (type == 1) { //request to change text on a textview

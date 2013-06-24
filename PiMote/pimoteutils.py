@@ -246,11 +246,13 @@ class PhoneServer(Server):
 class Phone():
 	buttons = []
 	outputs = []
+	video = False
 	controltype = 0
 	INPUT_REGULAR = 1
 	INPUT_TEXT = 2
 	INPUT_TOGGLE = 3
 	OUTPUT_TEXT = 4
+	VIDEO_FEED = 5
 	def addButton(self, button):
 		if isinstance(button, Button):
 			button.id = len(self.buttons)
@@ -263,6 +265,13 @@ class Phone():
 			self.outputs.append(output)
 		else:
 			print("Not an output")
+	def addVideoFeed(self, vid):
+		if self.video:
+			print("You can only have one video feed running..")
+			sys.exit(0)
+		else:
+			self.vid = vid
+			self.video = True
 	def buttonPressed(self, id, msg):
 		pass
 	def getButtons(self):
@@ -275,6 +284,8 @@ class Phone():
 		for o in self.outputs:
 			o.socket = socket
 			o.setup(socket)
+		if self.video == True:
+			self.vid.setup(socket)
 	def updateButtons(self, id, message):
 		for b in self.buttons:
 			if b.id == id:
@@ -362,3 +373,12 @@ class OutputText():
 		self.socket.send(str(1)+","+str(self.id)+","+str(self.message))
 	def setup(self, socket):
 		socket.send(str(0)+","+str(self.type)+","+str(self.id)+","+str(self.message)) 
+
+class VideoFeed():
+	def __init__(self, theip, width, height):
+		self.ip = theip
+		self.type = Phone.VIDEO_FEED
+		self.width = width
+		self.height = height
+	def setup(self, socket):
+		socket.send(str(0)+","+str(self.type)+","+self.ip+","+str(self.width)+","+str(self.height))

@@ -41,11 +41,13 @@ b1 = Button("Hello")
 b2 = ToggleButton("This is a toggle button", True)
 b3 = InputText("Input text here")
 o1 = OutputText("Hello")
+v = VideoFeed("192.168.0.11", 200, 200)
 
 thisphone.addButton(b1)
 thisphone.addButton(b2)
 thisphone.addButton(b3)
 thisphone.addOutput(o1)
+thisphone.addVideoFeed(v)
 #Create the server
 myserver = PhoneServer()
 #Add the phone
