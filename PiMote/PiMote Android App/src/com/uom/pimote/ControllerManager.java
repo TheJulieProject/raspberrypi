@@ -31,26 +31,30 @@ public class ControllerManager {
     ImageView hud;
 
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
-    public ControllerManager(Context c, final TCPClient tcp, final int pollRate, String ip, int videoV) {
-        ((Communicator)c).setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+    public ControllerManager(final Context c, final TCPClient tcp, final int pollRate, String ip, int videoV, int voiceV) {
+        ((Communicator) c).setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         ((Communicator) c).setContentView(R.layout.controllayout);
         this.tcp = tcp;
         final ImageView leftForward;
         final ImageView leftBackwards;
         final ImageView rightForward;
         final ImageView rightBackwards;
+        final ImageView microphone;
 
         boolean video = videoV == 0 ? false : true;
+        boolean voice = voiceV == 0 ? false : true;
         leftForward = (ImageView) ((Communicator) c).findViewById(R.id.left_motor_forward);
         leftBackwards = (ImageView) ((Communicator) c).findViewById(R.id.left_motor_backwards);
         rightForward = (ImageView) ((Communicator) c).findViewById(R.id.right_motor_forward);
         rightBackwards = (ImageView) ((Communicator) c).findViewById(R.id.right_motor_backwards);
+        microphone = (ImageView) ((Communicator) c).findViewById(R.id.microphone);
         hud = (ImageView)((Communicator)c).findViewById(R.id.HUD);
 
         leftForward.setClickable(true);
         leftBackwards.setClickable(true);
         rightForward.setClickable(true);
         rightBackwards.setClickable(true);
+        microphone.setClickable(true);
 
         leftForward.setOnTouchListener(new OnTouchListener() {
 
@@ -105,6 +109,17 @@ public class ControllerManager {
 
         });
 
+        if (voice) {
+            microphone.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    ((Communicator)c).startVoiceRecognition();
+                } // onClick()
+            });
+            microphone.setVisibility(View.VISIBLE);
+        }else{
+            microphone.setVisibility(View.INVISIBLE);
+        } // if - else
 
         URL = new String("http://" + ip + ":8080/?action=stream");
 

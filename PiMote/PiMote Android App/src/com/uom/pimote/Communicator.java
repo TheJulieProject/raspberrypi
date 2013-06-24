@@ -5,9 +5,12 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.speech.RecognizerIntent;
 import android.util.Log;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
+import java.util.ArrayList;
 
 public class Communicator extends Activity {
 
@@ -23,6 +26,9 @@ public class Communicator extends Activity {
     RegularButtonManager regular = null;
     ControllerManager cm = null;
     boolean setup = false;
+
+    private static final int REQUEST_CODE = 1234;
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -42,17 +48,35 @@ public class Communicator extends Activity {
 
     }
 
+    /* Fire an intent to start the voice recognition activity. */
+    public void startVoiceRecognition() {
+        Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
+        intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
+                RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
+        intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Voice recognition Demo...");
+        startActivityForResult(intent, REQUEST_CODE);
+    } // startRecording()
+
+    /* Handle the results from the voice recognition activity. */
     @Override
-    protected void onPause() {
-        super.onPause();
-        task.cancel(true);
-        if(cm!=null) cm.stopPlayback();
-        finish();
-    }
+    protected void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        if (requestCode == REQUEST_CODE && resultCode == RESULT_OK)
+        {
+            // Populate the wordsList with the String values the recognition engine thought it heard
+            ArrayList<String> matches = data.getStringArrayListExtra(
+                    RecognizerIntent.EXTRA_RESULTS);
+            tcp.sendMessage(matches.get(0));
+        }
+        super.onActivityResult(requestCode, resultCode, data);
+    } // onActivityResult()
 
     @Override
     protected void onStop() {
         super.onStop();
+        task.cancel(true);
+        if(cm!=null) cm.stopPlayback();
+        finish();
         Log.d("pi", "Ending");
         tcp.stopClient();
     }
@@ -112,7 +136,7 @@ public class Communicator extends Activity {
                 if (controlType == JOYSTICK_CONTROL) {
 
                     cm = new ControllerManager(Communicator.this, tcp,
-                            Integer.parseInt(info[1]), ip, Integer.parseInt(info[2]));
+                            Integer.parseInt(info[1]), ip, Integer.parseInt(info[2]), Integer.parseInt(info[3]));
                 } else {
                     regular = new RegularButtonManager(Communicator.this, tcp,
                             layout);

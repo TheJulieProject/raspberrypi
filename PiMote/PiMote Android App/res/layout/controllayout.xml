@@ -44,7 +44,8 @@
             android:id="@+id/right_motor_backwards"
             android:layout_alignParentBottom="true"
             android:layout_alignParentRight="true"
-            android:src="@drawable/ic_action_backwards"/>
+            android:src="@drawable/ic_action_backwards"
+            android:background="@color/black"/>
 
     <com.uom.pimote.MjpegView
             android:id="@+id/mv"
@@ -68,5 +69,16 @@
             android:layout_alignParentBottom="true"
             android:layout_toLeftOf="@+id/right_motor_forward"
             android:alpha="1"/>
+
+    <ImageView
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:id="@+id/microphone"
+            android:src="@drawable/mic"
+            android:scaleType="centerCrop"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"
+            android:clickable="false"
+            android:cropToPadding="false"/>
 
 </RelativeLayout>
