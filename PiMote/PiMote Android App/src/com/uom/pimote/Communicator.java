@@ -76,6 +76,7 @@ public class Communicator extends Activity {
         super.onStop();
         task.cancel(true);
         if(cm!=null) cm.stopPlayback();
+        if(regular!=null)regular.stop();
         finish();
         Log.d("pi", "Ending");
         tcp.stopClient();
@@ -83,6 +84,7 @@ public class Communicator extends Activity {
 
     public void endActivity(String msg) {
         if(cm!=null) cm.stopPlayback();
+        if(regular!=null)regular.stop();
         Intent i = new Intent(this, Main.class);
         Bundle b = new Bundle();
         b.putString("pr", msg);
