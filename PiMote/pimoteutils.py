@@ -227,7 +227,7 @@ class PhoneServer(Server):
 			self.phone.updateButtons(int(id), msg)
 			self.phone.buttonPressed(int(id), msg)
 		elif isinstance(self.phone, ControllerPhone):
-			self.phone.controlPress(int(message))
+			self.phone.controlPress(message)
 		
 		# Signify all is well
 		return True
@@ -300,6 +300,7 @@ class Phone():
 class ControllerPhone():
 	controltype = 1
 	video = False
+	voice = False
 	def controlPress(self, type):
 		'''
 		0 - Forward
@@ -314,11 +315,15 @@ class ControllerPhone():
 		pass
 	def setVideo(self, value):
 		self.video = value
+	def setVoice(self, value):
+		self.voice = value
 	def setup(self, socket):
-		value = 0
+		voiceV = videoV = 0
 		if self.video == True:
-			value = 1
-		socket.send(str(self.controltype) + "," + str(self.pollrate)+","+str(value))
+			videoV = 1
+		if self.voice == True:
+			voiceV = 1
+		socket.send(str(self.controltype) + "," + str(videoV) + "," + str(voiceV))
 
 
 
