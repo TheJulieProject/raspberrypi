@@ -210,7 +210,7 @@ class Client(Receiver):
 		self.stop()
 
 
-###################################################################################################################################
+########################-------SERVER-------########################################
 
 
 class PhoneServer(Server):
@@ -241,6 +241,7 @@ class PhoneServer(Server):
 		print("Phone disconnected")
 		return True
 
+################------PHONE TYPES--------####################
 
 class Phone():
 	buttons = []
@@ -286,7 +287,6 @@ class Phone():
 
 
 class ControllerPhone():
-	pollrate = 5
 	controltype = 1
 	video = False
 	def controlPress(self, type):
@@ -301,8 +301,6 @@ class ControllerPhone():
 		7 - Left
 		'''
 		pass
-	def setPollRate(self, rate):
-		self.pollrate = rate
 	def setVideo(self, value):
 		self.video = value
 	def setup(self, socket):
@@ -310,6 +308,10 @@ class ControllerPhone():
 		if self.video == True:
 			value = 1
 		socket.send(str(self.controltype) + "," + str(self.pollrate)+","+str(value))
+
+
+
+####################----COMPONENTS----######################
 
 class Button():
 	def __init__(self, name):
@@ -323,7 +325,7 @@ class Button():
 	def getType(self):
 		return self.type
 	def setup(self, socket):
-		socket.send(str(0)+","+str(Phone.INPUT_REGULAR) + "," + str(self.id) + "," + str(self.name))
+		socket.send(str(0)+","+str(self.type) + "," + str(self.id) + "," + str(self.name))
 
 class InputText(Button):
 	def __init__(self, name):
