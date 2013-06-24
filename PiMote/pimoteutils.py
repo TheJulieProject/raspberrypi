@@ -210,7 +210,7 @@ class Client(Receiver):
 		self.stop()
 
 
-###################################################################################################################################
+########################-------SERVER-------########################################
 
 
 class PhoneServer(Server):
@@ -241,15 +241,18 @@ class PhoneServer(Server):
 		print("Phone disconnected")
 		return True
 
+################------PHONE TYPES--------####################
 
 class Phone():
 	buttons = []
 	outputs = []
+	video = False
 	controltype = 0
 	INPUT_REGULAR = 1
 	INPUT_TEXT = 2
 	INPUT_TOGGLE = 3
 	OUTPUT_TEXT = 4
+	VIDEO_FEED = 5
 	def addButton(self, button):
 		if isinstance(button, Button):
 			button.id = len(self.buttons)
@@ -262,6 +265,13 @@ class Phone():
 			self.outputs.append(output)
 		else:
 			print("Not an output")
+	def addVideoFeed(self, vid):
+		if self.video:
+			print("You can only have one video feed running..")
+			sys.exit(0)
+		else:
+			self.vid = vid
+			self.video = True
 	def buttonPressed(self, id, msg):
 		pass
 	def getButtons(self):
@@ -274,6 +284,8 @@ class Phone():
 		for o in self.outputs:
 			o.socket = socket
 			o.setup(socket)
+		if self.video == True:
+			self.vid.setup(socket)
 	def updateButtons(self, id, message):
 		for b in self.buttons:
 			if b.id == id:
@@ -286,7 +298,6 @@ class Phone():
 
 
 class ControllerPhone():
-	pollrate = 5
 	controltype = 1
 	video = False
 	def controlPress(self, type):
@@ -301,8 +312,6 @@ class ControllerPhone():
 		7 - Left
 		'''
 		pass
-	def setPollRate(self, rate):
-		self.pollrate = rate
 	def setVideo(self, value):
 		self.video = value
 	def setup(self, socket):
@@ -310,6 +319,10 @@ class ControllerPhone():
 		if self.video == True:
 			value = 1
 		socket.send(str(self.controltype) + "," + str(self.pollrate)+","+str(value))
+
+
+
+####################----COMPONENTS----######################
 
 class Button():
 	def __init__(self, name):
@@ -323,7 +336,7 @@ class Button():
 	def getType(self):
 		return self.type
 	def setup(self, socket):
-		socket.send(str(0)+","+str(Phone.INPUT_REGULAR) + "," + str(self.id) + "," + str(self.name))
+		socket.send(str(0)+","+str(self.type) + "," + str(self.id) + "," + str(self.name))
 
 class InputText(Button):
 	def __init__(self, name):
@@ -360,3 +373,12 @@ class OutputText():
 		self.socket.send(str(1)+","+str(self.id)+","+str(self.message))
 	def setup(self, socket):
 		socket.send(str(0)+","+str(self.type)+","+str(self.id)+","+str(self.message)) 
+
+class VideoFeed():
+	def __init__(self, theip, width, height):
+		self.ip = theip
+		self.type = Phone.VIDEO_FEED
+		self.width = width
+		self.height = height
+	def setup(self, socket):
+		socket.send(str(0)+","+str(self.type)+","+self.ip+","+str(self.width)+","+str(self.height))
