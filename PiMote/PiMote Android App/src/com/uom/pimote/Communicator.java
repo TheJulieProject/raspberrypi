@@ -22,7 +22,6 @@ public class Communicator extends Activity {
     TCPClient tcp;
     String ip;
     int port;
-    LinearLayout layout;
     AsyncTask<String, String, TCPClient> task = null;
     RegularButtonManager regular = null;
     ControllerManager cm = null;
@@ -137,7 +136,7 @@ public class Communicator extends Activity {
                     getActionBar().show();
                     setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
                     setContentView(R.layout.activity_main);
-                    layout = (LinearLayout) findViewById(R.id.mainlayout);
+                    LinearLayout layout = (LinearLayout) findViewById(R.id.mainlayout);
                     regular = new RegularButtonManager(Communicator.this, tcp,
                             layout);
                 }
