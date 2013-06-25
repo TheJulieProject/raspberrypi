@@ -38,7 +38,7 @@ public class RegularButtonManager {
         this.c = c;
         this.tcp = tcp;
         this.layout = layout;
-        ((Communicator) c).setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        //((Communicator) c).setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         outputs = new ArrayList<TextView>();
     }
 

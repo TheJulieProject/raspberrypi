@@ -2,7 +2,6 @@ package com.uom.pimote;
 
 import android.annotation.TargetApi;
 import android.content.Context;
-import android.content.pm.ActivityInfo;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.util.Log;
@@ -32,8 +31,9 @@ public class ControllerManager {
 
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
     public ControllerManager(final Context c, final TCPClient tcp, final int pollRate, String ip, int videoV, int voiceV) {
-        ((Communicator) c).setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-        ((Communicator) c).setContentView(R.layout.controllayout);
+        //((Communicator) c).setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+        Log.e("BOO", "HERE");
+        //((Communicator) c).setContentView(R.layout.controllayout);
         this.tcp = tcp;
         final ImageView leftForward;
         final ImageView leftBackwards;
