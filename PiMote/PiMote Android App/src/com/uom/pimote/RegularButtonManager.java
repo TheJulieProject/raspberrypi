@@ -24,8 +24,6 @@ import java.util.ArrayList;
 
 public class RegularButtonManager {
 
-
-    //TextView[] outputs;
     TCPClient tcp;
     Context c;
     LinearLayout layout;

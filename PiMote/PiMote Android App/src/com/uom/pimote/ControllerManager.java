@@ -28,7 +28,6 @@ public class ControllerManager {
     private MjpegView mv = null;
 
     public ControllerManager(final Context c, final TCPClient tcp, final int pollRate, String ip, int videoV, int voiceV) {
-        Log.e("BOO", "HERE");
 
         this.tcp = tcp;
         final ImageView leftForward;

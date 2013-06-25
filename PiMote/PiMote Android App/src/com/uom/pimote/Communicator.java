@@ -74,7 +74,7 @@ public class Communicator extends Activity {
         if (cm != null) cm.stopPlayback();
         if (regular != null) regular.stop();
         finish();
-        Log.d("pi", "Ending");
+        Log.e("pi", "Ending");
         tcp.stopClient();
     }
 
@@ -141,7 +141,7 @@ public class Communicator extends Activity {
                             layout);
                 }
                 setup = true;
-            } else {
+            } else { //setup was done
                 int type = Integer.parseInt(info[0]);
                 String[] setup = new String[info.length - 1];
                 for (int i = 1; i < info.length; i++) {
@@ -152,7 +152,6 @@ public class Communicator extends Activity {
                         regular.addButtons(setup);
                     }
                 } else if (type == 1) { //request to change text on a textview
-                    Log.e("TCPClient", "Text is to be changed to: " + setup[1]);
                     TextView output = regular.getTextView(Integer.parseInt(setup[0]));
                     output.setText(setup[1]);
                 }
