@@ -26,6 +26,7 @@ public class Communicator extends Activity {
     RegularButtonManager regular = null;
     ControllerManager cm = null;
     boolean setup = false;
+    private int lastvoicepress = -1;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -47,11 +48,13 @@ public class Communicator extends Activity {
     }
 
     /* Fire an intent to start the voice recognition activity. */
-    public void startVoiceRecognition() {
+    public void startVoiceRecognition(int id) {
+        lastvoicepress = id;
         Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
                 RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
         intent.putExtra(RecognizerIntent.EXTRA_PROMPT, "Voice recognition Demo...");
+        intent.putExtra("theid", id);
         startActivityForResult(intent, REQUEST_CODE);
     } // startRecording()
 
@@ -62,13 +65,24 @@ public class Communicator extends Activity {
             // Populate the wordsList with the String values the recognition engine thought it heard
             ArrayList<String> matches = data.getStringArrayListExtra(
                     RecognizerIntent.EXTRA_RESULTS);
-            tcp.sendMessage(matches.get(0));
+            tcp.sendMessage(lastvoicepress +","+matches.get(0));
         }
         super.onActivityResult(requestCode, resultCode, data);
     } // onActivityResult()
 
     @Override
     protected void onStop() {
+        super.onStop();
+        task.cancel(true);
+        if (cm != null) cm.stopPlayback();
+        if (regular != null) regular.stop();
+        finish();
+        Log.e("pi", "Ending");
+        tcp.stopClient();
+    }
+
+    @Override
+    protected void onPause() {
         super.onStop();
         task.cancel(true);
         if (cm != null) cm.stopPlayback();

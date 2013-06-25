@@ -253,6 +253,7 @@ class Phone():
 	INPUT_TOGGLE = 3
 	OUTPUT_TEXT = 4
 	VIDEO_FEED = 5
+	VOICE_INPUT = 6
 	def addButton(self, button):
 		if isinstance(button, Button):
 			button.id = len(self.buttons)
@@ -352,7 +353,6 @@ class InputText(Button):
 
 class ToggleButton(Button):
 	def __init__(self, name, initialvalue):
-		self.id = id
 		self.name = name
 		self.value = initialvalue
 		self.type = Phone.INPUT_TOGGLE
@@ -365,6 +365,14 @@ class ToggleButton(Button):
 		if self.value == True:
 			tf=1
 		socket.send(str(0)+","+str(self.type) + "," + str(self.id) + "," + str(self.name) + "," + str(tf))
+
+class VoiceInput(Button):
+	def __init__(self):
+		self.type = Phone.VOICE_INPUT
+	def getId(self):
+		return self.id
+	def setup(self, socket):
+		socket.send(str(0)+","+str(self.type)+","+str(self.id))
 
 
 

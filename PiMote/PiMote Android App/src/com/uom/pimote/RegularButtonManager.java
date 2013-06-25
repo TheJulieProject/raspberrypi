@@ -7,6 +7,7 @@ import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
 import android.widget.TableRow;
@@ -56,6 +57,9 @@ public class RegularButtonManager {
             case 5:
                 addNewFeed(setup);
                 break;
+            case 6:
+                addVoiceInput(setup);
+                break;
         }
     }
 
@@ -88,9 +92,12 @@ public class RegularButtonManager {
         button.setGravity(3);
         button.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
-                if (tcp != null)
+                if (tcp != null) {
+                    String text = addText.getText().toString();
+                    if(text.equals("")) text = "null";
                     tcp.sendMessage(setup[1] + ","
-                            + addText.getText().toString());
+                            + text);
+                }
                 addText.setText("");
             }
         });
@@ -154,6 +161,20 @@ public class RegularButtonManager {
         mv.setLayoutParams(params);
         mv.setVisibility(View.VISIBLE);
         Log.e("MJPG", mv.getMeasuredWidth() + "," + mv.getMeasuredHeight());
+    }
+
+    public void addVoiceInput(final String[] setup){
+        ImageButton voice = new ImageButton(c);
+        voice.setImageDrawable(c.getResources().getDrawable(R.drawable.mic));
+        final int id = Integer.parseInt(setup[1]);
+        Log.e("aksd", id+"");
+        voice.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ((Communicator) c).startVoiceRecognition(id);
+            } // onClick()
+        });
+        layout.addView(voice);
     }
 
     public void stop() {

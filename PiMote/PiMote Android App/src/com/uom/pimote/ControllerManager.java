@@ -108,7 +108,7 @@ public class ControllerManager {
             microphone.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    ((Communicator) c).startVoiceRecognition();
+                    ((Communicator) c).startVoiceRecognition(0);
                 } // onClick()
             });
             microphone.setVisibility(View.VISIBLE);

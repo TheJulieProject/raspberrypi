@@ -23,16 +23,10 @@ class MyPhone(Phone):
 	#Override
 	text = "Hello"
 	def buttonPressed(self, id, message):
-		if id == b1.getId():
-			o1.setText(self.text)
-			if self.text == "Hello":
-				self.text = "World"
-			else:
-				self.text = "Hello"
-		elif id == b2.getId():
-			print("Toggle switched to " + str(message))
-		elif id == b3.getId():
-			o1.setText(message)
+		if id == vi.getId():
+			print(message)
+		else:
+			print(str(id) + ", " + str(vi.getId()))
 
 # Create the phone object
 thisphone = MyPhone()
@@ -41,13 +35,15 @@ b1 = Button("Hello")
 b2 = ToggleButton("This is a toggle button", True)
 b3 = InputText("Input text here")
 o1 = OutputText("Hello")
-v = VideoFeed("192.168.0.3", 400, 400)
+v = VideoFeed("10.0.2.7", 400, 400)
+vi = VoiceInput()
 
 thisphone.addButton(b1)
 thisphone.addButton(b2)
 thisphone.addButton(b3)
 thisphone.addOutput(o1)
 thisphone.addVideoFeed(v)
+thisphone.addButton(vi)
 #Create the server
 myserver = PhoneServer()
 #Add the phone
