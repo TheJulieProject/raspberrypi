@@ -1,6 +1,5 @@
 package com.uom.pimote;
 
-import android.app.ActionBar;
 import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.ActivityInfo;
@@ -28,7 +27,6 @@ public class Communicator extends Activity {
     RegularButtonManager regular = null;
     ControllerManager cm = null;
     boolean setup = false;
-    ActionBar ab;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -42,7 +40,7 @@ public class Communicator extends Activity {
         } catch (Exception e) {
             endActivity("Bad Arguments");
         }
-        ab = getActionBar();
+
         if (task == null)
             task = new connectTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, "");
 
@@ -130,13 +128,13 @@ public class Communicator extends Activity {
                 Log.e("TCPClient", "Setting up");
                 controlType = Integer.parseInt(info[0]);
                 if (controlType == JOYSTICK_CONTROL) {
-                    ab.hide();
+                    getActionBar().hide();
                     setContentView(R.layout.controllayout);
                     setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
                     cm = new ControllerManager(Communicator.this, tcp,
                             Integer.parseInt(info[1]), ip, Integer.parseInt(info[2]), Integer.parseInt(info[3]));
                 } else {
-                    ab.show();
+                    getActionBar().show();
                     setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
                     setContentView(R.layout.activity_main);
                     layout = (LinearLayout) findViewById(R.id.mainlayout);
