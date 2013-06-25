@@ -2,7 +2,7 @@ package com.uom.pimote;
 
 import android.app.Activity;
 import android.content.Intent;
-import android.content.res.Configuration;
+import android.content.pm.ActivityInfo;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.speech.RecognizerIntent;
@@ -98,11 +98,6 @@ public class Communicator extends Activity {
         endActivity("");
     }
 
-    @Override
-    public void onConfigurationChanged(Configuration newConfig){
-
-    }
-
     public class connectTask extends AsyncTask<String, String, TCPClient> {
 
         @Override
@@ -136,10 +131,11 @@ public class Communicator extends Activity {
                 Log.e("TCPClient", "Setting up");
                 controlType = Integer.parseInt(info[0]);
                 if (controlType == JOYSTICK_CONTROL) {
-
+                    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
                     cm = new ControllerManager(Communicator.this, tcp,
                             Integer.parseInt(info[1]), ip, Integer.parseInt(info[2]), Integer.parseInt(info[3]));
                 } else {
+                    setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
                     regular = new RegularButtonManager(Communicator.this, tcp,
                             layout);
                 }

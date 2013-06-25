@@ -41,7 +41,7 @@ b1 = Button("Hello")
 b2 = ToggleButton("This is a toggle button", True)
 b3 = InputText("Input text here")
 o1 = OutputText("Hello")
-v = VideoFeed("192.168.0.11", 200, 200)
+v = VideoFeed("192.168.0.3", 400, 400)
 
 thisphone.addButton(b1)
 thisphone.addButton(b2)
@@ -54,3 +54,4 @@ myserver = PhoneServer()
 myserver.addPhone(thisphone)
 # Start server
 myserver.start(ip, port)
+

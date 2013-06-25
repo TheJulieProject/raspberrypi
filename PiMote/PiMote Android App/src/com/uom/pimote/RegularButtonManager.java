@@ -137,6 +137,7 @@ public class RegularButtonManager {
         TextView text = new TextView(c);
         text.setTextSize(18);
         text.setLayoutParams(params);
+        if(setup.length == 3)
         text.setText(setup[2]);
         layout.addView(text);
         outputs.add(text);
