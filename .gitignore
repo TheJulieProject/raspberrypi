@@ -8,3 +8,4 @@ PiMote/PiMote Android App/project.properties
 
 PiMote/PiMote Android App/.idea/workspace.xml
 *.apk
+*.pyc
