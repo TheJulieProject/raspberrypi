@@ -49,7 +49,6 @@ public class TCPClient {
         try {
             if (socket != null) socket.close();
         } catch (IOException e) {
-            // TODO Auto-generated catch block
             e.printStackTrace();
         }
     }

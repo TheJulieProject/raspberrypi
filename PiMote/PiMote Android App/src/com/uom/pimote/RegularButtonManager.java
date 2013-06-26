@@ -192,17 +192,16 @@ public class RegularButtonManager {
         }
     }
 
-    public void pause(){
+    public void pause() {
         mv.pause();
     }
 
-    public void resume(){
+    public void resume() {
         mv.resume();
     }
 
     public class DoRead extends AsyncTask<String, Void, MjpegInputStream> {
         protected MjpegInputStream doInBackground(String... url) {
-            //TODO: if camera has authentication deal with it and don't just not work
             HttpResponse res = null;
             DefaultHttpClient httpclient = new DefaultHttpClient();
             Log.d("MjpegRegular", "1. Sending http request");

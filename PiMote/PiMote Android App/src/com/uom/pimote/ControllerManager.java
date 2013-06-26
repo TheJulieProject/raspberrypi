@@ -36,8 +36,8 @@ public class ControllerManager {
         final ImageView rightBackwards;
         final ImageView microphone;
 
-        boolean video = videoV == 0 ? false : true;
-        boolean voice = voiceV == 0 ? false : true;
+        boolean video = videoV != 0;
+        boolean voice = voiceV != 0;
         leftForward = (ImageView) ((Communicator) c).findViewById(R.id.left_motor_forward);
         leftBackwards = (ImageView) ((Communicator) c).findViewById(R.id.left_motor_backwards);
         rightForward = (ImageView) ((Communicator) c).findViewById(R.id.right_motor_forward);
@@ -55,7 +55,6 @@ public class ControllerManager {
 
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                // TODO Auto-generated method stub
                 if (event.getAction() == MotionEvent.ACTION_DOWN
                         || event.getAction() == MotionEvent.ACTION_UP)
                     toggleControl(1,
@@ -68,7 +67,6 @@ public class ControllerManager {
 
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                // TODO Auto-generated method stub
                 if (event.getAction() == MotionEvent.ACTION_DOWN
                         || event.getAction() == MotionEvent.ACTION_UP)
                     toggleControl(2,
@@ -81,7 +79,6 @@ public class ControllerManager {
 
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                // TODO Auto-generated method stub
                 if (event.getAction() == MotionEvent.ACTION_DOWN
                         || event.getAction() == MotionEvent.ACTION_UP)
                     toggleControl(3,
@@ -94,7 +91,6 @@ public class ControllerManager {
 
             @Override
             public boolean onTouch(View v, MotionEvent event) {
-                // TODO Auto-generated method stub
                 if (event.getAction() == MotionEvent.ACTION_DOWN
                         || event.getAction() == MotionEvent.ACTION_UP)
                     toggleControl(4,
@@ -108,7 +104,7 @@ public class ControllerManager {
             microphone.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View view) {
-                    ((Communicator) c).startVoiceRecognition(0);
+                    ((Communicator) c).startVoiceRecognition(1);
                 } // onClick()
             });
             microphone.setVisibility(View.VISIBLE);
@@ -116,7 +112,7 @@ public class ControllerManager {
             microphone.setVisibility(View.INVISIBLE);
         } // if - else
 
-        URL = new String("http://" + ip + ":8080/?action=stream");
+        URL = "http://" + ip + ":8080/?action=stream";
 
         mv = (MjpegView) ((Communicator) c).findViewById(R.id.mv);
 
@@ -138,17 +134,11 @@ public class ControllerManager {
         }
     }
 
-    public void startPlayback(){
-        if(mv != null){
-            mv.startPlayback();
-        }
-    }
-
-    public void pause(){
+    public void pause() {
         mv.pause();
     }
 
-    public void resume(){
+    public void resume() {
         mv.resume();
     }
 
@@ -180,7 +170,6 @@ public class ControllerManager {
 
     public class DoRead extends AsyncTask<String, Void, MjpegInputStream> {
         protected MjpegInputStream doInBackground(String... url) {
-            //TODO: if camera has authentication deal with it and don't just not work
             HttpResponse res = null;
             DefaultHttpClient httpclient = new DefaultHttpClient();
             Log.d(TAG, "1. Sending http request");
