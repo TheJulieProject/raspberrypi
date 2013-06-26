@@ -5,9 +5,11 @@ import android.os.AsyncTask;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
 import android.widget.TableRow;
@@ -94,7 +96,7 @@ public class RegularButtonManager {
             public void onClick(View v) {
                 if (tcp != null) {
                     String text = addText.getText().toString();
-                    if(text.equals("")) text = "null";
+                    if (text.equals("")) text = "null";
                     tcp.sendMessage(setup[1] + ","
                             + text);
                 }
@@ -152,7 +154,6 @@ public class RegularButtonManager {
     }
 
     public void addNewFeed(String[] setup) {
-        Log.e("MJPG", setup[1]);
         String URL = "http://" + setup[1] + ":8080/?action=stream";
         mv = (MjpegView) ((Communicator) c).findViewById(R.id.mv2);
         read = new DoRead().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, URL);
@@ -160,14 +161,15 @@ public class RegularButtonManager {
         params.setMargins(0, 10, 0, 10);
         mv.setLayoutParams(params);
         mv.setVisibility(View.VISIBLE);
-        Log.e("MJPG", mv.getMeasuredWidth() + "," + mv.getMeasuredHeight());
     }
 
-    public void addVoiceInput(final String[] setup){
+    public void addVoiceInput(final String[] setup) {
         ImageButton voice = new ImageButton(c);
         voice.setImageDrawable(c.getResources().getDrawable(R.drawable.mic));
+        LayoutParams params = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, 100);
+        voice.setScaleType(ImageView.ScaleType.CENTER_INSIDE);
+        voice.setLayoutParams(params);
         final int id = Integer.parseInt(setup[1]);
-        Log.e("aksd", id+"");
         voice.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -179,9 +181,23 @@ public class RegularButtonManager {
 
     public void stop() {
         if (mv != null) {
-            mv.stopPlayback();
             read.cancel(true);
+            mv.stopPlayback();
         }
+    }
+
+    public void startPlayback() {
+        if (mv != null) {
+            mv.startPlayback();
+        }
+    }
+
+    public void pause(){
+        mv.pause();
+    }
+
+    public void resume(){
+        mv.resume();
     }
 
     public class DoRead extends AsyncTask<String, Void, MjpegInputStream> {

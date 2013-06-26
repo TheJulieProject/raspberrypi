@@ -27,7 +27,7 @@ public class ControllerManager {
     ImageView hud;
     private MjpegView mv = null;
 
-    public ControllerManager(final Context c, final TCPClient tcp, final int pollRate, String ip, int videoV, int voiceV) {
+    public ControllerManager(final Context c, final TCPClient tcp, String ip, int videoV, int voiceV) {
 
         this.tcp = tcp;
         final ImageView leftForward;
@@ -136,6 +136,20 @@ public class ControllerManager {
             mv.stopPlayback();
             read.cancel(true);
         }
+    }
+
+    public void startPlayback(){
+        if(mv != null){
+            mv.startPlayback();
+        }
+    }
+
+    public void pause(){
+        mv.pause();
+    }
+
+    public void resume(){
+        mv.resume();
     }
 
     public void toggleControl(int position, boolean value) {

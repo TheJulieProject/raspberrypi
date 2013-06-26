@@ -37,10 +37,13 @@ public class MjpegView extends SurfaceView implements SurfaceHolder.Callback {
     private int dispWidth;
     private int dispHeight;
     private int displayMode;
+    private boolean mPause = false;
+    private Object mPauseLock;
 
     public MjpegView(Context context, AttributeSet attrs) {
         super(context, attrs);
         init(context);
+        mPauseLock = new Object();
     }
 
     public MjpegView(Context context) {
@@ -66,10 +69,28 @@ public class MjpegView extends SurfaceView implements SurfaceHolder.Callback {
     }
 
     public void startPlayback() {
+
         if (mIn != null) {
             mRun = true;
+
             thread.start();
+
         }
+
+    }
+
+    public void pause() {
+        synchronized (mPauseLock) {
+            mPause = true;
+        }
+    }
+
+    public void resume() {
+        synchronized (mPauseLock) {
+            mPause = false;
+            mPauseLock.notifyAll();
+        }
+
     }
 
     public void stopPlayback() {
@@ -196,6 +217,14 @@ public class MjpegView extends SurfaceView implements SurfaceHolder.Callback {
             Paint p = new Paint();
             String fps;
             while (mRun) {
+                synchronized (mPauseLock) {
+                    while (mPause) {
+                        try {
+                            mPauseLock.wait();
+                        } catch (Exception e) {
+                        }
+                    }
+                }
                 if (surfaceDone) {
                     try {
                         c = mSurfaceHolder.lockCanvas();

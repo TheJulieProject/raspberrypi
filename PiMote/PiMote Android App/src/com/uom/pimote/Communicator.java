@@ -27,18 +27,18 @@ public class Communicator extends Activity {
     ControllerManager cm = null;
     boolean setup = false;
     private int lastvoicepress = -1;
+    private boolean voiceRecognition = false;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        //setContentView(R.layout.activity_main);
 
         try {
             Bundle b = getIntent().getExtras();
             port = b.getInt("port");
             ip = b.getString("ip");
         } catch (Exception e) {
-            endActivity("Bad Arguments");
+            endActivity("Bad Arguments", true);
         }
 
         if (task == null)
@@ -50,6 +50,7 @@ public class Communicator extends Activity {
     /* Fire an intent to start the voice recognition activity. */
     public void startVoiceRecognition(int id) {
         lastvoicepress = id;
+        voiceRecognition = true;
         Intent intent = new Intent(RecognizerIntent.ACTION_RECOGNIZE_SPEECH);
         intent.putExtra(RecognizerIntent.EXTRA_LANGUAGE_MODEL,
                 RecognizerIntent.LANGUAGE_MODEL_FREE_FORM);
@@ -65,47 +66,57 @@ public class Communicator extends Activity {
             // Populate the wordsList with the String values the recognition engine thought it heard
             ArrayList<String> matches = data.getStringArrayListExtra(
                     RecognizerIntent.EXTRA_RESULTS);
-            tcp.sendMessage(lastvoicepress +","+matches.get(0));
+            tcp.sendMessage(lastvoicepress + "," + matches.get(0));
         }
+        voiceRecognition = false;
         super.onActivityResult(requestCode, resultCode, data);
     } // onActivityResult()
 
     @Override
     protected void onStop() {
         super.onStop();
-        task.cancel(true);
-        if (cm != null) cm.stopPlayback();
-        if (regular != null) regular.stop();
-        finish();
-        Log.e("pi", "Ending");
-        tcp.stopClient();
+        endActivity("", false);
     }
 
     @Override
     protected void onPause() {
-        super.onStop();
-        task.cancel(true);
-        if (cm != null) cm.stopPlayback();
-        if (regular != null) regular.stop();
-        finish();
-        Log.e("pi", "Ending");
-        tcp.stopClient();
+        super.onPause();
+        if (!voiceRecognition) endActivity("", false);
+        else {
+            if (cm != null) cm.pause();
+            if (regular != null) regular.pause();
+        }
     }
 
-    public void endActivity(String msg) {
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (cm != null) cm.resume();
+        if (regular != null) regular.resume();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+    }
+
+    public void endActivity(String msg, boolean main) {
         if (cm != null) cm.stopPlayback();
         if (regular != null) regular.stop();
-        Intent i = new Intent(this, Main.class);
-        Bundle b = new Bundle();
-        b.putString("pr", msg);
-        i.putExtras(b);
-        startActivity(i);
+        tcp.stopClient();
+        if (main) {
+            Intent i = new Intent(this, Main.class);
+            Bundle b = new Bundle();
+            b.putString("pr", msg);
+            i.putExtras(b);
+            startActivity(i);
+        }
         finish();
     }
 
     @Override
     public void onBackPressed() {
-        endActivity("");
+        endActivity("", true);
     }
 
     public class connectTask extends AsyncTask<String, String, TCPClient> {
@@ -123,7 +134,7 @@ public class Communicator extends Activity {
                 }
 
                 public void failActivity(String msg) {
-                    endActivity(msg);
+                    endActivity(msg, true);
                 }
             }, ip, port);
             tcp.run();
@@ -144,8 +155,7 @@ public class Communicator extends Activity {
                     getActionBar().hide();
                     setContentView(R.layout.controllayout);
                     setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-                    cm = new ControllerManager(Communicator.this, tcp,
-                            Integer.parseInt(info[1]), ip, Integer.parseInt(info[2]), Integer.parseInt(info[3]));
+                    cm = new ControllerManager(Communicator.this, tcp, ip, Integer.parseInt(info[1]), Integer.parseInt(info[2]));
                 } else {
                     getActionBar().show();
                     setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
