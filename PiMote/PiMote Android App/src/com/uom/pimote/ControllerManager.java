@@ -147,22 +147,22 @@ public class ControllerManager {
         switch (position) {
             case 1:
                 if (forwardPress != value)
-                    tcp.sendMessage("" + (0 + flag));
+                    tcp.sendMessage("0," + (0 + flag));
                 forwardPress = value;
                 break;
             case 2:
                 if (backPress != value)
-                    tcp.sendMessage("" + (2 + flag));
+                    tcp.sendMessage("0," + (2 + flag));
                 backPress = value;
                 break;
             case 3:
                 if (leftPress != value)
-                    tcp.sendMessage("" + (4 + flag));
+                    tcp.sendMessage("0," + (4 + flag));
                 leftPress = value;
                 break;
             case 4:
                 if (rightPress != value)
-                    tcp.sendMessage("" + (6 + flag));
+                    tcp.sendMessage("0," + (6 + flag));
                 rightPress = value;
                 break;
         }
