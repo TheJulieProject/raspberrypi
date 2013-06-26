@@ -25,8 +25,6 @@ class MyPhone(Phone):
 	def buttonPressed(self, id, message):
 		if id == vi.getId():
 			print(message)
-		else:
-			print(str(id) + ", " + str(vi.getId()))
 
 # Create the phone object
 thisphone = MyPhone()
