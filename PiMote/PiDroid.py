@@ -187,7 +187,7 @@ PiDroid.setVoice(True)
 
 # Enabling the NXT Lego Robot
 if ROBOT_ENABLED == 1:
-	import robot_interf as r
+	import NXTinterface as r
 	nxt = r.NXTRobot()
 
 #Create the server

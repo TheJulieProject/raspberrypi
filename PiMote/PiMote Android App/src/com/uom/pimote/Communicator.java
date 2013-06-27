@@ -223,7 +223,7 @@ public class Communicator extends Activity {
                     if (controlType == JOYSTICK_CONTROL) {
                         cm = new ControllerManager(Communicator.this, tcp, ip, Integer.parseInt(info[1]), Integer.parseInt(info[2]));
                     } else {
-                        regular = new RegularButtonManager(Communicator.this, tcp);
+                        regular = new RegularButtonManager(Communicator.this, tcp, ip);
                     }
                     break;
 
