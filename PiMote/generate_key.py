@@ -18,14 +18,12 @@ def generator(size, chars):
 size = 16
 chars = string.ascii_letters + string.digits + "                    "
 
-privateKey = "####################\n"
+privateKey = "#"
 
 for x in range(0,30):
-	privateKey += "# "
 	privateKey += generator(size, chars)
-	privateKey += " #\n"
 
-privateKey += "####################\n"
+privateKey += "#"
 
 file = open('privatekey.data', 'w')
 file.write(privateKey)

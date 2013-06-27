@@ -25,7 +25,7 @@ def calc_command(number):
  else:
   return "Nothing"
 
-# Open the webcam
+# Set the webcam
 cam= Camera(20, 15)
 
 while True:
@@ -37,8 +37,8 @@ while True:
 	# Number of pixels accumulated
 	acc_count = 0
 
-	# Current coordinate. Initially is 5 as it represent the centre
-	# of the grid, which means do nothing.
+	# Current coordinate. Initially it is 5 as it represents the centre
+	# of the grid, which means "do nothing".
 	coordinate = 5
 
 	# Take an image from the camera
@@ -46,7 +46,7 @@ while True:
 
 	for x in range(0, image.width):
   	  for y in range(0, image.height):
-    		# Get the value of the current pixel
+    		# Get the value of the channels of the current pixel
     		red, green, blue = image[x, y]
 
    		# check if the blue intensity is greater than the green
@@ -92,6 +92,6 @@ while True:
 	# Calculate the command corresponding to the coordinate and print it
 	print calc_command(coordinate)
 
-	# Wait a second
+	# Wait a second and a half
 	time.sleep(1.5)
 
