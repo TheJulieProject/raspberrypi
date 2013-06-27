@@ -34,11 +34,15 @@ public class RegularButtonManager {
     ArrayList<TextView> outputs;
     MjpegView mv = null;
     AsyncTask<String, Void, MjpegInputStream> read = null;
+    String ip;
 
-    public RegularButtonManager(Context c, TCPClient tcp) {
+    int viewPosition;
+
+    public RegularButtonManager(Context c, TCPClient tcp, String ip) {
         this.c = c;
         this.tcp = tcp;
-        this.layout = layout;
+        this.ip = ip;
+        this.viewPosition = 0;
         //((Communicator) c).setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         outputs = new ArrayList<TextView>();
         ((Communicator) c).getActionBar().show();
@@ -62,7 +66,7 @@ public class RegularButtonManager {
                 addNewTextView(setup);
                 break;
             case 5:
-                addNewFeed(setup);
+                addNewFeed(setup, ip);
                 break;
             case 6:
                 addVoiceInput(setup);
@@ -80,7 +84,7 @@ public class RegularButtonManager {
             }
         });
 
-        layout.addView(button);
+        layout.addView(button, viewPosition++);
     }
 
     public void addNewTextInput(final String[] setup) {
@@ -110,8 +114,7 @@ public class RegularButtonManager {
         });
         textButtonLayout.addView(addText);
         textButtonLayout.addView(button);
-
-        layout.addView(textButtonLayout);
+        layout.addView(textButtonLayout, viewPosition++);
     }
 
     public void addNewToggle(final String[] setup) {
@@ -138,7 +141,7 @@ public class RegularButtonManager {
         });
         textButtonLayout.addView(text);
         textButtonLayout.addView(button);
-        layout.addView(textButtonLayout);
+        layout.addView(textButtonLayout, viewPosition++);
     }
 
     public void addNewTextView(final String[] setup) {
@@ -150,7 +153,7 @@ public class RegularButtonManager {
         text.setLayoutParams(params);
         if (setup.length == 3)
             text.setText(setup[2]);
-        layout.addView(text);
+        layout.addView(text, viewPosition++);
         outputs.add(text);
     }
 
@@ -158,14 +161,17 @@ public class RegularButtonManager {
         return outputs.get(id);
     }
 
-    public void addNewFeed(String[] setup) {
-        String URL = "http://" + setup[1] + ":8080/?action=stream";
+    public void addNewFeed(String[] setup, String ip) {
+        String feedIp = ip;
+        if(Integer.parseInt(setup[3]) == 1) feedIp = setup[4];
+        String URL = "http://" + feedIp + ":8080/?action=stream";
         mv = (MjpegView) ((Communicator) c).findViewById(R.id.mv2);
         read = new DoRead().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, URL);
-        LayoutParams params = new LayoutParams(Integer.parseInt(setup[2]), Integer.parseInt(setup[3]));
+        LayoutParams params = new LayoutParams(Integer.parseInt(setup[1]), Integer.parseInt(setup[2]));
         params.setMargins(0, 10, 0, 10);
         mv.setLayoutParams(params);
         mv.setVisibility(View.VISIBLE);
+        viewPosition++;
     }
 
     public void addVoiceInput(final String[] setup) {
@@ -181,7 +187,7 @@ public class RegularButtonManager {
                 ((Communicator) c).startVoiceRecognition(id);
             } // onClick()
         });
-        layout.addView(voice);
+        layout.addView(voice, viewPosition++);
     }
 
     public void stop() {

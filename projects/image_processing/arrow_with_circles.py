@@ -1,24 +1,22 @@
 #!/usr/bin/env python
-#from imgproc import *
 import cv
 from cv2 import *
 import math
 
+# Represent a point with the x (width) and y (height) coordinates and if it 
+# is active or not.
 class Point:
  def __init__(self, requiredheight, requiredwidth, requiredactive):
  	self.height = requiredheight
 	self.width = requiredwidth
 	self.isActive = requiredactive
  
-# Get the corners of the octogone and draw them in the screen
-def octagon(img):
- # Check if initialized
- global initialized
- if not initialized:
+# Get the corners of the octagon and draw them in the screen
+def octagon(img): 
   # Import
   global point1, point2, point3, point4, point5, point6, point7, point8, t
 
-  # Calculate the smallest of the image sizes
+  # Calculate the smallest of the image parameters
   if img.height < img.width:
    smallest = img.height
   else:
@@ -27,7 +25,7 @@ def octagon(img):
   # Distance from borders (in pixels)
   t = 13
 
-  # Value to center the octogone (in pixels)
+  # Value to center the octagon (in pixels)
   c = 20
 
   # Calculate distance d from a corner to the centre of the square.
@@ -57,8 +55,6 @@ def octagon(img):
 
   point8 = Point(t+ c, smallest-t-d, False)
   cv.Circle(imcolor,(point8.height, point8.width),radius,cv.RGB(0, 255, 0))
-
-  initialized = False
 
 # Check if a corner is in one of the 8 regions and, in that case, activate it.
 def active(x,y): 
@@ -120,23 +116,18 @@ def direction():
 	return "Forw"
  elif not point5.isActive:
   if not point8.isActive  and point1.isActive and point2.isActive  and point3.isActive  and point4.isActive  and point6.isActive  and point7.isActive:
-	return "Left_Forw"
- else:
-  return "No command"
+	return "Left_Forw" 
    
 # ------------------------- START -------------------
 
-# Keep octogone points.
+# Keep octagon points.
 global point1, point2, point3, point4, point5, point6, point7, point8
 
 # Radius for circles
 global radius
 radius = 7
 
-# Keep if octogone has been initialized
-global initialized
-initialized = False
-
+# Set window for display the result and the camera
 namedWindow("Corner detection", cv.CV_WINDOW_AUTOSIZE)
 cam = VideoCapture(0)
 
@@ -150,14 +141,16 @@ while True:
 	imcolor = cv.LoadImage('cam_image.jpg')
 	image = cv.LoadImage('cam_image.jpg',cv.CV_LOAD_IMAGE_GRAYSCALE)
 
-	# Initialise the octogone
+	# Initialise the octagon
 	octagon(imcolor)	
 	
+	# Destination of the harris algorithm
 	cornerMap = cv.CreateMat(image.height, image.width, cv.CV_32FC1)
 	
 	# OpenCV corner detection
 	cv.CornerHarris(image,cornerMap,3)
 	
+	# Iterate through each pixel to get the final command.
 	for y in range(0, image.height):
  	 for x in range(0, image.width):
 	  harris = cv.Get2D(cornerMap, y, x) # get the x,y value
@@ -165,13 +158,13 @@ while True:
 	  # check the corner detector response
 	  if harris[0] > 10e-06:
  	  
-	   # draw a small circle on the original image
+	   # draw a small circle on the original image to represent the corner
            cv.Circle(imcolor,(x,y),2,cv.RGB(155, 0, 25))
 
-	   # Check if it is in one of the 8 points.
+	   # Check if that corner is in one of the 8 points.
 	   active(x,y)
 
-	   # Change to blue the activated points.
+	   # Change to blue the activated corners of the octagon.
 	   bluePoint()	
 
 	   # Print the resulting direction
@@ -179,6 +172,7 @@ while True:
 	   if not direct == None:
 		print direct
 	
+	# Output the image
 	cv.ShowImage("Corner detection", imcolor)	
 	waitKey(1)	
 	

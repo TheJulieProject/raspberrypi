@@ -218,12 +218,11 @@ public class Communicator extends Activity {
 
 
                 case SET_CONTROL_TYPE:
-                    Log.e("SETUP", "Control type set");
                     controlType = Integer.parseInt(info[1]);
                     if (controlType == JOYSTICK_CONTROL) {
                         cm = new ControllerManager(Communicator.this, tcp, ip, Integer.parseInt(info[1]), Integer.parseInt(info[2]));
                     } else {
-                        regular = new RegularButtonManager(Communicator.this, tcp);
+                        regular = new RegularButtonManager(Communicator.this, tcp, ip);
                     }
                     break;
 
