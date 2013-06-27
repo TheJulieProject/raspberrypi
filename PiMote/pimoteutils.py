@@ -214,32 +214,60 @@ class Client(Receiver):
 
 
 class PhoneServer(Server):
+	SENT_PASSWORD = 0
+	SENT_DATA = 1
+	PASSWORD_FAIL = 2314
+	REQUEST_PASSWORD = 9855
+	STORE_KEY = 5649
 	phone = None
-	_
+	isPassword = False
+	key = "thisistheserverkey1"
 	def addPhone(self, thephone):
 		self.phone = thephone
 	def onStart(self):
 		print("Server has started")
 		
 	def onMessage(self, socket, message):
-		if isinstance(self.phone, Phone):
-			(id, sep, msg) = message.strip().partition(",")
-			self.phone.updateButtons(int(id), msg)
-			self.phone.buttonPressed(int(id), msg)
-		elif isinstance(self.phone, ControllerPhone):
-			self.phone.controlPress(message)
+		(sentType, sep, msg) = message.strip().partition(",")
+		if int(sentType) == PhoneServer.SENT_PASSWORD:
+			self.managePassword(msg, socket)
+		elif int(sentType) == PhoneServer.SENT_DATA:
+			self.manageIncomingMessage(msg)
 		
 		# Signify all is well
 		return True
 
 	def onConnect(self, socket):
 		print("Phone connected")
-		self.phone.setup(socket)
+		if self.isPassword:
+			socket.send(str(PhoneServer.REQUEST_PASSWORD))
+		else:
+			self.phone.setup(socket)
 		return True
 
 	def onDisconnect(self, socket):
 		print("Phone disconnected")
 		return True
+
+	def setPassword(self, value, pswd):
+		self.isPassword = value
+		self.password = pswd
+
+	def managePassword(self, password, socket):
+		if password == self.password:
+			socket.send(str(PhoneServer.STORE_KEY)+","+self.key)
+			self.phone.setup(socket)
+		elif password == self.key:
+			self.phone.setup(socket)
+		else:
+			socket.send(str(PhoneServer.PASSWORD_FAIL))
+	def manageIncomingMessage(self, message):
+		if isinstance(self.phone, Phone):
+			(id, sep, msg) = message.strip().partition(",")
+			self.phone.updateButtons(int(id), msg)
+			self.phone.buttonPressed(int(id), msg)
+		elif isinstance(self.phone, ControllerPhone):
+			self.phone.controlPress(message)
 
 ################------PHONE TYPES--------####################
 
@@ -254,6 +282,9 @@ class Phone():
 	OUTPUT_TEXT = 4
 	VIDEO_FEED = 5
 	VOICE_INPUT = 6
+	SET_CONTROL_TYPE = 0
+	SETUP = 1
+	REQUEST_OUTPUT_CHANGE = 2
 	def addButton(self, button):
 		if isinstance(button, Button):
 			button.id = len(self.buttons)
@@ -279,7 +310,7 @@ class Phone():
 		return self.buttons
 	def setup(self, socket):
 		self.socket = socket
-		socket.send(str(self.controltype))
+		socket.send(str(Phone.SET_CONTROL_TYPE)+","+str(self.controltype))
 		for i in self.buttons:
 			i.setup(socket)
 		for o in self.outputs:
@@ -341,14 +372,14 @@ class Button():
 	def getType(self):
 		return self.type
 	def setup(self, socket):
-		socket.send(str(0)+","+str(self.type) + "," + str(self.id) + "," + str(self.name))
+		socket.send(str(Phone.SETUP)+","+str(self.type) + "," + str(self.id) + "," + str(self.name))
 
 class InputText(Button):
 	def __init__(self, name):
 		self.name = name
 		self.type = Phone.INPUT_TEXT
 	def setup(self, socket):
-		socket.send(str(0)+","+str(self.type) + "," + str(self.id) + "," + str(self.name))
+		socket.send(str(Phone.SETUP)+","+str(self.type) + "," + str(self.id) + "," + str(self.name))
 
 class ToggleButton(Button):
 	def __init__(self, name, initialvalue):
@@ -363,13 +394,13 @@ class ToggleButton(Button):
 		tf = 0
 		if self.value == True:
 			tf=1
-		socket.send(str(0)+","+str(self.type) + "," + str(self.id) + "," + str(self.name) + "," + str(tf))
+		socket.send(str(Phone.SETUP)+","+str(self.type) + "," + str(self.id) + "," + str(self.name) + "," + str(tf))
 
 class VoiceInput(Button):
 	def __init__(self):
 		self.type = Phone.VOICE_INPUT
 	def setup(self, socket):
-		socket.send(str(0)+","+str(self.type)+","+str(self.id))
+		socket.send(str(Phone.SETUP)+","+str(self.type)+","+str(self.id))
 
 
 
@@ -380,11 +411,11 @@ class OutputText():
 		self.message = initialmessage
 	def setText(self, message):
 		self.message = message
-		self.socket.send(str(1)+","+str(self.id)+","+str(self.message))
+		self.socket.send(str(Phone.REQUEST_OUTPUT_CHANGE)+","+str(self.id)+","+str(self.message))
 	def getText(self):
 		return self.message
 	def setup(self, socket):
-		socket.send(str(0)+","+str(self.type)+","+str(self.id)+","+str(self.message)) 
+		socket.send(str(Phone.SETUP)+","+str(self.type)+","+str(self.id)+","+str(self.message)) 
 
 class VideoFeed():
 	def __init__(self, theip, width, height):
@@ -393,4 +424,4 @@ class VideoFeed():
 		self.width = width
 		self.height = height
 	def setup(self, socket):
-		socket.send(str(0)+","+str(self.type)+","+self.ip+","+str(self.width)+","+str(self.height))
+		socket.send(str(Phone.SETUP)+","+str(self.type)+","+self.ip+","+str(self.width)+","+str(self.height))

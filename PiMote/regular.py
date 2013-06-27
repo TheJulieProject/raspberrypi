@@ -26,6 +26,7 @@ class MyPhone(Phone):
 		# Your code will go here! Check for the ID of the button pressed #
 		# and handle that button press as you wish.                      #
 		#########----------------------------------------------###########
+		pass
 
 # Create the phone object
 thisphone = MyPhone()
@@ -46,6 +47,7 @@ thisphone.addVideoFeed(v)
 thisphone.addButton(vi)
 #Create the server
 myserver = PhoneServer()
+myserver.setPassword(True, "helloworld")
 #Add the phone
 myserver.addPhone(thisphone)
 # Start server

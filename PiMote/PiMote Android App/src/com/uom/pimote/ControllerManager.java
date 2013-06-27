@@ -1,6 +1,7 @@
 package com.uom.pimote;
 
 import android.content.Context;
+import android.content.pm.ActivityInfo;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -29,12 +30,18 @@ public class ControllerManager {
 
     public ControllerManager(final Context c, final TCPClient tcp, String ip, int videoV, int voiceV) {
 
+        ((Communicator)c).getActionBar().hide();
+        ((Communicator)c).setContentView(R.layout.controllayout);
+        ((Communicator)c).setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+
         this.tcp = tcp;
         final ImageView leftForward;
         final ImageView leftBackwards;
         final ImageView rightForward;
         final ImageView rightBackwards;
         final ImageView microphone;
+
+
 
         boolean video = videoV != 0;
         boolean voice = voiceV != 0;
@@ -147,22 +154,22 @@ public class ControllerManager {
         switch (position) {
             case 1:
                 if (forwardPress != value)
-                    tcp.sendMessage("0," + (0 + flag));
+                    tcp.sendMessage(Communicator.SEND_DATA+","+"0," + (0 + flag));
                 forwardPress = value;
                 break;
             case 2:
                 if (backPress != value)
-                    tcp.sendMessage("0," + (2 + flag));
+                    tcp.sendMessage(Communicator.SEND_DATA+","+"0," + (2 + flag));
                 backPress = value;
                 break;
             case 3:
                 if (leftPress != value)
-                    tcp.sendMessage("0," + (4 + flag));
+                    tcp.sendMessage(Communicator.SEND_DATA+","+"0," + (4 + flag));
                 leftPress = value;
                 break;
             case 4:
                 if (rightPress != value)
-                    tcp.sendMessage("0," + (6 + flag));
+                    tcp.sendMessage(Communicator.SEND_DATA+","+"0," + (6 + flag));
                 rightPress = value;
                 break;
         }

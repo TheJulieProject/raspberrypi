@@ -1,6 +1,7 @@
 package com.uom.pimote;
 
 import android.content.Context;
+import android.content.pm.ActivityInfo;
 import android.os.AsyncTask;
 import android.util.Log;
 import android.view.View;
@@ -34,12 +35,16 @@ public class RegularButtonManager {
     MjpegView mv = null;
     AsyncTask<String, Void, MjpegInputStream> read = null;
 
-    public RegularButtonManager(Context c, TCPClient tcp, LinearLayout layout) {
+    public RegularButtonManager(Context c, TCPClient tcp) {
         this.c = c;
         this.tcp = tcp;
         this.layout = layout;
         //((Communicator) c).setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         outputs = new ArrayList<TextView>();
+        ((Communicator)c).getActionBar().show();
+        ((Communicator)c).setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        ((Communicator)c).setContentView(R.layout.activity_main);
+        this.layout = (LinearLayout)((Communicator)c).findViewById(R.id.mainlayout);
     }
 
     public void addButtons(final String[] setup) {
@@ -71,7 +76,7 @@ public class RegularButtonManager {
         button.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
                 if (tcp != null)
-                    tcp.sendMessage(setup[1] + "," + " ");
+                    tcp.sendMessage(Communicator.SEND_DATA+","+setup[1] + "," + " ");
             }
         });
 
@@ -97,7 +102,7 @@ public class RegularButtonManager {
                 if (tcp != null) {
                     String text = addText.getText().toString();
                     if (text.equals("")) text = "null";
-                    tcp.sendMessage(setup[1] + ","
+                    tcp.sendMessage(Communicator.SEND_DATA+","+setup[1] + ","
                             + text);
                 }
                 addText.setText("");
@@ -128,7 +133,7 @@ public class RegularButtonManager {
             @Override
             public void onClick(View view) {
                 int tf = ((ToggleButton) view).isChecked() ? 1 : 0;
-                tcp.sendMessage(setup[1] + "," + tf);
+                tcp.sendMessage(Communicator.SEND_DATA+","+setup[1] + "," + tf);
             }
         });
         textButtonLayout.addView(text);
