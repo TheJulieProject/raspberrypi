@@ -9,7 +9,7 @@ class Point:
         self.width = requiredwidth
         self.isActive = requiredactive
 
-#namedWindow("Normal feed", cv.CV_WINDOW_AUTOSIZE)
+namedWindow("Normal feed", cv.CV_WINDOW_AUTOSIZE)
 namedWindow("Edge detection", cv.CV_WINDOW_AUTOSIZE)
 cam = VideoCapture(0)
 
@@ -79,7 +79,7 @@ while True:
 	print "Both down"
 
  #Show the images
- #cv.ShowImage("Normal feed", image)
+ cv.ShowImage("Normal feed", image)
  cv.ShowImage("Edge detection", canny)	
  waitKey(1)	
 	
