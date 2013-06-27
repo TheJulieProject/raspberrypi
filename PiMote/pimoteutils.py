@@ -221,7 +221,9 @@ class PhoneServer(Server):
 	STORE_KEY = 5649
 	phone = None
 	isPassword = False
-	key = "thisistheserverkey1"
+	key = "thisistheserverkey1876"
+	clientMax = False
+	noOfClients = 0
 	def addPhone(self, thephone):
 		self.phone = thephone
 	def onStart(self):
@@ -239,6 +241,11 @@ class PhoneServer(Server):
 
 	def onConnect(self, socket):
 		print("Phone connected")
+		self.noOfClients+=1
+		if self.clientMax:
+			if self.noOfClients > self.maxClients:
+				socket.send(str(PhoneServer.PASSWORD_FAIL))
+
 		if self.isPassword:
 			socket.send(str(PhoneServer.REQUEST_PASSWORD))
 		else:
@@ -247,10 +254,11 @@ class PhoneServer(Server):
 
 	def onDisconnect(self, socket):
 		print("Phone disconnected")
+		self.noOfClients-=1
 		return True
 
-	def setPassword(self, value, pswd):
-		self.isPassword = value
+	def setPassword(self, pswd):
+		self.isPassword = True
 		self.password = pswd
 
 	def managePassword(self, password, socket):
@@ -261,6 +269,7 @@ class PhoneServer(Server):
 			self.phone.setup(socket)
 		else:
 			socket.send(str(PhoneServer.PASSWORD_FAIL))
+
 	def manageIncomingMessage(self, message):
 		if isinstance(self.phone, Phone):
 			(id, sep, msg) = message.strip().partition(",")
@@ -268,6 +277,10 @@ class PhoneServer(Server):
 			self.phone.buttonPressed(int(id), msg)
 		elif isinstance(self.phone, ControllerPhone):
 			self.phone.controlPress(message)
+
+	def setMaxClients(self, x):
+		self.clientMax = True
+		self.maxClients = x
 
 ################------PHONE TYPES--------####################
 
