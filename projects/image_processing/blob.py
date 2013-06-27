@@ -2,10 +2,10 @@
 from imgproc import *
 import time
 
-# open the webcam
+# Set the webcam
 cam= Camera(20, 15)
 
-# open a view, setting the view to the size of the captured image
+# open a window, setting it to the size of the captured image
 view = Viewer(cam.width, cam.height, "Blob finding")
 
 while True:

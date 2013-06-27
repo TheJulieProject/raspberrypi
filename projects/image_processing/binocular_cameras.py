@@ -2,7 +2,8 @@
 import cv
 from cv2 import *
 
-# code from glowing python
+# Code from glowing python
+# Keep objects whsoe disparity is above the set threshold
 def cut(disparity, image, threshold):
  for i in range(0, image.height):
   for j in range(0, image.width):
@@ -10,9 +11,10 @@ def cut(disparity, image, threshold):
    if cv.GetReal2D(disparity,i,j) > threshold:
     cv.Set2D(disparity,i,j,cv.Get2D(image,i,j))
 
-# taking pictures
-caml = VideoCapture(1)
-camr = VideoCapture(0)
+# Set cameras. The one at the left should be the one connected
+# first to the Raspberry
+caml = VideoCapture(0)
+camr = VideoCapture(1)
 
 # grab an image from the left camera
 s, image = caml.read()
@@ -24,7 +26,7 @@ s, image = camr.read()
 if s:
  imwrite('scene_r.bmp', image)
 
-# loading the stereo pair
+# Load each image in grey
 left = cv.LoadImage('scene_l.bmp',cv.CV_LOAD_IMAGE_GRAYSCALE)
 right = cv.LoadImage('scene_r.bmp',cv.CV_LOAD_IMAGE_GRAYSCALE)
 
@@ -42,6 +44,7 @@ cv.ConvertScale(disparity_left,disp_left_visual,-16)
 # cutting the object farthest of a threshold
 cut(disp_left_visual,left,120)
 
+# Show result
 cv.NamedWindow('Disparity map',cv.CV_WINDOW_AUTOSIZE)
 cv.ShowImage('Disparity map',disp_left_visual)
 cv.WaitKey()
