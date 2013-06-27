@@ -7,7 +7,7 @@ Needs porting into python3 for use with PiFace
 
 # Import PhoneServer and Phone classes from pimoteutils.
 import sys
-from pimoteutils import PhoneServer, ControllerPhone
+from pimoteutils import *
 
 
 #
@@ -33,6 +33,11 @@ RIGHT_FORWARDS_OFF  = "4"
 RIGHT_FORWARDS_ON   = "5"
 RIGHT_BACKWARDS_OFF = "6"
 RIGHT_BACKWARDS_ON  = "7"
+
+BOTH_OFF = "-1"
+
+ROBOT_ENABLED = 0	# 0 = OFF, 1 == ON; for testing purposes
+
 
 # Override Phone so you can control what you do with the messages
 #   "id" - the ID of the button that has been pressed
@@ -73,21 +78,24 @@ class PiDroid(ControllerPhone):
 					p.wait()
 					toBeSpoken = word
 			cmd = ['./speech.sh', toBeSpoken]
-			subprocess.Popen(cmd, stdout=subprocess.PIPE)
+			p = subprocess.Popen(cmd, stdout=subprocess.PIPE)			
 		else:
 			cmd = ['./speech.sh', something]
 			p = subprocess.Popen(cmd, stdout=subprocess.PIPE)
-			p.wait()
+		p.wait()
 
 
 	def reply(self, toSomething):
 		answer = self.PiAI.Ask(toSomething)
-		print 'replied: ' + answer
+		print "replied: " + answer
 		self.say(answer)
 
 
 	def moveRobot(self, message, power):
 		
+		if ROBOT_ENABLED == 0:
+			return
+
 		if   message == LEFT_FORWARDS_OFF:
 			nxt.leftMotor.idle()
 		
@@ -112,6 +120,13 @@ class PiDroid(ControllerPhone):
 
 		elif message == RIGHT_BACKWARDS_ON:
 			nxt.rightMotor.run(-power)
+
+		elif message == BOTH_OFF:
+			nxt.leftMotor.idle()
+			nxt.rightMotor.idle()
+
+		else:
+			print 'ERROR: received ' + message + ' as ROBOT_CONTROL'
 
 
 	def interpretVoice(self, message):
@@ -143,8 +158,7 @@ class PiDroid(ControllerPhone):
 			self.moveRobot(RIGHT_BACKWARDS_ON, power)	#
 
 		elif message == "stop":
-			nxt.leftMotor.idle()
-			nxt.rightMotor.idle()
+			self.moveRobot(BOTH_OFF)	#
 
 
 		elif message == "speak to me":
@@ -172,11 +186,13 @@ PiDroid.setVideo(True)
 PiDroid.setVoice(True)
 
 # Enabling the NXT Lego Robot
-import robot_interf as r
-nxt = r.NXTRobot()
+if ROBOT_ENABLED == 1:
+	import robot_interf as r
+	nxt = r.NXTRobot()
 
 #Create the server
 myserver = PhoneServer()
+myserver.setPassword("helloworld")
 #Add the phone (app)
 myserver.addPhone(PiDroid)
 # Start server
