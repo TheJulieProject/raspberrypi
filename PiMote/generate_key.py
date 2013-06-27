@@ -1,10 +1,10 @@
-#############################################
-#											#
-#			RANDOM KEY GENERATOR			#				
-#											#
-#			- some description -			#
-#											#
-#############################################
+#################################################
+#						#
+#		RANDOM KEY GENERATOR		#				
+#						#
+#		- some description -		#
+#						#
+#################################################
 
 
 import string
@@ -27,4 +27,6 @@ for x in range(0,30):
 
 privateKey += "####################\n"
 
-print privateKey
+file = open('privatekey.data', 'w')
+file.write(privateKey)
+
