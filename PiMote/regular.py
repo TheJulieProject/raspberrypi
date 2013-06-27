@@ -21,21 +21,23 @@ port = int(sys.argv[2])
 #   "message" - the message sent by the phone. If no message it will be ""
 class MyPhone(Phone):
 	#Override
-	text = "Hello"
 	def buttonPressed(self, id, message):
-		if id == vi.getId():
-			print(message)
+		#########----------------------------------------------###########
+		# Your code will go here! Check for the ID of the button pressed #
+		# and handle that button press as you wish.                      #
+		#########----------------------------------------------###########
 
 # Create the phone object
 thisphone = MyPhone()
 
-b1 = Button("Hello")
-b2 = ToggleButton("This is a toggle button", True)
-b3 = InputText("Input text here")
-o1 = OutputText("Hello")
-v = VideoFeed("10.0.2.7", 400, 400)
-vi = VoiceInput()
+b1 = Button("Hello") #Regular button
+b2 = ToggleButton("This is a toggle button", True) #Toggle
+b3 = InputText("Input text here") #Text Input
+o1 = OutputText("Hello") #Output field
+v = VideoFeed("10.0.2.7", 400, 400) #Live video feed
+vi = VoiceInput() #Voice input
 
+#Add the buttons to the phone
 thisphone.addButton(b1)
 thisphone.addButton(b2)
 thisphone.addButton(b3)
