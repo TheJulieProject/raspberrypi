@@ -36,10 +36,13 @@ public class RegularButtonManager {
     AsyncTask<String, Void, MjpegInputStream> read = null;
     String ip;
 
+    int viewPosition;
+
     public RegularButtonManager(Context c, TCPClient tcp, String ip) {
         this.c = c;
         this.tcp = tcp;
         this.ip = ip;
+        this.viewPosition = 0;
         //((Communicator) c).setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         outputs = new ArrayList<TextView>();
         ((Communicator) c).getActionBar().show();
@@ -81,7 +84,7 @@ public class RegularButtonManager {
             }
         });
 
-        layout.addView(button);
+        layout.addView(button, viewPosition++);
     }
 
     public void addNewTextInput(final String[] setup) {
@@ -111,8 +114,7 @@ public class RegularButtonManager {
         });
         textButtonLayout.addView(addText);
         textButtonLayout.addView(button);
-
-        layout.addView(textButtonLayout);
+        layout.addView(textButtonLayout, viewPosition++);
     }
 
     public void addNewToggle(final String[] setup) {
@@ -139,7 +141,7 @@ public class RegularButtonManager {
         });
         textButtonLayout.addView(text);
         textButtonLayout.addView(button);
-        layout.addView(textButtonLayout);
+        layout.addView(textButtonLayout, viewPosition++);
     }
 
     public void addNewTextView(final String[] setup) {
@@ -151,7 +153,7 @@ public class RegularButtonManager {
         text.setLayoutParams(params);
         if (setup.length == 3)
             text.setText(setup[2]);
-        layout.addView(text);
+        layout.addView(text, viewPosition++);
         outputs.add(text);
     }
 
@@ -169,6 +171,7 @@ public class RegularButtonManager {
         params.setMargins(0, 10, 0, 10);
         mv.setLayoutParams(params);
         mv.setVisibility(View.VISIBLE);
+        viewPosition++;
     }
 
     public void addVoiceInput(final String[] setup) {
@@ -184,7 +187,7 @@ public class RegularButtonManager {
                 ((Communicator) c).startVoiceRecognition(id);
             } // onClick()
         });
-        layout.addView(voice);
+        layout.addView(voice, viewPosition++);
     }
 
     public void stop() {

@@ -10,6 +10,7 @@ import sys
 import threading
 import time
 import socket as socketlib
+import subprocess
 
 
 class Socket():
@@ -211,73 +212,97 @@ class Client(Receiver):
 
 
 ########################-------SERVER-------########################################
-
+#  This is the main server that runs on the pi. All messages are sorted here and sent
+#  to the phone that handles them.
+#  It also initialises and sorts the security.
 
 class PhoneServer(Server):
+	#Protocol final static variables
 	SENT_PASSWORD = 0
 	SENT_DATA = 1
 	PASSWORD_FAIL = 2314
 	REQUEST_PASSWORD = 9855
 	STORE_KEY = 5649
+
 	phone = None
 	isPassword = False
-	key = "thisistheserverkey1876"
 	clientMax = False
 	noOfClients = 0
-	def addPhone(self, thephone):
+
+	#Store the phone object for reference
+	def addPhone(self, thephone): 
 		self.phone = thephone
+
+	#Called when the server is started
 	def onStart(self):
 		print("Server has started")
-		
+		if isPassword: #If password protected
+			read = False
+			while not read: #Loop to get the key
+				try:
+					file = open("privatekey.data", "r")
+					self.key = file.read() #Read the key
+					read = True
+				except: #No such file so generate key and file
+					subprocess.call("python generate_key.py", shell=True)
+
+	#Called when a message is recieved from the phone
 	def onMessage(self, socket, message):
+		#First int is a protocol variable
 		(sentType, sep, msg) = message.strip().partition(",")
-		if int(sentType) == PhoneServer.SENT_PASSWORD:
+		if int(sentType) == PhoneServer.SENT_PASSWORD: #Password data
 			self.managePassword(msg, socket)
-		elif int(sentType) == PhoneServer.SENT_DATA:
+		elif int(sentType) == PhoneServer.SENT_DATA: #Input data
 			self.manageIncomingMessage(msg)
 		
 		# Signify all is well
 		return True
 
+	#Called when a phone connects to the server
 	def onConnect(self, socket):
 		print("Phone connected")
-		self.noOfClients+=1
+		self.noOfClients+=1 #Counting clients
 		if self.clientMax:
 			if self.noOfClients > self.maxClients:
-				socket.send(str(PhoneServer.PASSWORD_FAIL))
+				socket.send(str(PhoneServer.PASSWORD_FAIL)) #Kick them if full
 
-		if self.isPassword:
+		if self.isPassword: #if the server has password, request it
 			socket.send(str(PhoneServer.REQUEST_PASSWORD))
-		else:
+		else: #otherwise setup
 			self.phone.setup(socket)
 		return True
 
+	#Called when a phone disconnects from the server
 	def onDisconnect(self, socket):
 		print("Phone disconnected")
-		self.noOfClients-=1
+		self.noOfClients-=1 #tracking clients
 		return True
 
+	#Used to set a password for the server
 	def setPassword(self, pswd):
 		self.isPassword = True
 		self.password = pswd
 
+	#Handle the password recieved from the phone
 	def managePassword(self, password, socket):
-		if password == self.password:
+		if password == self.password: #Password was right, tell them to store key
 			socket.send(str(PhoneServer.STORE_KEY)+","+self.key)
-			self.phone.setup(socket)
-		elif password == self.key:
-			self.phone.setup(socket)
-		else:
-			socket.send(str(PhoneServer.PASSWORD_FAIL))
+			self.phone.setup(socket)#setup
+		elif password == self.key:#they had a key
+			self.phone.setup(socket)#setup
+		else:#wrong password
+			socket.send(str(PhoneServer.PASSWORD_FAIL)) #kick them
 
+	#Manage incoming message
 	def manageIncomingMessage(self, message):
-		if isinstance(self.phone, Phone):
-			(id, sep, msg) = message.strip().partition(",")
-			self.phone.updateButtons(int(id), msg)
-			self.phone.buttonPressed(int(id), msg)
-		elif isinstance(self.phone, ControllerPhone):
-			self.phone.controlPress(message)
+		if isinstance(self.phone, Phone): #Regular phone
+			(id, sep, msg) = message.strip().partition(",") #Strip component ID and message apart
+			self.phone.updateButtons(int(id), msg) #Update buttons if needed
+			self.phone.buttonPressed(int(id), msg) #Allow the user to handle the message
+		elif isinstance(self.phone, ControllerPhone): #Controller
+			self.phone.controlPress(message) #Controller handler
 
+	#Used to limit the amount of clients that can connect at one time
 	def setMaxClients(self, x):
 		self.clientMax = True
 		self.maxClients = x
@@ -285,31 +310,44 @@ class PhoneServer(Server):
 ################------PHONE TYPES--------####################
 
 class Phone():
-	buttons = []
+	buttons = [] #For user use
 	outputs = []
-	video = False
-	controltype = 0
+	components = [] #To send to phone
+
+	controltype = 0 #Type of phone
+
+	#More final protocol variables for setup
 	INPUT_REGULAR = 1
 	INPUT_TEXT = 2
 	INPUT_TOGGLE = 3
 	OUTPUT_TEXT = 4
 	VIDEO_FEED = 5
 	VOICE_INPUT = 6
+	#Setup
 	SET_CONTROL_TYPE = 0
 	SETUP = 1
+	#Data being sent
 	REQUEST_OUTPUT_CHANGE = 2
+
+	#Add a button to the phone
 	def addButton(self, button):
 		if isinstance(button, Button):
 			button.id = len(self.buttons)
 			self.buttons.append(button)
+			self.components.append(button)
 		else:
 			print("Button not provided")
+
+	#Add an output to the phone
 	def addOutput(self, output):
 		if isinstance(output, OutputText):
 			output.id = len(self.outputs)
 			self.outputs.append(output)
+			self.components.append(output)
 		else:
 			print("Not an output")
+
+	#Add a video feed to the phone
 	def addVideoFeed(self, vid):
 		if self.video:
 			print("You can only have one video feed running..")
@@ -317,20 +355,24 @@ class Phone():
 		else:
 			self.vid = vid
 			self.video = True
+			self.components.append(vid)
+
+	#User overrides this. Called when a message is recieved
 	def buttonPressed(self, id, msg):
 		pass
+	#Returns all buttons
 	def getButtons(self):
 		return self.buttons
+	#Returns all outputs
+	def getOutputs(self):
+		return self.outputs
+	#Used for setup
 	def setup(self, socket):
 		self.socket = socket
 		socket.send(str(Phone.SET_CONTROL_TYPE)+","+str(self.controltype))
-		for i in self.buttons:
-			i.setup(socket)
-		for o in self.outputs:
-			o.socket = socket
-			o.setup(socket)
-		if self.video == True:
-			self.vid.setup(socket)
+		for c in self.components:
+			c.setup(socket) #setup each component
+	#Updates the state of buttons (toggle)
 	def updateButtons(self, id, message):
 		for b in self.buttons:
 			if b.id == id:
@@ -347,16 +389,6 @@ class ControllerPhone():
 	video = False
 	voice = False
 	def controlPress(self, type):
-		'''
-		0 - Forward
-		1 - Forward and left
-		2 - Forward and right
-		3 - Backwards
-		4 - Backwards and left
-		5 - Backwards and right
-		6 - Right
-		7 - Left
-		'''
 		pass
 	def setVideo(self, value):
 		self.video = value
@@ -428,6 +460,7 @@ class OutputText():
 	def getText(self):
 		return self.message
 	def setup(self, socket):
+		self.socket = socket
 		socket.send(str(Phone.SETUP)+","+str(self.type)+","+str(self.id)+","+str(self.message)) 
 
 class VideoFeed():
