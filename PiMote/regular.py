@@ -26,7 +26,14 @@ class MyPhone(Phone):
 		# Your code will go here! Check for the ID of the button pressed #
 		# and handle that button press as you wish.                      #
 		#########----------------------------------------------###########
-		pass
+		if id == b1.getId():
+			o1.setText("Button pressed")
+		elif id == b2.getId():
+			o1.setText("Toggle switched to " + message)
+		elif id == b3.getId():
+			o1.setText(message)
+		elif id == vi.getId():
+			o1.setText(message)
 
 # Create the phone object
 thisphone = MyPhone()
@@ -35,7 +42,7 @@ b1 = Button("Hello") #Regular button
 b2 = ToggleButton("This is a toggle button", True) #Toggle
 b3 = InputText("Input text here") #Text Input
 o1 = OutputText("Hello") #Output field
-v = VideoFeed("10.0.2.7", 400, 400) #Live video feed
+v = VideoFeed("10.0.2.7", 320, 240) #Live video feed
 vi = VoiceInput() #Voice input
 
 #Add the buttons to the phone
@@ -47,7 +54,7 @@ thisphone.addVideoFeed(v)
 thisphone.addButton(vi)
 #Create the server
 myserver = PhoneServer()
-myserver.setPassword(True, "helloworld")
+myserver.setPassword("helloworld")
 #Add the phone
 myserver.addPhone(thisphone)
 # Start server

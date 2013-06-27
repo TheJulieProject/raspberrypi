@@ -30,7 +30,7 @@ public class Communicator extends Activity {
     private static final int PASSWORD_FAIL = 2314;
     private static int controlType = -1;
     TCPClient tcp;
-    String ip, password;
+    String ip;
     int port;
     AsyncTask<String, String, TCPClient> task = null;
     RegularButtonManager regular = null;
