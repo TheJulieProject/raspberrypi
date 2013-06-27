@@ -215,7 +215,7 @@ class Client(Receiver):
 
 class PhoneServer(Server):
 	phone = None
-
+	_
 	def addPhone(self, thephone):
 		self.phone = thephone
 	def onStart(self):
@@ -332,7 +332,6 @@ class ControllerPhone():
 
 class Button():
 	def __init__(self, name):
-		self.id = id
 		self.name = name
 		self.type = Phone.INPUT_REGULAR
 	def getId(self):
@@ -369,8 +368,6 @@ class ToggleButton(Button):
 class VoiceInput(Button):
 	def __init__(self):
 		self.type = Phone.VOICE_INPUT
-	def getId(self):
-		return self.id
 	def setup(self, socket):
 		socket.send(str(0)+","+str(self.type)+","+str(self.id))
 
@@ -384,6 +381,8 @@ class OutputText():
 	def setText(self, message):
 		self.message = message
 		self.socket.send(str(1)+","+str(self.id)+","+str(self.message))
+	def getText(self):
+		return self.message
 	def setup(self, socket):
 		socket.send(str(0)+","+str(self.type)+","+str(self.id)+","+str(self.message)) 
 
