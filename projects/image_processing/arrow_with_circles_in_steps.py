@@ -1,24 +1,22 @@
 #!/usr/bin/env python
-#from imgproc import *
 import cv
 from cv2 import *
 import math
 
+# Represent a point with the x (width) and y (height) coordinates and if it 
+# is active or not.
 class Point:
  def __init__(self, requiredheight, requiredwidth, requiredactive):
  	self.height = requiredheight
 	self.width = requiredwidth
 	self.isActive = requiredactive
  
-# Get the corners of the octogone and draw them in the screen
-def octagon(img):
- # Check if initialized
- global initialized
- if not initialized:
+# Get the corners of the octagon and draw them in the screen
+def octagon(img): 
   # Import
   global point1, point2, point3, point4, point5, point6, point7, point8, t
 
-  # Calculate the smallest of the image sizes
+  # Calculate the smallest of the image parameters
   if img.height < img.width:
    smallest = img.height
   else:
@@ -27,7 +25,7 @@ def octagon(img):
   # Distance from borders (in pixels)
   t = 13
 
-  # Value to center the octogone (in pixels)
+  # Value to center the octagon (in pixels)
   c = 20
 
   # Calculate distance d from a corner to the centre of the square.
@@ -58,8 +56,7 @@ def octagon(img):
   point8 = Point(t+ c, smallest-t-d, False)
   cv.Circle(imcolor,(point8.height, point8.width),radius,cv.RGB(0, 255, 0))
 
-  initialized = False
-
+  # Show the image before using the harris algorithm
   cv.ShowImage("Octagon", imcolor)
 
 # Check if a corner is in one of the 8 regions and, in that case, activate it.
@@ -133,11 +130,7 @@ global point1, point2, point3, point4, point5, point6, point7, point8
 global radius
 radius = 7
 
-# Keep if octogone has been initialized
-global initialized
-initialized = False
-
-# Create the windows.
+# Create the windows to show the final result and the intermediate steps.
 namedWindow("Normal feed", cv.CV_WINDOW_AUTOSIZE)
 namedWindow("Black and white", cv.CV_WINDOW_AUTOSIZE)
 namedWindow("Octagon", cv.CV_WINDOW_AUTOSIZE)
@@ -146,45 +139,45 @@ namedWindow("Red channel", cv.CV_WINDOW_AUTOSIZE)
 namedWindow("Green channel", cv.CV_WINDOW_AUTOSIZE)
 namedWindow("Blue channel", cv.CV_WINDOW_AUTOSIZE)
 
-# Web cam
+# Set the webcam
 cam = VideoCapture(0)
 
 while True:
-
+	# Read and image and save it
 	s, image = cam.read()
 	if s:
 	 imwrite('cam_image.jpg', image)
 
 	# Code from Glowing python.
+	# Load image in colour, in grey scale and using the cv2 command.
 	imcolor = cv.LoadImage('cam_image.jpg')
 	image = cv.LoadImage('cam_image.jpg',cv.CV_LOAD_IMAGE_GRAYSCALE)
 	imgchannels = imread('cam_image.jpg')
 
-	# Separe variables for separate channels.
+	# Separe variables for separate red, green and blue channels.
 	channelR = split(imgchannels)[2]
 	channelG = split(imgchannels)[1]
 	channelB = split(imgchannels)[0]
-
-	# Split the image into channels.
-	#cv.Split(imcolor, channelR, channelG, channelB, None)
 
 	# Show the channels.
 	imshow("Red channel", channelR)
 	imshow("Green channel", channelG)
 	imshow("Blue channel", channelB)
 
-	# Show both images.
+	# Show image in black and white and in colour.
 	cv.ShowImage("Normal feed", imcolor)
 	cv.ShowImage("Black and white", image)
 
-	# Initialise the octogone
+	# Initialise the octagon
 	octagon(imcolor)	
 	
+	# Destination of the harris algorithm
 	cornerMap = cv.CreateMat(image.height, image.width, cv.CV_32FC1)
 	
 	# OpenCV corner detection
 	cv.CornerHarris(image,cornerMap,3)
 	
+	# Iterate through each pixel to get the final command.
 	for y in range(0, image.height):
  	 for x in range(0, image.width):
 	  harris = cv.Get2D(cornerMap, y, x) # get the x,y value
@@ -192,13 +185,13 @@ while True:
 	  # check the corner detector response
 	  if harris[0] > 10e-06:
  	  
-	   # draw a small circle on the original image
+	   # draw a small circle on the original image to represent the corner
            cv.Circle(imcolor,(x,y),2,cv.RGB(155, 0, 25))
 
 	   # Check if it is in one of the 8 points.
 	   active(x,y)
 
-	   # Change to blue the activated points.
+	   # Change to blue the activated corners of the octagon.
 	   bluePoint()	
 
 	   # Print the resulting direction
@@ -206,6 +199,7 @@ while True:
 	   if not direct == None:
 		print direct	
 
+	# Show the final result.
 	cv.ShowImage("Final output", imcolor)	
 	waitKey(1)	
 	
