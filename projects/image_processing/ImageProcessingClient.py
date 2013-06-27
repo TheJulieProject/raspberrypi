@@ -9,10 +9,11 @@ Needs porting into python3 for use with PiFace
 import sys
 from pimoteutils import *
 # import 
+import move_robot_with_hands as moveRobot
 
 # Parse the IP address and port you wish to listen on.
-ip = sys.argv[1] 		# PiDroid 10.0.2.5
-port = int(sys.argv[2]) # 8090
+ip = sys.argv[1] 		
+port = int(sys.argv[2]) 
 
 # Messages to PiDroid are sent as
 # ("ROBOT_CONTROL,ACTION")
@@ -37,7 +38,7 @@ PROCESS_IMAGES_ON  = "1"
 
 class ImageProcessingClient(Client):
 	
-	def onStart():
+	def onStart(self):
 		print "Client started."
 
 	def onMessage(self, message):
@@ -57,22 +58,27 @@ myClient.start(ip, port)
 while myClient.isRunning():
 	try: 
 		if myClient.processing == True:
-			if   == :
+			command = moveRobot.move()
+			commandRight, commandLeft = command.split("_")
+			if commandLeft == "1":
 				myClient.send(LEFT_UP)
-			elif == :
+			elif commandLeft == "-1":
 				myClient.send(LEFT_DOWN)
-			elif == :
+			elif commandLeft == "0":
 				myClient.send(LEFT_OFF)
+			elif commandLeft == "Do nothing":
+				pass
+			else:
+				print "ERROR: Invalid image processing output to server"
 
-			elif == :
+			if commandRight == "1":
 				myClient.send(RIGHT_UP)
-			elif == :
+			elif commandRight == "-1":
 				myClient.send(RIGHT_DOWN)
-			elif == :
+			elif commandRight == "0":
 				myClient.send(RIGHT_OFF)
-
-			elif == :
-				myClient.send(BOTH_OFF)
+			elif commandRight == "Do nothing":
+				pass
 			else:
 				print "ERROR: Invalid image processing output to server"
 	except:
