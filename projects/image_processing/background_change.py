@@ -3,11 +3,11 @@ from imgproc import *
 import time
 import cv
 
-# open the webcam
+# Open the webcam
 cam= Camera(20, 15)
 
-# open a view, setting the view to the size of the captured image
-view = Viewer(cam.width, cam.height, "Blob finding")
+# Create two views, one for the original image and another for the image with the background deleted
+view = Viewer(cam.width, cam.height, "Normal feed")
 cv.NamedWindow("Another background", cv.CV_WINDOW_AUTOSIZE)
 
 while True:
@@ -25,15 +25,16 @@ while True:
     		# get the value of the current pixel
     		red, green, blue = my_image[x, y]
 
-   		# check if the blue intensity is greater than the green
+   		# check if the intensity is near white
    		if green > 200 and red > 200 and blue > 200:      		 
-      			# this pixel is predominantly blue
+      			# this pixel is predominantly white
       			# let's set it to black
       			my_image[x, y] = 0, 0, 0
-		else:
+		# If it shouldn't be deleted, then copy to the destiny image
+    		else:
 		 destiny[y,x] = blue,green,red
 
-	# display the image on the screen
+	# display the images on the screen
 	view.displayImage(my_image)
 	cv.ShowImage("Another background", destiny)
 	cv.WaitKey(1)
