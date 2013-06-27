@@ -10,9 +10,11 @@ class Point:
         self.height = requiredheight
         self.width = requiredwidth
         self.isActive = requiredactive
+	self.currentState = 0
+	self.previousState = 0
 
 # Window for the final image
-namedWindow("Edge detection", cv.CV_WINDOW_AUTOSIZE)
+namedWindow("Robot movement", cv.CV_WINDOW_AUTOSIZE)
 
 # Set webcam
 cam = VideoCapture(0)
@@ -54,44 +56,54 @@ while True:
 
 	# If white check in which quarter is located
 	if pixel == 255.0:
-	 # If left quarter and not read yet, store coordinates.
+	 # If left quarter and not read yet, store state.
 	 if y < image.width/4 and not rightHand.isActive:
-	  rightHand.height = x
-	  rightHand.width = y
-	  rightHand.isActive = True
-	 # If right quarter and not read yet, store coordinates.
-	 elif y > image.width*3/4 and not leftHand.isActive:
-	  leftHand.height = x
-	  leftHand.width = y
-	  leftHand.isActive = True
+	  if x < image.height/3:
+		rightHand.currentState = 1
+		rightHand.isActive = True
+	  elif x > image.height*2/3:
+		rightHand.currentState = -1
+		rightHand.isActive = True
+	  else:
+		rightHand.currentState = 0
+		rightHand.isActive = True
+	 # If right quarter and not read yet, store state.
+	 if y > image.width*3/4 and not leftHand.isActive:
+	  if x < image.height/3:
+		leftHand.currentState = 1
+		leftHand.isActive = True
+	  elif x > image.height*2/3:
+		leftHand.currentState = -1
+		leftHand.isActive = True
+	  else:
+		leftHand.currentState = 0
+		leftHand.isActive = True
 	 # If both hands have been read, stop the loops.
-	 elif rightHand.isActive and leftHand.isActive:
+	 if rightHand.isActive and leftHand.isActive:
 	  break 
 
- # Check where the dots are and print the resulting command.
- if rightHand.height < image.height/3:
-  if leftHand.height < image.height/3:
-	print "Forward"
-  elif leftHand.height < image.height*2/3:
-	print "Forward_right"
+ # Send a message if the current state is different to the previous state.
+ if rightHand.currentState != rightHand.previousState:
+  if rightHand.currentState == 1:
+	print "Right up"
+  elif rightHand.currentState == -1:
+	print "Right down"
   else:
-	print "Turn_left"
- elif rightHand.height < image.height*2/3:
-  if leftHand.height < image.height/3:
-	print "Forward_left"
-  elif leftHand.height < image.height*2/3:
-	print "Stop"
-  else:
-	print "Back_right"
- else:
-  if leftHand.height < image.height/3:
-	print "Turn_right"
-  elif leftHand.height < image.height*2/3:
-	print "Back_left"
-  else:
-	print "Back"
+	print "Stop right"
 
+  rightHand.previousState = rightHand.currentState
+
+ elif leftHand.currentState != leftHand.previousState:
+  if leftHand.currentState == 1:
+	print "Left up"
+  elif leftHand.currentState == -1:
+	print "Left down"
+  else:
+	print "Stop Left"
+
+  leftHand.previousState = leftHand.currentState
+ 
  #Show the image
- cv.ShowImage("Edge detection", canny)	
+ cv.ShowImage("Robot movement", canny)	
  waitKey(1)	
 	
