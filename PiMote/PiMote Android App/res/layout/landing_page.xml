@@ -42,10 +42,9 @@
         android:id="@+id/connectBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/textView2"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="45dp"
-        android:text="Connect" />
+        android:text="Connect"
+        android:layout_centerVertical="true"
+        android:layout_centerHorizontal="true"/>
 
     <EditText
         android:id="@+id/portNo"
@@ -57,5 +56,25 @@
         android:layout_toRightOf="@+id/textView2"
         android:ems="10"
         android:inputType="number" />
+
+    <EditText
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:inputType="textPassword"
+            android:ems="10"
+            android:id="@+id/passwordText"
+            android:layout_marginTop="20dp"
+            android:layout_below="@+id/portNo"
+            android:layout_toRightOf="@+id/textView2"
+            android:password="true"/>
+
+    <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textAppearance="?android:attr/textAppearanceLarge"
+            android:text="Password: "
+            android:id="@+id/textView"
+            android:layout_alignBottom="@+id/passwordText"
+            android:layout_alignLeft="@+id/textView2"/>
 
 </RelativeLayout>
