@@ -236,7 +236,7 @@ class PhoneServer(Server):
 	#Called when the server is started
 	def onStart(self):
 		print("Server has started")
-		if isPassword: #If password protected
+		if self.isPassword: #If password protected
 			read = False
 			while not read: #Loop to get the key
 				try:
@@ -315,6 +315,8 @@ class Phone():
 	components = [] #To send to phone
 
 	controltype = 0 #Type of phone
+
+	video = False
 
 	#More final protocol variables for setup
 	INPUT_REGULAR = 1
