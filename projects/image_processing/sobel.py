@@ -1,9 +1,8 @@
 #!/usr/bin/env python
-#from imgproc import *
 import cv
 from cv2 import *
 import math
-   
+
 # Set the camera
 cam = VideoCapture(0)
 
@@ -22,8 +21,5 @@ dstSobel = cv.CreateMat(image.height, image.width, cv.CV_32FC1)
 # Apply sobel algorithm
 cv.Sobel(image, dstSobel, 1, 1, 3)	
 	
-# Show the image
-cv.ShowImage("Sobel", dstSobel)	
-waitKey(0)	
-
-	
+# Save the image
+cv.SaveImage('sobel.jpg', dstSobel)
