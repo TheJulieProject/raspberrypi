@@ -42,7 +42,7 @@ b1 = Button("Hello") #Regular button
 b2 = ToggleButton("This is a toggle button", True) #Toggle
 b3 = InputText("Input text here") #Text Input
 o1 = OutputText("Hello") #Output field
-v = VideoFeed("10.0.2.7", 320, 240) #Live video feed
+v = VideoFeed(320, 240) #Live video feed
 vi = VoiceInput() #Voice input
 
 #Add the buttons to the phone

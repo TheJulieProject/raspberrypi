@@ -368,7 +368,7 @@ class ControllerPhone():
 			videoV = 1
 		if self.voice == True:
 			voiceV = 1
-		socket.send(str(self.controltype) + "," + str(videoV) + "," + str(voiceV))
+		socket.send(str(Phone.SET_CONTROL_TYPE)+","+str(self.controltype) + "," + str(videoV) + "," + str(voiceV))
 
 
 
@@ -431,10 +431,14 @@ class OutputText():
 		socket.send(str(Phone.SETUP)+","+str(self.type)+","+str(self.id)+","+str(self.message)) 
 
 class VideoFeed():
-	def __init__(self, theip, width, height):
-		self.ip = theip
+	outsidefeed = 0;
+	ip = "-"
+	def __init__(self, width, height):
 		self.type = Phone.VIDEO_FEED
 		self.width = width
 		self.height = height
+	def setIp(self, ip):
+		self.ip = ip
+		self.outsidefeed = 1
 	def setup(self, socket):
-		socket.send(str(Phone.SETUP)+","+str(self.type)+","+self.ip+","+str(self.width)+","+str(self.height))
+		socket.send(str(Phone.SETUP)+","+str(self.type)+","+str(self.width)+","+str(self.height)+","+str(self.outsidefeed)+","+self.ip)
