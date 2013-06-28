@@ -10,6 +10,7 @@ import sys
 import threading
 import time
 import socket as socketlib
+import subprocess
 
 
 class Socket():
@@ -221,14 +222,21 @@ class PhoneServer(Server):
 	STORE_KEY = 5649
 	phone = None
 	isPassword = False
-	key = "thisistheserverkey1876"
 	clientMax = False
 	noOfClients = 0
 	def addPhone(self, thephone):
 		self.phone = thephone
 	def onStart(self):
 		print("Server has started")
-		
+		read = False
+		while not read:
+			try:
+				file = open("privatekey.data", "r")
+				self.key = file.read()
+				read = True
+			except:
+				subprocess.call("python generate_key.py", shell=True)
+
 	def onMessage(self, socket, message):
 		(sentType, sep, msg) = message.strip().partition(",")
 		if int(sentType) == PhoneServer.SENT_PASSWORD:
