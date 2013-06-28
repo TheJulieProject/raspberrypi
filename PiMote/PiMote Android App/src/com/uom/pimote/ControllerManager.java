@@ -29,10 +29,10 @@ public class ControllerManager {
     private MjpegView mv = null;
 
     public ControllerManager(final Context c, final TCPClient tcp, String ip, int videoV, int voiceV) {
-
         ((Communicator)c).getActionBar().hide();
-        ((Communicator)c).setContentView(R.layout.controllayout);
         ((Communicator)c).setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+        ((Communicator)c).setContentView(R.layout.controllayout);
+
 
         this.tcp = tcp;
         final ImageView leftForward;
