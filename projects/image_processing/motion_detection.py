@@ -37,7 +37,7 @@ while True:
 	  blue, green, red = image[y,x]
 
 	  # Take luminosity into account by assuming that a change of 10 is permited. If more, then motion was detected.
-	  if math.fabs(prevBlue - blue) > 10 and math.fabs(prevGreen - green) > 10 and math.fabs(prevRed - red) > 10:
+	  if math.fabs(prevBlue - blue) > 20 or math.fabs(prevGreen - green) > 20 or math.fabs(prevRed - red) > 20:
 		# Update pixel count and, if greater than threshold, say that motion was detected.
 		differentPixels = differentPixels + 1
 		
