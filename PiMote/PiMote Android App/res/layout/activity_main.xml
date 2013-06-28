@@ -15,18 +15,14 @@
             android:layout_height="match_parent"
             android:orientation="vertical"
             android:padding="10sp"
-                >
+            android:gravity="center">
 
             <com.uom.pimote.MjpegView
                     android:id="@+id/mv2"
                     android:layout_width="100dp"
                     android:layout_height="100dp"
                     android:visibility="gone"
-                    android:layout_gravity="center"
-                    android:layout_alignParentTop="false"
-                    android:layout_alignParentLeft="false"
-                    android:layout_alignParentRight="false"
-                    android:layout_centerHorizontal="true"/>
+                    android:layout_gravity="center"/>
 
         </LinearLayout>
     </ScrollView>
