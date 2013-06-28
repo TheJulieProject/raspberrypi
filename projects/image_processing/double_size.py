@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-#from imgproc import *
 import cv
 from cv2 import *
 
