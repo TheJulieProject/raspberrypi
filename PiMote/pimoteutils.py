@@ -295,6 +295,7 @@ class PhoneServer(Server):
 class Phone():
 	buttons = []
 	outputs = []
+	components = []
 	video = False
 	controltype = 0
 	INPUT_REGULAR = 1
@@ -310,12 +311,14 @@ class Phone():
 		if isinstance(button, Button):
 			button.id = len(self.buttons)
 			self.buttons.append(button)
+			self.components.append(button)
 		else:
 			print("Button not provided")
 	def addOutput(self, output):
 		if isinstance(output, OutputText):
 			output.id = len(self.outputs)
 			self.outputs.append(output)
+			self.components.append(output)
 		else:
 			print("Not an output")
 	def addVideoFeed(self, vid):
@@ -325,20 +328,18 @@ class Phone():
 		else:
 			self.vid = vid
 			self.video = True
+			self.components.append(vid)
 	def buttonPressed(self, id, msg):
 		pass
 	def getButtons(self):
 		return self.buttons
+	def getOutputs(self):
+		return self.outputs
 	def setup(self, socket):
 		self.socket = socket
 		socket.send(str(Phone.SET_CONTROL_TYPE)+","+str(self.controltype))
-		for i in self.buttons:
-			i.setup(socket)
-		for o in self.outputs:
-			o.socket = socket
-			o.setup(socket)
-		if self.video == True:
-			self.vid.setup(socket)
+		for c in self.components:
+			c.setup(socket)
 	def updateButtons(self, id, message):
 		for b in self.buttons:
 			if b.id == id:
@@ -436,6 +437,7 @@ class OutputText():
 	def getText(self):
 		return self.message
 	def setup(self, socket):
+		self.socket = socket
 		socket.send(str(Phone.SETUP)+","+str(self.type)+","+str(self.id)+","+str(self.message)) 
 
 class VideoFeed():
