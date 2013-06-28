@@ -316,6 +316,8 @@ class Phone():
 
 	controltype = 0 #Type of phone
 
+	video = False
+
 	#More final protocol variables for setup
 	INPUT_REGULAR = 1
 	INPUT_TEXT = 2
