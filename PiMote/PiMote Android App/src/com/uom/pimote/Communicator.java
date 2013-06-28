@@ -28,6 +28,7 @@ public class Communicator extends Activity {
     private static final int REQUEST_PASSWORD = 9855;
     private static final int STORE_KEY = 5649;
     private static final int PASSWORD_FAIL = 2314;
+    private static final int DISCONNECTED_BY_SERVER = 6234;
     private static int controlType = -1;
     TCPClient tcp;
     String ip;
@@ -216,6 +217,9 @@ public class Communicator extends Activity {
                     }
                     break;
 
+                case DISCONNECTED_BY_SERVER:
+                    endActivity("Disconnected by server", true);
+                    break;
 
                 case SET_CONTROL_TYPE:
                     controlType = Integer.parseInt(info[1]);
