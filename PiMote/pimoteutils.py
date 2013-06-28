@@ -236,7 +236,7 @@ class PhoneServer(Server):
 	#Called when the server is started
 	def onStart(self):
 		print("Server has started")
-		if isPassword: #If password protected
+		if self.isPassword: #If password protected
 			read = False
 			while not read: #Loop to get the key
 				try:
