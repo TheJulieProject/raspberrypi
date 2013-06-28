@@ -9,7 +9,7 @@ Needs porting into python3 for use with PiFace
 import sys
 # Import PhoneServer and Phone classes from pimoteutils.
 # Button only imported so we can access the variables
-from pimoteutils import *
+from pimote import *
 
 
 # Parse the IP address and port you wish to listen on.
@@ -50,7 +50,7 @@ thisphone.addButton(b1)
 thisphone.addButton(b2)
 thisphone.addButton(b3)
 thisphone.addOutput(o1)
-thisphone.addVideoFeed(v)
+
 thisphone.addButton(vi)
 #Create the server
 myserver = PhoneServer()
