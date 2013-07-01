@@ -1,0 +1,8 @@
+Traceback (most recent call last):
+  File "ImageProcessingClient.py", line 55, in <module>
+    myClient.start(ip, port)
+  File "/usr/local/lib/python2.7/dist-packages/pimote/pimoteutils.py", line 177, in start
+    self._socket.connect((ip, int(port)))
+  File "/usr/lib/python2.7/socket.py", line 224, in meth
+    return getattr(self._sock,name)(*args)
+socket.timeout: timed out
