@@ -219,7 +219,7 @@ public class Communicator extends Activity {
 
                 case DISCONNECTED_BY_SERVER:
                     endActivity("Disconnected by server", true);
-
+                    break;
 
                 case SET_CONTROL_TYPE:
                     controlType = Integer.parseInt(info[1]);
