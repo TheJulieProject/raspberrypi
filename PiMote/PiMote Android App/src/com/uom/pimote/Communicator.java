@@ -180,7 +180,7 @@ public class Communicator extends Activity {
         protected void onProgressUpdate(String... values) {
             super.onProgressUpdate(values);
             final String[] info = values[0].split(",");
-            // Log.d("pi", info[0] + ", " + info[1]);
+            Log.d("pi", info[0]);
 
             switch (Integer.parseInt(info[0])) {
                 case REQUEST_PASSWORD: {
@@ -241,6 +241,7 @@ public class Communicator extends Activity {
                     output.setText(info[2]);
                     break;
 
+                default: Log.e("ERROR", "Wut?!");
             }
         }
     }

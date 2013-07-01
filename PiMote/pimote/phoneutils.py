@@ -139,8 +139,7 @@ class Phone():
   #Add a button to the phone
   def addButton(self, button):
     if isinstance(button, Button):
-      button.id = len(self.buttons)
-      self.buttons.append(button)
+      button.id = len(self.components)
       self.components.append(button)
     else:
       print("Button not provided")
@@ -148,8 +147,7 @@ class Phone():
   #Add an output to the phone
   def addOutput(self, output):
     if isinstance(output, OutputText):
-      output.id = len(self.outputs)
-      self.outputs.append(output)
+      output.id = len(self.components)
       self.components.append(output)
     else:
       print("Not an output")
