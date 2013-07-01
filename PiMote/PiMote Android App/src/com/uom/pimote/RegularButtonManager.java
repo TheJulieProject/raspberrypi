@@ -24,7 +24,6 @@ import org.apache.http.impl.client.DefaultHttpClient;
 
 import java.io.IOException;
 import java.net.URI;
-import java.util.HashMap;
 
 public class RegularButtonManager {
 
@@ -34,24 +33,19 @@ public class RegularButtonManager {
     MjpegView mv = null;
     AsyncTask<String, Void, MjpegInputStream> read = null;
     String ip;
-    HashMap<Integer,Integer> outputs;
 
     int viewPosition;
-
-    private static int textViewId = 0;
 
     public RegularButtonManager(Context c, TCPClient tcp, String ip) {
         this.c = c;
         this.tcp = tcp;
         this.ip = ip;
         this.viewPosition = 0;
-        textViewId = 0;
         //((Communicator) c).setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         ((Communicator) c).getActionBar().show();
         ((Communicator) c).setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         ((Communicator) c).setContentView(R.layout.activity_main);
         this.layout = (LinearLayout) ((Communicator) c).findViewById(R.id.mainlayout);
-        outputs = new HashMap<Integer, Integer>();
     }
 
     public void addButtons(final String[] setup) {
@@ -157,12 +151,11 @@ public class RegularButtonManager {
         if (setup.length == 3)
             text.setText(setup[2]);
         layout.addView(text, viewPosition++);
-        text.setId(textViewId++);
-        outputs.put(Integer.parseInt(setup[1]), text.getId());
+        text.setId(Integer.parseInt(setup[1]));
     }
 
     public TextView getTextView(int id) {
-        return (TextView)((Communicator)c).findViewById(outputs.get(id));
+        return (TextView)((Communicator)c).findViewById(id);
     }
 
     public void addNewFeed(String[] setup, String ip) {
