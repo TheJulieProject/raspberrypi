@@ -27,6 +27,7 @@ class PhoneServer(Server):
   PASSWORD_FAIL = 2314
   REQUEST_PASSWORD = 9855
   STORE_KEY = 5649
+  DISCONNECT_USER = 6234
 
   phone = None
   isPassword = False
@@ -68,7 +69,7 @@ class PhoneServer(Server):
     self.noOfClients+=1 #Counting clients
     if self.clientMax:
       if self.noOfClients > self.maxClients:
-        socket.send(str(PhoneServer.PASSWORD_FAIL)) #Kick them if full
+        socket.send(str(PhoneServer.DISCONNECT_USER)) #Kick them if full
 
     if self.isPassword: #if the server has password, request it
       socket.send(str(PhoneServer.REQUEST_PASSWORD))
