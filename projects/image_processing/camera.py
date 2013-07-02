@@ -1,7 +1,6 @@
 """
 Sometimes we may have (or want) to use the pygame interface to the camera, sometimes opencv, to avoid changing lots of code this camera class is a wrapper around the opencv code - making it look like pygames camera.
 Brian Thorne - OLPC Hitlab Project 2009
-Diego Abel - Raspberry Pi Development 2013
 """
 
 import cv as opencv
