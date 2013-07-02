@@ -47,7 +47,7 @@
             android:src="@drawable/ic_action_backwards"
             android:background="@color/black"/>
 
-    <com.uom.pimote.MjpegView
+    <com.uom.pimote.mjpegvideo.MjpegView
             android:id="@+id/mv"
             android:layout_width="320dp"
             android:layout_height="240dp"

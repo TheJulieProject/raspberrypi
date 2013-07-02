@@ -1,6 +1,9 @@
+#   PhoneUtils - Author: Tom Richardson, Radu Jipa 2013
+#   For use with PiMote and pimoteutils
+
+
 from pimoteutils import *
-import string
-import random
+import string, random
 
 def generator(size, chars):
   return ''.join(random.choice(chars) for x in range(size))
@@ -28,6 +31,7 @@ class PhoneServer(Server):
   REQUEST_PASSWORD = 9855
   STORE_KEY = 5649
   DISCONNECT_USER = 6234
+  MESSAGE_FOR_MANAGER = 7335
 
   phone = None
   isPassword = False
@@ -165,12 +169,6 @@ class Phone():
   #User overrides this. Called when a message is recieved
   def buttonPressed(self, id, msg):
     pass
-  #Returns all buttons
-  def getButtons(self):
-    return self.buttons
-  #Returns all outputs
-  def getOutputs(self):
-    return self.outputs
   #Used for setup
   def setup(self, socket):
     self.socket = socket
@@ -222,14 +220,14 @@ class Button():
   def getType(self):
     return self.type
   def setup(self, socket):
-    socket.send(str(Phone.SETUP)+","+str(self.type) + "," + str(self.id) + "," + str(self.name))
+    socket.send(str(PhoneServer.MESSAGE_FOR_MANAGER)+","+str(Phone.SETUP)+","+str(self.type) + "," + str(self.id) + "," + str(self.name))
 
 class InputText(Button):
   def __init__(self, name):
     self.name = name
     self.type = Phone.INPUT_TEXT
   def setup(self, socket):
-    socket.send(str(Phone.SETUP)+","+str(self.type) + "," + str(self.id) + "," + str(self.name))
+    socket.send(str(PhoneServer.MESSAGE_FOR_MANAGER)+","+str(Phone.SETUP)+","+str(self.type) + "," + str(self.id) + "," + str(self.name))
 
 class ToggleButton(Button):
   def __init__(self, name, initialvalue):
@@ -244,13 +242,13 @@ class ToggleButton(Button):
     tf = 0
     if self.value == True:
       tf=1
-    socket.send(str(Phone.SETUP)+","+str(self.type) + "," + str(self.id) + "," + str(self.name) + "," + str(tf))
+    socket.send(str(PhoneServer.MESSAGE_FOR_MANAGER)+","+str(Phone.SETUP)+","+str(self.type) + "," + str(self.id) + "," + str(self.name) + "," + str(tf))
 
 class VoiceInput(Button):
   def __init__(self):
     self.type = Phone.VOICE_INPUT
   def setup(self, socket):
-    socket.send(str(Phone.SETUP)+","+str(self.type)+","+str(self.id))
+    socket.send(str(PhoneServer.MESSAGE_FOR_MANAGER)+","+str(Phone.SETUP)+","+str(self.type)+","+str(self.id))
 
 
 
@@ -261,12 +259,12 @@ class OutputText():
     self.message = initialmessage
   def setText(self, message):
     self.message = message
-    self.socket.send(str(Phone.REQUEST_OUTPUT_CHANGE)+","+str(self.id)+","+str(self.message))
+    self.socket.send(str(PhoneServer.MESSAGE_FOR_MANAGER)+","+str(Phone.REQUEST_OUTPUT_CHANGE)+","+str(self.id)+","+str(self.message))
   def getText(self):
     return self.message
   def setup(self, socket):
     self.socket = socket
-    socket.send(str(Phone.SETUP)+","+str(self.type)+","+str(self.id)+","+str(self.message)) 
+    socket.send(str(PhoneServer.MESSAGE_FOR_MANAGER)+","+str(Phone.SETUP)+","+str(self.type)+","+str(self.id)+","+str(self.message)) 
 
 class VideoFeed():
   outsidefeed = 0;
@@ -279,4 +277,4 @@ class VideoFeed():
     self.ip = ip
     self.outsidefeed = 1
   def setup(self, socket):
-    socket.send(str(Phone.SETUP)+","+str(self.type)+","+str(self.width)+","+str(self.height)+","+str(self.outsidefeed)+","+self.ip)
+    socket.send(str(PhoneServer.MESSAGE_FOR_MANAGER)+","+str(Phone.SETUP)+","+str(self.type)+","+str(self.width)+","+str(self.height)+","+str(self.outsidefeed)+","+self.ip)
