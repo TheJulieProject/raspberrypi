@@ -11,6 +11,10 @@ import android.speech.RecognizerIntent;
 import android.util.Log;
 import android.widget.EditText;
 
+import com.uom.pimote.managers.ControllerManager;
+import com.uom.pimote.managers.PimoteManager;
+import com.uom.pimote.managers.RegularButtonManager;
+
 import java.util.ArrayList;
 
 public class Communicator extends Activity {
@@ -89,7 +93,7 @@ public class Communicator extends Activity {
         super.onPause();
         if (!voiceRecognition) endActivity("", false);
         else {
-            if(manager!=null)manager.pauseVideo();
+            if (manager != null) manager.pauseVideo();
         }
     }
 
@@ -181,7 +185,7 @@ public class Communicator extends Activity {
                     SharedPreferences prefs = getSharedPreferences("pimotePrefs", MODE_PRIVATE);
                     if (prefs.contains(ip)) {
                         Log.e("SETUP", "Key used");
-                        tcp.sendMessage(SEND_PASSWORD+","+prefs.getString(ip, "lolfail"));
+                        tcp.sendMessage(SEND_PASSWORD + "," + prefs.getString(ip, "lolfail"));
                         authTypeKey = true;
                     } else {
                         Log.e("SETUP", "Need password");
@@ -225,13 +229,14 @@ public class Communicator extends Activity {
                     break;
 
                 case MESSAGE_FOR_MANAGER:
-                    String[] message = new String[info.length-1];
-                    for(int i = 1; i < info.length; i++)
-                        message[i-1] = info[i];
+                    String[] message = new String[info.length - 1];
+                    for (int i = 1; i < info.length; i++)
+                        message[i - 1] = info[i];
                     manager.onMessage(message);
                     break;
 
-                default: Log.e("ERROR", "Wut?!");
+                default:
+                    Log.e("ERROR", "Wut?!");
             }
         }
     }
