@@ -2,29 +2,20 @@ package com.uom.pimote;
 
 import android.content.Context;
 import android.content.pm.ActivityInfo;
-import android.os.AsyncTask;
-import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
 import android.widget.ImageView;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
+import com.uom.pimote.mjpegvideo.MjpegView;
 
-import java.io.IOException;
-import java.net.URI;
-
-public class ControllerManager {
+public class ControllerManager extends PimoteManager {
 
     // Mjpeg streamer variables
     private static final String TAG = "MJPEG";
     boolean forwardPress, backPress, leftPress, rightPress = false;
     TCPClient tcp;
     String URL;
-    AsyncTask<String, Void, MjpegInputStream> read = null;
     ImageView hud;
     private MjpegView mv = null;
 
@@ -126,27 +117,12 @@ public class ControllerManager {
         if (video) {
             mv.setVisibility(View.VISIBLE);
             hud.setVisibility(View.VISIBLE);
-            read = new DoRead().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, URL);
+            startVideo(mv, URL);
         } else {
             mv.setVisibility(View.INVISIBLE);
             hud.setVisibility(View.INVISIBLE);
         }
 
-    }
-
-    public void stopPlayback() {
-        if (read != null) {
-            mv.stopPlayback();
-            read.cancel(true);
-        }
-    }
-
-    public void pause() {
-        mv.pause();
-    }
-
-    public void resume() {
-        mv.resume();
     }
 
     public void toggleControl(int position, boolean value) {
@@ -172,39 +148,6 @@ public class ControllerManager {
                     tcp.sendMessage(Communicator.SEND_DATA+","+"0," + (6 + flag));
                 rightPress = value;
                 break;
-        }
-    }
-
-    public class DoRead extends AsyncTask<String, Void, MjpegInputStream> {
-        protected MjpegInputStream doInBackground(String... url) {
-            HttpResponse res = null;
-            DefaultHttpClient httpclient = new DefaultHttpClient();
-            Log.d(TAG, "1. Sending http request");
-            try {
-                res = httpclient.execute(new HttpGet(URI.create(url[0])));
-                Log.d(TAG, "2. Request finished, status = " + res.getStatusLine().getStatusCode());
-                if (res.getStatusLine().getStatusCode() == 401) {
-                    //You must turn off camera User Access Control before this will work
-                    return null;
-                }
-                return new MjpegInputStream(res.getEntity().getContent());
-            } catch (ClientProtocolException e) {
-                e.printStackTrace();
-                Log.d(TAG, "Request failed-ClientProtocolException", e);
-                //Error connecting to camera
-            } catch (IOException e) {
-                e.printStackTrace();
-                Log.d(TAG, "Request failed-IOException", e);
-                //Error connecting to camera
-            }
-
-            return null;
-        }
-
-        protected void onPostExecute(MjpegInputStream result) {
-            mv.setSource(result);
-            mv.setDisplayMode(MjpegView.SIZE_BEST_FIT);
-            mv.showFps(true);
         }
     }
 }

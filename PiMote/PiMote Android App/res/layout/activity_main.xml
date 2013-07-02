@@ -17,7 +17,7 @@
             android:padding="10sp"
             android:gravity="center">
 
-            <com.uom.pimote.MjpegView
+            <com.uom.pimote.mjpegvideo.MjpegView
                     android:id="@+id/mv2"
                     android:layout_width="100dp"
                     android:layout_height="100dp"
