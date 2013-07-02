@@ -1,4 +1,4 @@
-package com.uom.pimote;
+package com.uom.pimote.managers;
 
 import android.content.Context;
 import android.content.pm.ActivityInfo;
@@ -7,6 +7,9 @@ import android.view.View;
 import android.view.View.OnTouchListener;
 import android.widget.ImageView;
 
+import com.uom.pimote.Communicator;
+import com.uom.pimote.R;
+import com.uom.pimote.TCPClient;
 import com.uom.pimote.mjpegvideo.MjpegView;
 
 public class ControllerManager extends PimoteManager {

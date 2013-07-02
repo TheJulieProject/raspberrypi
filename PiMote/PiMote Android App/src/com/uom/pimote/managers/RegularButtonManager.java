@@ -1,4 +1,4 @@
-package com.uom.pimote;
+package com.uom.pimote.managers;
 
 import android.content.Context;
 import android.content.pm.ActivityInfo;
@@ -15,6 +15,9 @@ import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
+import com.uom.pimote.Communicator;
+import com.uom.pimote.R;
+import com.uom.pimote.TCPClient;
 import com.uom.pimote.mjpegvideo.MjpegView;
 
 public class RegularButtonManager extends PimoteManager {

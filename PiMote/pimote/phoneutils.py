@@ -3,118 +3,27 @@
 
 
 from pimoteutils import *
-import string, random
 
-def generator(size, chars):
-  return ''.join(random.choice(chars) for x in range(size))
-
-def createKey():
-  size = 16
-  chars = string.ascii_letters + string.digits + "                    "
-  privateKey = "#"
-  for x in range(0,30):
-    privateKey += generator(size, chars)
-  privateKey += "#"
-  file = open('privatekey.data', 'w')
-  file.write(privateKey)
 
 ########################-------SERVER-------########################################
 #  This is the main server that runs on the pi. All messages are sorted here and sent
 #  to the phone that handles them.
 #  It also initialises and sorts the security.
 
-class PhoneServer(Server):
-  #Protocol final static variables
-  SENT_PASSWORD = 0
-  SENT_DATA = 1
-  PASSWORD_FAIL = 2314
-  REQUEST_PASSWORD = 9855
-  STORE_KEY = 5649
-  DISCONNECT_USER = 6234
-  MESSAGE_FOR_MANAGER = 7335
-
+class PhoneServer(PiMoteServer):
   phone = None
-  isPassword = False
-  clientMax = False
-  noOfClients = 0
 
   #Store the phone object for reference
   def addPhone(self, thephone): 
     self.phone = thephone
 
-  #Called when the server is started
-  def onStart(self):
-    print("Server has started")
-    if self.isPassword: #If password protected
-      read = False
-      while not read: #Loop to get the key
-        try:
-          file = open("privatekey.data", "r")
-          self.key = file.read() #Read the key
-          read = True
-        except: #No such file so generate key and file
-          createKey()
-
-  #Called when a message is recieved from the phone
-  def onMessage(self, socket, message):
-    #First int is a protocol variable
-    (sentType, sep, msg) = message.strip().partition(",")
-    if int(sentType) == PhoneServer.SENT_PASSWORD: #Password data
-      self.managePassword(msg, socket)
-    elif int(sentType) == PhoneServer.SENT_DATA: #Input data
-      self.manageIncomingMessage(msg)
-    
-    # Signify all is well
-    return True
-
-  #Called when a phone connects to the server
-  def onConnect(self, socket):
-    print("Phone connected")
-    self.noOfClients+=1 #Counting clients
-    if self.clientMax:
-      if self.noOfClients > self.maxClients:
-        socket.send(str(PhoneServer.DISCONNECT_USER)) #Kick them if full
-
-    if self.isPassword: #if the server has password, request it
-      socket.send(str(PhoneServer.REQUEST_PASSWORD))
-    else: #otherwise setup
-      self.phone.setup(socket)
-    return True
-
-  #Called when a phone disconnects from the server
-  def onDisconnect(self, socket):
-    print("Phone disconnected")
-    self.noOfClients-=1 #tracking clients
-    return True
-
-  #Used to set a password for the server
-  def setPassword(self, pswd):
-    self.isPassword = True
-    self.password = pswd
-
-  #Handle the password recieved from the phone
-  def managePassword(self, password, socket):
-    if password == self.password: #Password was right, tell them to store key
-      socket.send(str(PhoneServer.STORE_KEY)+","+self.key)
-      self.phone.setup(socket)#setup
-    elif password == self.key:#they had a key
-      self.phone.setup(socket)#setup
-    else:#wrong password
-      socket.send(str(PhoneServer.PASSWORD_FAIL)) #kick them
-
-  #Manage incoming message
-  def manageIncomingMessage(self, message):
+  def messageReceived(self, message):
     if isinstance(self.phone, Phone): #Regular phone
       (id, sep, msg) = message.strip().partition(",") #Strip component ID and message apart
       self.phone.updateButtons(int(id), msg) #Update buttons if needed
       self.phone.buttonPressed(int(id), msg) #Allow the user to handle the message
     elif isinstance(self.phone, ControllerPhone): #Controller
       self.phone.controlPress(message) #Controller handler
-
-  #Used to limit the amount of clients that can connect at one time
-  def setMaxClients(self, x):
-    self.clientMax = True
-    self.maxClients = x
 
 ################------PHONE TYPES--------####################
 
@@ -220,14 +129,14 @@ class Button():
   def getType(self):
     return self.type
   def setup(self, socket):
-    socket.send(str(PhoneServer.MESSAGE_FOR_MANAGER)+","+str(Phone.SETUP)+","+str(self.type) + "," + str(self.id) + "," + str(self.name))
+    socket.send(str(PiMoteServer.MESSAGE_FOR_MANAGER)+","+str(Phone.SETUP)+","+str(self.type) + "," + str(self.id) + "," + str(self.name))
 
 class InputText(Button):
   def __init__(self, name):
     self.name = name
     self.type = Phone.INPUT_TEXT
   def setup(self, socket):
-    socket.send(str(PhoneServer.MESSAGE_FOR_MANAGER)+","+str(Phone.SETUP)+","+str(self.type) + "," + str(self.id) + "," + str(self.name))
+    socket.send(str(PiMoteServer.MESSAGE_FOR_MANAGER)+","+str(Phone.SETUP)+","+str(self.type) + "," + str(self.id) + "," + str(self.name))
 
 class ToggleButton(Button):
   def __init__(self, name, initialvalue):
@@ -242,13 +151,13 @@ class ToggleButton(Button):
     tf = 0
     if self.value == True:
       tf=1
-    socket.send(str(PhoneServer.MESSAGE_FOR_MANAGER)+","+str(Phone.SETUP)+","+str(self.type) + "," + str(self.id) + "," + str(self.name) + "," + str(tf))
+    socket.send(str(PiMoteServer.MESSAGE_FOR_MANAGER)+","+str(Phone.SETUP)+","+str(self.type) + "," + str(self.id) + "," + str(self.name) + "," + str(tf))
 
 class VoiceInput(Button):
   def __init__(self):
     self.type = Phone.VOICE_INPUT
   def setup(self, socket):
-    socket.send(str(PhoneServer.MESSAGE_FOR_MANAGER)+","+str(Phone.SETUP)+","+str(self.type)+","+str(self.id))
+    socket.send(str(PiMoteServer.MESSAGE_FOR_MANAGER)+","+str(Phone.SETUP)+","+str(self.type)+","+str(self.id))
 
 
 
@@ -259,12 +168,12 @@ class OutputText():
     self.message = initialmessage
   def setText(self, message):
     self.message = message
-    self.socket.send(str(PhoneServer.MESSAGE_FOR_MANAGER)+","+str(Phone.REQUEST_OUTPUT_CHANGE)+","+str(self.id)+","+str(self.message))
+    self.socket.send(str(PiMoteServer.MESSAGE_FOR_MANAGER)+","+str(Phone.REQUEST_OUTPUT_CHANGE)+","+str(self.id)+","+str(self.message))
   def getText(self):
     return self.message
   def setup(self, socket):
     self.socket = socket
-    socket.send(str(PhoneServer.MESSAGE_FOR_MANAGER)+","+str(Phone.SETUP)+","+str(self.type)+","+str(self.id)+","+str(self.message)) 
+    socket.send(str(PiMoteServer.MESSAGE_FOR_MANAGER)+","+str(Phone.SETUP)+","+str(self.type)+","+str(self.id)+","+str(self.message)) 
 
 class VideoFeed():
   outsidefeed = 0;
@@ -277,4 +186,4 @@ class VideoFeed():
     self.ip = ip
     self.outsidefeed = 1
   def setup(self, socket):
-    socket.send(str(PhoneServer.MESSAGE_FOR_MANAGER)+","+str(Phone.SETUP)+","+str(self.type)+","+str(self.width)+","+str(self.height)+","+str(self.outsidefeed)+","+self.ip)
+    socket.send(str(PiMoteServer.MESSAGE_FOR_MANAGER)+","+str(Phone.SETUP)+","+str(self.type)+","+str(self.width)+","+str(self.height)+","+str(self.outsidefeed)+","+self.ip)

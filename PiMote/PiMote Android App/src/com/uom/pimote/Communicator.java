@@ -11,6 +11,10 @@ import android.speech.RecognizerIntent;
 import android.util.Log;
 import android.widget.EditText;
 
+import com.uom.pimote.managers.ControllerManager;
+import com.uom.pimote.managers.PimoteManager;
+import com.uom.pimote.managers.RegularButtonManager;
+
 import java.util.ArrayList;
 
 public class Communicator extends Activity {
