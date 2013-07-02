@@ -1,4 +1,4 @@
-package com.uom.pimote;
+package com.uom.pimote.mjpegvideo;
 
 import android.content.Context;
 import android.graphics.Bitmap;

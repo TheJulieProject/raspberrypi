@@ -2,8 +2,6 @@ package com.uom.pimote;
 
 import android.content.Context;
 import android.content.pm.ActivityInfo;
-import android.os.AsyncTask;
-import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -17,23 +15,16 @@ import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
+import com.uom.pimote.mjpegvideo.MjpegView;
 
-import java.io.IOException;
-import java.net.URI;
+public class RegularButtonManager extends PimoteManager {
 
-public class RegularButtonManager {
-
+    private static final int SETUP = 1;
+    private static final int REQUEST_OUTPUT_CHANGE = 2;
     TCPClient tcp;
     Context c;
     LinearLayout layout;
-    MjpegView mv = null;
-    AsyncTask<String, Void, MjpegInputStream> read = null;
     String ip;
-
     int viewPosition;
 
     public RegularButtonManager(Context c, TCPClient tcp, String ip) {
@@ -41,11 +32,27 @@ public class RegularButtonManager {
         this.tcp = tcp;
         this.ip = ip;
         this.viewPosition = 0;
-        //((Communicator) c).setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         ((Communicator) c).getActionBar().show();
         ((Communicator) c).setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         ((Communicator) c).setContentView(R.layout.activity_main);
         this.layout = (LinearLayout) ((Communicator) c).findViewById(R.id.mainlayout);
+    }
+
+    @Override
+    public void onMessage(String[] message) {
+        switch (Integer.parseInt(message[0])) {
+            case SETUP:
+                String[] setup = new String[message.length-1];
+                for(int i = 1; i < message.length; i++)
+                    setup[i-1] = message[i];
+                addButtons(setup);
+                break;
+
+            case REQUEST_OUTPUT_CHANGE:
+                TextView output = getTextView(Integer.parseInt(message[1]));
+                output.setText(message[2]);
+                break;
+        }
     }
 
     public void addButtons(final String[] setup) {
@@ -155,15 +162,15 @@ public class RegularButtonManager {
     }
 
     public TextView getTextView(int id) {
-        return (TextView)((Communicator)c).findViewById(id);
+        return (TextView) ((Communicator) c).findViewById(id);
     }
 
     public void addNewFeed(String[] setup, String ip) {
         String feedIp = ip;
-        if(Integer.parseInt(setup[3]) == 1) feedIp = setup[4];
+        if (Integer.parseInt(setup[3]) == 1) feedIp = setup[4];
         String URL = "http://" + feedIp + ":8080/?action=stream";
-        mv = (MjpegView) ((Communicator) c).findViewById(R.id.mv2);
-        read = new DoRead().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, URL);
+        MjpegView mv = (MjpegView) ((Communicator) c).findViewById(R.id.mv2);
+        startVideo(mv, URL);
         LayoutParams params = new LayoutParams(Integer.parseInt(setup[1]), Integer.parseInt(setup[2]));
         params.setMargins(0, 10, 0, 10);
         mv.setLayoutParams(params);
@@ -187,57 +194,5 @@ public class RegularButtonManager {
         layout.addView(voice, viewPosition++);
     }
 
-    public void stop() {
-        if (mv != null) {
-            read.cancel(true);
-            mv.stopPlayback();
-        }
-    }
 
-    public void startPlayback() {
-        if (mv != null) {
-            mv.startPlayback();
-        }
-    }
-
-    public void pause() {
-        if (mv != null) mv.pause();
-    }
-
-    public void resume() {
-        if (mv != null) mv.resume();
-    }
-
-    public class DoRead extends AsyncTask<String, Void, MjpegInputStream> {
-        protected MjpegInputStream doInBackground(String... url) {
-            HttpResponse res = null;
-            DefaultHttpClient httpclient = new DefaultHttpClient();
-            Log.d("MjpegRegular", "1. Sending http request");
-            try {
-                res = httpclient.execute(new HttpGet(URI.create(url[0])));
-                Log.d("MjpegRegular", "2. Request finished, status = " + res.getStatusLine().getStatusCode());
-                if (res.getStatusLine().getStatusCode() == 401) {
-                    //You must turn off camera User Access Control before this will work
-                    return null;
-                }
-                return new MjpegInputStream(res.getEntity().getContent());
-            } catch (ClientProtocolException e) {
-                e.printStackTrace();
-                Log.d("MjpegRegular", "Request failed-ClientProtocolException", e);
-                //Error connecting to camera
-            } catch (IOException e) {
-                e.printStackTrace();
-                Log.d("MjpegRegular", "Request failed-IOException", e);
-                //Error connecting to camera
-            }
-
-            return null;
-        }
-
-        protected void onPostExecute(MjpegInputStream result) {
-            mv.setSource(result);
-            mv.setDisplayMode(MjpegView.SIZE_BEST_FIT);
-            mv.showFps(true);
-        }
-    }
 }
