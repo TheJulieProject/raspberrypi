@@ -16,6 +16,8 @@ Usage:
 TODO: make into a class
 TODO: make it standalone runnable as well...
 TODO: use optparser
+
+Modified by Diego Abel to use on Raspberry Pi
 """
 
 from os import path
