@@ -1,4 +1,4 @@
-package com.uom.pimote;
+package com.uom.pimote.managers;
 
 import android.os.AsyncTask;
 import android.util.Log;

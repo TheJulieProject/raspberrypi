@@ -11,7 +11,20 @@ import threading
 import time
 import socket as socketlib
 import subprocess
+import string, random
 
+def generator(size, chars):
+  return ''.join(random.choice(chars) for x in range(size))
+
+def createKey():
+  size = 16
+  chars = string.ascii_letters + string.digits + "                    "
+  privateKey = "#"
+  for x in range(0,30):
+    privateKey += generator(size, chars)
+  privateKey += "#"
+  file = open('privatekey.data', 'w')
+  file.write(privateKey)
 
 class Socket():
 	"""
@@ -166,8 +179,6 @@ class Server(Receiver):
 	def onStop(self):
 		pass
 
-
-
 class Client(Receiver):
 	
 	def start(self, ip, port):
@@ -209,5 +220,95 @@ class Client(Receiver):
 		
 	def onJoin(self):
 		self.stop()
+
+
+# Added by Tom Richardson - 02/07/2013
+
+class PiMoteServer(Server):
+  SENT_PASSWORD = 0
+  SENT_DATA = 1
+  PASSWORD_FAIL = 2314
+  REQUEST_PASSWORD = 9855
+  STORE_KEY = 5649
+  DISCONNECT_USER = 6234
+  MESSAGE_FOR_MANAGER = 7335
+
+  isPassword = False
+  clientMax = False
+  noOfClients = 0
+
+  #Called when the server is started
+  def onStart(self):
+    print("Server has started")
+    if self.isPassword: #If password protected
+      read = False
+      while not read: #Loop to get the key
+        try:
+          file = open("privatekey.data", "r")
+          self.key = file.read() #Read the key
+          read = True
+        except: #No such file so generate key and file
+          createKey()
+
+  #Called when a message is recieved from the phone
+  def onMessage(self, socket, message):
+    #First int is a protocol variable
+    (sentType, sep, msg) = message.strip().partition(",")
+    if int(sentType) == PiMoteServer.SENT_PASSWORD: #Password data
+      self.managePassword(msg, socket)
+    elif int(sentType) == PiMoteServer.SENT_DATA: #Input data
+      self.messageReceived(msg)
+    
+    # Signify all is well
+    return True
+
+  #Called when a phone connects to the server
+  def onConnect(self, socket):
+    print("Client connected")
+    self.noOfClients+=1 #Counting clients
+    if self.clientMax:
+      if self.noOfClients > self.maxClients:
+        socket.send(str(PiMoteServer.DISCONNECT_USER)) #Kick them if full
+
+    if self.isPassword: #if the server has password, request it
+      socket.send(str(PiMoteServer.REQUEST_PASSWORD))
+    else: #otherwise setup
+      self.phone.setup(socket)
+    self.clientConnected(socket)
+    return True
+
+  #Called when a phone disconnects from the server
+  def onDisconnect(self, socket):
+    print("Client disconnected")
+    self.noOfClients-=1 #tracking clients
+    self.clientDisconnected(socket)
+    return True
+
+  #Used to set a password for the server
+  def setPassword(self, pswd):
+    self.isPassword = True
+    self.password = pswd
+
+  #Handle the password received from the phone
+  def managePassword(self, password, socket):
+    if password == self.password: #Password was right, tell them to store key
+      socket.send(str(PiMoteServer.STORE_KEY)+","+self.key)
+      self.phone.setup(socket)#setup
+    elif password == self.key:#they had a key
+      self.phone.setup(socket)#setup
+    else:#wrong password
+      socket.send(str(PiMoteServer.PASSWORD_FAIL)) #kick them
+
+  #Used to limit the amount of clients that can connect at one time
+  def setMaxClients(self, x):
+    self.clientMax = True
+    self.maxClients = x
+
+  def messageReceived(self, message):
+    pass
+  def clientConnected(self, socket):
+    pass
+  def clientDisconnected(self, socket):
+    pass
 
 
