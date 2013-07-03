@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 from imgproc import *
-import time
 
 # open the webcam
 my_camera = Camera(160, 120)
