@@ -4,7 +4,7 @@ import datetime
 import time
 
 # Set camera
-cam = VideoCapture(0)
+cam = VideoCapture(2)
 
 # Read from the camera and save the image in the given place.
 while True:
@@ -15,4 +15,4 @@ while True:
  if s:
   imwrite("image"+str(now.day)+str(now.hour)+str(now.minute)+str(now.second)+".jpg", image)
 
- time.sleep(5)
+ time.sleep(4)
