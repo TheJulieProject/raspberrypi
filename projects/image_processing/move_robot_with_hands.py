@@ -13,17 +13,18 @@ class Point:
 	self.currentState = 0
 	self.previousState = 0
 
-# Window for the final image
+# Window for the final image and the normal one
+namedWindow("Normal feed", cv.CV_WINDOW_AUTOSIZE)
 namedWindow("Robot movement", cv.CV_WINDOW_AUTOSIZE)
 
 # Set webcam
-cam = VideoCapture(0)
+cam = VideoCapture(2)
 
 # Keep hands points
 leftHand = Point(0,0,False)
 rightHand = Point(0,0,False)
 
-while True:
+def move():
  # Take an image and save it
  s, image = cam.read()
  if s:
@@ -47,6 +48,19 @@ while True:
  # Use canny algorithm for edge detection
  canny = cv.CreateImage(cv.GetSize(image),8,1)
  cv.Canny(gray,canny,50,200)
+ 
+ # Draw guide lines in the image.
+ cv.Line(image, (image.width/4, 0), (image.width/4, image.height/3), cv.RGB(255,0, 0)) 
+ cv.Line(image, (0, image.height/3), (image.width/4, image.height/3), cv.RGB(255,0, 0))
+ 
+ cv.Line(image, (image.width*3/4, 0), (image.width*3/4, image.height/3), cv.RGB(255,0, 0)) 
+ cv.Line(image, (image.width*3/4, image.height/3), (image.width, image.height/3), cv.RGB(255,0, 0)) 
+
+ cv.Line(image, (image.width/4, image.height*2/3), (image.width/4, image.height), cv.RGB(255,0, 0)) 
+ cv.Line(image, (0, image.height*2/3), (image.width/4, image.height*2/3), cv.RGB(255,0, 0)) 
+
+ cv.Line(image, (image.width*3/4, image.height*2/3), (image.width*3/4, image.height), cv.RGB(255,0, 0)) 
+ cv.Line(image, (image.width*3/4, image.height*2/3), (image.width, image.height*2/3), cv.RGB(255,0, 0)) 
 
  # Search for hands
  for x in range(0, image.height):
@@ -82,28 +96,50 @@ while True:
 	 if rightHand.isActive and leftHand.isActive:
 	  break 
 
+ # If at the end of the loop one of the hands hasnt been read, 
+ # it current coordinate will change to 0.
+ if not rightHand.isActive:
+  rightHand.currentState = 0
+ if not leftHand.isActive:
+  leftHand.currentState = 0
+
+ # Keep commands
+ commandLeft = commandRight = ""
+
  # Send a message if the current state is different to the previous state.
  if rightHand.currentState != rightHand.previousState:
   if rightHand.currentState == 1:
-	print "Right up"
+	commandRight = "1"
   elif rightHand.currentState == -1:
-	print "Right down"
+	commandRight = "-1"
   else:
-	print "Stop right"
+	commandRight = "0"
 
   rightHand.previousState = rightHand.currentState
 
- elif leftHand.currentState != leftHand.previousState:
+ else:
+	commandRight = "Do nothing"
+
+ if leftHand.currentState != leftHand.previousState:
   if leftHand.currentState == 1:
-	print "Left up"
+	commandLeft = "1"
   elif leftHand.currentState == -1:
-	print "Left down"
+	commandLeft = "-1"
   else:
-	print "Stop Left"
+	commandLeft = "0"
 
   leftHand.previousState = leftHand.currentState
+
+ else:
+	commandLeft = "Do nothing"
  
  #Show the image
+ cv.ShowImage("Normal feed", image)
  cv.ShowImage("Robot movement", canny)	
  waitKey(1)	
+
+ # Return the command
+ return commandRight + "_" + commandLeft
 	
+#while True:
+ #move()
