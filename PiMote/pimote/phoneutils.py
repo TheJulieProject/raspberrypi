@@ -25,6 +25,9 @@ class PhoneServer(PiMoteServer):
     elif isinstance(self.phone, ControllerPhone): #Controller
       self.phone.controlPress(message) #Controller handler
 
+  def clientConnected(self, socket):
+    self.phone.setup(socket)
+
 ################------PHONE TYPES--------####################
 
 class Phone():
