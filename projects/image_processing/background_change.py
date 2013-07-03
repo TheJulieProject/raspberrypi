@@ -1,6 +1,5 @@
 #!/usr/bin/env python
 from imgproc import *
-import time
 import cv
 
 # Open the webcam
