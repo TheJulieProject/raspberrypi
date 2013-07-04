@@ -42,7 +42,10 @@ disp_left_visual = cv.CreateMat(left.height, left.width, cv.CV_8U)
 cv.ConvertScale(disparity_left,disp_left_visual,-16)
 
 # cutting the object farthest of a threshold
-cut(disp_left_visual,left,120)
+cut(disp_left_visual,left,80)
+
+# Save image if you want to
+cv.SaveImage("Binocular_vision.jpg", disp_left_visual)
 
 # Show result
 cv.NamedWindow('Disparity map',cv.CV_WINDOW_AUTOSIZE)

@@ -1,21 +1,20 @@
 #!/usr/bin/env python
-from imgproc import *
+from cv2 import *
 
-# open the webcam
-my_camera = Camera(160, 120)
+# Open the webcam
+cam= VideoCapture(0)
+
+# View for the final image
+namedWindow("Webcam feed", cv.CV_WINDOW_AUTOSIZE)
 
 while True:
-
 	# grab an image from the camera
-	my_image = my_camera.grabImage()
+        s, image = cam.read()
+        if s:
+         imwrite('cam_image.jpg', image)
 
-	# open a view, setting the view to the size of the captured 
-	# image
-	my_view = Viewer(my_image.width, my_image.height, 
-			 "Basic image processing")
+        my_image = imread('cam_image.jpg')	
 	
 	# display the image on the screen
-	my_view.displayImage(my_image)
-	
-
-	
+	imshow("Webcam feed", my_image)
+	waitKey(1)
