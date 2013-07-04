@@ -5,8 +5,8 @@
     android:background="@color/black">
 
     <ImageView
-            android:layout_width="100dp"
-            android:layout_height="100dp"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
             android:id="@+id/left_motor_forward"
             android:layout_marginTop="13dp"
             android:src="@drawable/ic_action_forward"
@@ -14,33 +14,24 @@
             android:layout_alignParentLeft="true"/>
 
     <ImageView
-            android:layout_width="100dp"
-            android:layout_height="100dp"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
             android:id="@+id/right_motor_forward"
             android:src="@drawable/ic_action_forward"
             android:layout_alignTop="@+id/left_motor_forward"
             android:layout_alignParentRight="true"/>
 
-    <TextView
-            android:layout_width="200dp"
-            android:layout_height="wrap_content"
-            android:id="@+id/debugText"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentRight="true"
-            android:layout_above="@+id/left_motor_backwards"
-            android:layout_below="@+id/left_motor_forward"/>
-
     <ImageView
-            android:layout_width="100dp"
-            android:layout_height="100dp"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
             android:id="@+id/left_motor_backwards"
             android:layout_alignParentBottom="true"
             android:layout_alignParentLeft="true"
             android:src="@drawable/ic_action_backwards"/>
 
     <ImageView
-            android:layout_width="100dp"
-            android:layout_height="100dp"
+            android:layout_width="80dp"
+            android:layout_height="80dp"
             android:id="@+id/right_motor_backwards"
             android:layout_alignParentBottom="true"
             android:layout_alignParentRight="true"
@@ -76,9 +67,23 @@
             android:id="@+id/microphone"
             android:src="@drawable/mic"
             android:scaleType="centerCrop"
-            android:layout_alignParentBottom="true"
-            android:layout_centerHorizontal="true"
             android:clickable="false"
-            android:cropToPadding="false"/>
+            android:cropToPadding="false"
+            android:layout_alignParentBottom="true"
+            android:layout_centerHorizontal="true"/>
+
+    <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/ultrasonicReading"
+            android:layout_alignTop="@+id/left_motor_forward"
+            android:layout_centerHorizontal="true"/>
+
+    <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/batteryReading"
+            android:layout_alignTop="@+id/right_motor_forward"
+            android:layout_toLeftOf="@+id/right_motor_forward"/>
 
 </RelativeLayout>

@@ -6,6 +6,7 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import com.uom.pimote.Communicator;
 import com.uom.pimote.R;
@@ -34,6 +35,8 @@ public class ControllerManager extends PimoteManager {
         final ImageView rightForward;
         final ImageView rightBackwards;
         final ImageView microphone;
+        final TextView ultrasonic;
+        final TextView battery;
 
 
 
@@ -45,6 +48,9 @@ public class ControllerManager extends PimoteManager {
         rightBackwards = (ImageView) ((Communicator) c).findViewById(R.id.right_motor_backwards);
         microphone = (ImageView) ((Communicator) c).findViewById(R.id.microphone);
         hud = (ImageView) ((Communicator) c).findViewById(R.id.HUD);
+        ultrasonic = (TextView) ((Communicator) c).findViewById(R.id.ultrasonicReading);
+        battery = (TextView) ((Communicator) c).findViewById(R.id.batteryReading);
+
 
         leftForward.setClickable(true);
         leftBackwards.setClickable(true);
