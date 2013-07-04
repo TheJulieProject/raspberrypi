@@ -163,7 +163,7 @@ class PiDroid(ControllerPhone):
 
 		elif message == "speak to me":
 			self.speak = True
-			self.say("I can talk! Horay!")
+			self.say("I can talk! Hooray!")
 
 		elif message == "stop speaking":
 			self.self = False
@@ -177,13 +177,13 @@ class PiDroid(ControllerPhone):
 
 		elif message == "goodbye":
 			self.conversation = False
-			self.say("This has been midly entertaining. Until next time, human.")
+			self.say("This has been mildly entertaining. Until next time, human.")
 		
 
 # Create the phone object
 PiDroid = PiDroid()
-PiDroid.setVideo(True)
-PiDroid.setVoice(True)
+PiDroid.setVideo()
+PiDroid.setVoice()
 
 # Enabling the NXT Lego Robot
 if ROBOT_ENABLED == 1:
