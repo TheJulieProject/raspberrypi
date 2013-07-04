@@ -15,15 +15,14 @@ import com.uom.pimote.mjpegvideo.MjpegView;
 
 public class ControllerManager extends PimoteManager {
 
-    // Mjpeg streamer variables
-    private static final String TAG = "MJPEG";
     boolean forwardPress, backPress, leftPress, rightPress = false;
     TCPClient tcp;
     String URL;
     ImageView hud;
     private MjpegView mv = null;
 
-    public ControllerManager(final Context c, final TCPClient tcp, String ip, int videoV, int voiceV) {
+    public ControllerManager(final Context c, final TCPClient tcp, String ip, int videoV, int voiceV, int recurringV, int sleepTime) {
+        super();
         ((Communicator)c).getActionBar().hide();
         ((Communicator)c).setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         ((Communicator)c).setContentView(R.layout.controllayout);
@@ -42,6 +41,7 @@ public class ControllerManager extends PimoteManager {
 
         boolean video = videoV != 0;
         boolean voice = voiceV != 0;
+        boolean recurring = recurringV != 0;
         leftForward = (ImageView) ((Communicator) c).findViewById(R.id.left_motor_forward);
         leftBackwards = (ImageView) ((Communicator) c).findViewById(R.id.left_motor_backwards);
         rightForward = (ImageView) ((Communicator) c).findViewById(R.id.right_motor_forward);
@@ -130,6 +130,12 @@ public class ControllerManager extends PimoteManager {
         } else {
             mv.setVisibility(View.INVISIBLE);
             hud.setVisibility(View.INVISIBLE);
+        }
+
+        if(recurring){
+            String[] setup = {2+"", sleepTime+""};
+            RecurringInfo t = new RecurringInfo(setup, tcp);
+            t.start();
         }
 
     }

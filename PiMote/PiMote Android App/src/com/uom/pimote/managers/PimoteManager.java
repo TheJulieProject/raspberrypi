@@ -3,6 +3,8 @@ package com.uom.pimote.managers;
 import android.os.AsyncTask;
 import android.util.Log;
 
+import com.uom.pimote.Communicator;
+import com.uom.pimote.TCPClient;
 import com.uom.pimote.mjpegvideo.MjpegInputStream;
 import com.uom.pimote.mjpegvideo.MjpegView;
 
@@ -13,6 +15,7 @@ import org.apache.http.impl.client.DefaultHttpClient;
 
 import java.io.IOException;
 import java.net.URI;
+import java.util.ArrayList;
 
 /**
  * Created by Tom on 02/07/2013.
@@ -20,10 +23,18 @@ import java.net.URI;
 public class PimoteManager {
     MjpegView mv = null;
     AsyncTask<String, Void, MjpegInputStream> read = null;
+    ArrayList<RecurringInfo> threads;
 
-    public void onMessage(String[] message){};
+    public PimoteManager() {
+        threads = new ArrayList<RecurringInfo>();
+    }
 
-    public void startVideo(MjpegView mv, String URL){
+    public void onMessage(String[] message) {
+    }
+
+    ;
+
+    public void startVideo(MjpegView mv, String URL) {
         this.mv = mv;
         read = new DoRead().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, URL);
     }
@@ -41,6 +52,19 @@ public class PimoteManager {
 
     public void resumeVideo() {
         if (mv != null) mv.resume();
+    }
+
+    public void addRecurringInformation(final String[] setup, TCPClient tcp) {
+        RecurringInfo t = new RecurringInfo(setup, tcp);
+        threads.add(t);
+        t.start();
+    }
+
+    public void stopAllThreads() {
+        for (int i = 0; i < threads.size(); i++) {
+            threads.get(i).stopThread();
+        }
+        stopVideo();
     }
 
     public class DoRead extends AsyncTask<String, Void, MjpegInputStream> {
@@ -73,6 +97,35 @@ public class PimoteManager {
             mv.setSource(result);
             mv.setDisplayMode(MjpegView.SIZE_BEST_FIT);
             mv.showFps(true);
+        }
+    }
+
+    class RecurringInfo extends Thread {
+        boolean running = true;
+        String id;
+        int sleepTime;
+        TCPClient tcp;
+
+        public RecurringInfo(String[] setup, TCPClient tcp) {
+            id = setup[1];
+            sleepTime = Integer.parseInt(setup[2]);
+            this.tcp = tcp;
+        }
+
+        @Override
+        public void run() {
+            while (running) {
+                try {
+                    tcp.sendMessage(Communicator.SEND_DATA + "," + id);
+                    Thread.sleep(sleepTime);
+                } catch (Exception e) {
+                    Log.e("THREAD", "Sleep error");
+                }
+            }
+        }
+
+        public void stopThread() {
+            running = false;
         }
     }
 

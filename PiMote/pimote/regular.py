@@ -9,7 +9,7 @@ Needs porting into python3 for use with PiFace
 import sys
 # Import PhoneServer and Phone classes from pimoteutils.
 # Button only imported so we can access the variables
-from pimote import *
+from phoneutils import *
 
 
 # Parse the IP address and port you wish to listen on.
@@ -23,6 +23,7 @@ class MyPhone(Phone):
 	#Override
 	num = 0
 	def buttonPressed(self, id, message):
+		print("Message")
 		#########----------------------------------------------###########
 		# Your code will go here! Check for the ID of the button pressed #
 		# and handle that button press as you wish.                      #
@@ -36,7 +37,7 @@ class MyPhone(Phone):
 		elif id == vi.getId():
 			o1.setText(message)
 		elif id == r.getId():
-			o1.setText(str(self.num))
+			o2.setText(str(self.num))
 			self.num+=1
 
 # Create the phone object
@@ -48,7 +49,8 @@ b3 = InputText("Input text here") #Text Input
 o1 = OutputText("Hello") #Output field
 v = VideoFeed(320, 240) #Live video feed
 vi = VoiceInput() #Voice input
-r = RecurringInfo(2000)
+r = RecurringInfo(500)
+o2 = OutputText("Hello") #Output field
 
 #Add the buttons to the phone
 thisphone.addButton(b1)
@@ -56,6 +58,7 @@ thisphone.addButton(b2)
 thisphone.addButton(b3)
 thisphone.addOutput(o1)
 thisphone.addButton(r)
+thisphone.addOutput(o2)
 
 thisphone.addButton(vi)
 #Create the server

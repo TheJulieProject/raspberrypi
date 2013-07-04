@@ -76,7 +76,11 @@ public class Communicator extends Activity {
             // Populate the wordsList with the String values the recognition engine thought it heard
             ArrayList<String> matches = data.getStringArrayListExtra(
                     RecognizerIntent.EXTRA_RESULTS);
-            tcp.sendMessage(Communicator.SEND_DATA + "," + lastvoicepress + "," + matches.get(0));
+            try {
+                tcp.sendMessage(Communicator.SEND_DATA + "," + lastvoicepress + "," + matches.get(0));
+            } catch (NullPointerException e) {
+                Log.e("VOICE", "No matches found");
+            }
         }
         voiceRecognition = false;
         super.onActivityResult(requestCode, resultCode, data);
@@ -93,7 +97,7 @@ public class Communicator extends Activity {
         super.onPause();
         if (!voiceRecognition) endActivity("", false);
         else {
-            if(manager!=null)manager.pauseVideo();
+            if (manager != null) manager.pauseVideo();
         }
     }
 
@@ -109,7 +113,7 @@ public class Communicator extends Activity {
     }
 
     public void endActivity(String msg, boolean main) {
-        if (manager != null) manager.stopVideo();
+        if (manager != null) manager.stopAllThreads();
         tcp.stopClient();
         if (main) {
             Intent i = new Intent(this, Main.class);
@@ -185,7 +189,7 @@ public class Communicator extends Activity {
                     SharedPreferences prefs = getSharedPreferences("pimotePrefs", MODE_PRIVATE);
                     if (prefs.contains(ip)) {
                         Log.e("SETUP", "Key used");
-                        tcp.sendMessage(SEND_PASSWORD+","+prefs.getString(ip, "lolfail"));
+                        tcp.sendMessage(SEND_PASSWORD + "," + prefs.getString(ip, "lolfail"));
                         authTypeKey = true;
                     } else {
                         Log.e("SETUP", "Need password");
@@ -222,20 +226,22 @@ public class Communicator extends Activity {
                 case SET_CONTROL_TYPE:
                     controlType = Integer.parseInt(info[1]);
                     if (controlType == JOYSTICK_CONTROL) {
-                        manager = new ControllerManager(Communicator.this, tcp, ip, Integer.parseInt(info[1]), Integer.parseInt(info[2]));
+                        manager = new ControllerManager(Communicator.this, tcp, ip, Integer.parseInt(info[1]), Integer.parseInt(info[2]),
+                                                        Integer.parseInt(info[3]), Integer.parseInt(info[4]));
                     } else if (controlType == NORMAL_CONTROL) {
                         manager = new RegularButtonManager(Communicator.this, tcp, ip);
                     }
                     break;
 
                 case MESSAGE_FOR_MANAGER:
-                    String[] message = new String[info.length-1];
-                    for(int i = 1; i < info.length; i++)
-                        message[i-1] = info[i];
+                    String[] message = new String[info.length - 1];
+                    for (int i = 1; i < info.length; i++)
+                        message[i - 1] = info[i];
                     manager.onMessage(message);
                     break;
 
-                default: Log.e("ERROR", "Wut?!");
+                default:
+                    Log.e("ERROR", "Wut?!");
             }
         }
     }
