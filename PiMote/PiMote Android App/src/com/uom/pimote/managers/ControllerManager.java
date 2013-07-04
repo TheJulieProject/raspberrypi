@@ -139,6 +139,10 @@ public class ControllerManager extends PimoteManager {
         }
 
     }
+    @Override
+    public void onMessage(String[] message){
+        //DO WHATEVER
+    }
 
     public void toggleControl(int position, boolean value) {
         int flag = value ? 1 : 0;
