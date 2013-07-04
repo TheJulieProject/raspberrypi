@@ -94,7 +94,6 @@ public class TCPClient {
                         mMessageListener.messageReceived(serverMessage);
                     }
                     serverMessage = null;
-                    Log.d("pi", "Message reset");
                 }
                 Log.e("TCP Client", "Stopped listening");
             } catch (Exception e) {

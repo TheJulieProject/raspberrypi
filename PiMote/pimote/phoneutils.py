@@ -46,6 +46,7 @@ class Phone():
   OUTPUT_TEXT = 4
   VIDEO_FEED = 5
   VOICE_INPUT = 6
+  RECURRING_INFO = 7
   #Setup
   SET_CONTROL_TYPE = 0
   SETUP = 1
@@ -103,19 +104,26 @@ class ControllerPhone():
   controltype = 1
   video = False
   voice = False
+  recurring = False
+  sleepTime = 0
   def controlPress(self, type):
     pass
-  def setVideo(self, value):
-    self.video = value
-  def setVoice(self, value):
-    self.voice = value
+  def setVideo(self):
+    self.video = True
+  def setVoice(self):
+    self.voice = True
+  def setRecurring(self, sleepTime):
+    self.recurring = True
+    self.sleepTime = sleepTime
   def setup(self, socket):
-    voiceV = videoV = 0
+    voiceV = videoV = recurringV = 0
     if self.video == True:
       videoV = 1
     if self.voice == True:
       voiceV = 1
-    socket.send(str(Phone.SET_CONTROL_TYPE)+","+str(self.controltype) + "," + str(videoV) + "," + str(voiceV))
+    if self.recurring == True:
+      recurringV = 1
+    socket.send(str(Phone.SET_CONTROL_TYPE)+","+str(self.controltype) + "," + str(videoV) + "," + str(voiceV)+","+str(recurringV)+","+str(sleepTime))
 
 
 
@@ -190,3 +198,11 @@ class VideoFeed():
     self.outsidefeed = 1
   def setup(self, socket):
     socket.send(str(PiMoteServer.MESSAGE_FOR_MANAGER)+","+str(Phone.SETUP)+","+str(self.type)+","+str(self.width)+","+str(self.height)+","+str(self.outsidefeed)+","+self.ip)
+
+#Counts as a button as it sends information
+class RecurringInfo(Button):
+  def __init__(self, sleepTime):
+    self.type = Phone.RECURRING_INFO
+    self.sleepTime = sleepTime
+  def setup(self, socket):
+    socket.send(str(PiMoteServer.MESSAGE_FOR_MANAGER)+","+str(Phone.SETUP)+","+str(self.type)+","+str(self.id)+","+str(self.sleepTime))

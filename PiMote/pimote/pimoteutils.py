@@ -85,7 +85,7 @@ class Receiver():
           except socketlib.timeout:
             pass
           except:
-            print 'EXCEPTION'
+            print('EXCEPTION')
         
         # Empty chunk means disconnect
         if chunk == '':
@@ -309,5 +309,41 @@ class PiMoteServer(Server):
     pass
   def clientDisconnected(self, socket):
     pass
+
+
+#Unfinished (low priority)
+class PiMoteClient(Client):
+  SEND_PASSWORD = 0
+  SEND_DATA = 1
+  def onMessage(self, socket, message):
+    (id, sep, msg) = message.split().partition(",")
+    if id == PiMoteServer.REQUEST_PASSWORD:
+      password = raw_input("Server password: ")
+      self.send(int(self.SEND_PASSWORD)+","+password)
+    elif id == PiMoteServer.STORE_KEY:
+      print("Store key")
+    elif id == PiMoteServer.PASSWORD_FAIL:
+      print("Wrong password")
+      self.stop()
+    elif id == PiMoteServer.DISCONNECT_USER:
+      print("Disconnected by server")
+      self.stop()
+    elif id == PiMoteServer.MESSAGE_FOR_MANAGER:
+      self.messageReceived(msg)
+    else:
+      self.messageReceived(message)
+    pass
+  def onConnect(self, socket):
+    pass
+  def onDisconnect(self, socket):
+    pass
+
+
+  def run(self):
+    pass
+  def messageReceived(self, message):
+    pass
+  def sendMessage(self, message):
+    self.send(str(self.SEND_DATA)+","+message)
 
 

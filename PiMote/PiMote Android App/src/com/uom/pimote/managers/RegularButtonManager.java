@@ -20,6 +20,8 @@ import com.uom.pimote.R;
 import com.uom.pimote.TCPClient;
 import com.uom.pimote.mjpegvideo.MjpegView;
 
+import java.util.ArrayList;
+
 public class RegularButtonManager extends PimoteManager {
 
     private static final int SETUP = 1;
@@ -31,6 +33,7 @@ public class RegularButtonManager extends PimoteManager {
     int viewPosition;
 
     public RegularButtonManager(Context c, TCPClient tcp, String ip) {
+        super();
         this.c = c;
         this.tcp = tcp;
         this.ip = ip;
@@ -39,15 +42,16 @@ public class RegularButtonManager extends PimoteManager {
         ((Communicator) c).setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         ((Communicator) c).setContentView(R.layout.activity_main);
         this.layout = (LinearLayout) ((Communicator) c).findViewById(R.id.mainlayout);
+        threads = new ArrayList<RecurringInfo>();
     }
 
     @Override
     public void onMessage(String[] message) {
         switch (Integer.parseInt(message[0])) {
             case SETUP:
-                String[] setup = new String[message.length-1];
-                for(int i = 1; i < message.length; i++)
-                    setup[i-1] = message[i];
+                String[] setup = new String[message.length - 1];
+                for (int i = 1; i < message.length; i++)
+                    setup[i - 1] = message[i];
                 addButtons(setup);
                 break;
 
@@ -77,6 +81,9 @@ public class RegularButtonManager extends PimoteManager {
                 break;
             case 6:
                 addVoiceInput(setup);
+                break;
+            case 7:
+                addRecurringInformation(setup, tcp);
                 break;
         }
     }
