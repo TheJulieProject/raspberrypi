@@ -1,5 +1,6 @@
 #!/usr/bin/env python
-from imgproc import *
+import cv
+from cv2 import *
 import time
 
 # function to obtain the command in words.
@@ -25,8 +26,11 @@ def calc_command(number):
  else:
   return "Nothing"
 
-# Set the webcam
-cam= Camera(20, 15)
+# Open the webcam
+cam= VideoCapture(0)
+
+# View for the final image
+namedWindow("Move robot with blob", cv.CV_WINDOW_AUTOSIZE)
 
 while True:
 
@@ -41,13 +45,17 @@ while True:
 	# of the grid, which means "do nothing".
 	coordinate = 5
 
-	# Take an image from the camera
-	image = cam.grabImage()
+	# grab an image from the camera
+	s, image = cam.read()
+	if s:
+	 imwrite('cam_image.jpg', image)
 
-	for x in range(0, image.width):
-  	  for y in range(0, image.height):
-    		# Get the value of the channels of the current pixel
-    		red, green, blue = image[x, y]
+	image = cv.LoadImage('cam_image.jpg')	
+	
+	for x in range(0, image.height):
+	 for y in range(0, image.width):
+    		# get the value of the current pixel
+    		blue, green, red = image[x, y]
 
    		# check if the blue intensity is greater than the green
    		if blue > green and blue > red and blue > 180 and green > 60:
