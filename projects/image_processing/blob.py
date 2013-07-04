@@ -1,14 +1,14 @@
 #!/usr/bin/env python
-from imgproc import *
+import cv
+from cv2 import *
 
-# Set the webcam
-cam= Camera(20, 15)
+# Open the webcam
+cam= VideoCapture(0)
 
-# open a window, setting it to the size of the captured image
-view = Viewer(cam.width, cam.height, "Blob finding")
+# View for the final image
+namedWindow("Webcam feed", cv.CV_WINDOW_AUTOSIZE)
 
 while True:
-
 	# x and y position accumulators
 	acc_x = 0
 	acc_y = 0
@@ -17,12 +17,16 @@ while True:
 	acc_count = 0
 
 	# grab an image from the camera
-	image = cam.grabImage()
+        s, image = cam.read()
+        if s:
+         imwrite('cam_image.jpg', image)
 
-	for x in range(0, image.width):
-  	  for y in range(0, image.height):
+        image = cv.LoadImage('cam_image.jpg')	
+
+	for x in range(0, image.height):
+  	  for y in range(0, image.width):
     		# get the value of the current pixel
-    		red, green, blue = image[x, y]
+    		blue, green, red = image[x, y]
 
    		# check if the blue intensity is greater than the green
    		if blue > green and blue > red and blue > 128:
@@ -40,11 +44,12 @@ while True:
  	 mean_y = acc_y / acc_count
 
  	 # draw a small cross in red at the mean position
- 	 image[mean_x + 0, mean_y - 1] = 255, 0, 0
- 	 image[mean_x - 1, mean_y + 0] = 255, 0, 0
-  	 image[mean_x + 0, mean_y + 0] = 255, 0, 0
-  	 image[mean_x + 1, mean_y + 0] = 255, 0, 0
-  	 image[mean_x + 0, mean_y + 1] = 255, 0, 0
+ 	 image[mean_x + 0, mean_y - 1] = 0, 0, 255
+ 	 image[mean_x - 1, mean_y + 0] = 0, 0, 255
+  	 image[mean_x + 0, mean_y + 0] = 0, 0, 255
+  	 image[mean_x + 1, mean_y + 0] = 0, 0, 255
+  	 image[mean_x + 0, mean_y + 1] = 0, 0, 255
 
 	# display the image on the screen
-	view.displayImage(image)
+	cv.ShowImage("Webcam feed", image)
+	waitKey(1)
