@@ -18,7 +18,7 @@ namedWindow("Normal feed", cv.CV_WINDOW_AUTOSIZE)
 namedWindow("Robot movement", cv.CV_WINDOW_AUTOSIZE)
 
 # Set webcam
-cam = VideoCapture(2)
+cam = VideoCapture(0)
 
 # Keep hands points
 leftHand = Point(0,0,False)

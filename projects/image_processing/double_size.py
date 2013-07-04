@@ -24,6 +24,9 @@ while True:
 
 	# Change the size of the image
 	cv.Resize(image, doubleimg)	
+
+	# Save the image if you want
+	cv.SaveImage("double_image.jpg",doubleimg)
 	
 	# Show images
 	cv.ShowImage("Normal", image)
