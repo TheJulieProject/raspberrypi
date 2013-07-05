@@ -24,8 +24,10 @@ public class PimoteManager {
     MjpegView mv = null;
     AsyncTask<String, Void, MjpegInputStream> read = null;
     ArrayList<RecurringInfo> threads;
+    TCPClient tcp;
 
-    public PimoteManager() {
+    public PimoteManager(TCPClient tcp) {
+        this.tcp = tcp;
         threads = new ArrayList<RecurringInfo>();
     }
 
@@ -98,6 +100,10 @@ public class PimoteManager {
             mv.setDisplayMode(MjpegView.SIZE_BEST_FIT);
             mv.showFps(true);
         }
+    }
+
+    public void send(String message){
+        tcp.sendMessage(Communicator.SEND_DATA + "," + message);
     }
 
     class RecurringInfo extends Thread {

@@ -24,7 +24,7 @@ public class ControllerManager extends PimoteManager {
     final TextView battery;
 
     public ControllerManager(final Context c, final TCPClient tcp, String ip, int videoV, int voiceV, int recurringV, int sleepTime) {
-        super();
+        super(tcp);
         ((Communicator)c).getActionBar().hide();
         ((Communicator)c).setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         ((Communicator)c).setContentView(R.layout.controllayout);
@@ -151,22 +151,22 @@ public class ControllerManager extends PimoteManager {
         switch (position) {
             case 1:
                 if (forwardPress != value)
-                    tcp.sendMessage(Communicator.SEND_DATA+","+"0," + (0 + flag));
+                    send("0," + (0 + flag));
                 forwardPress = value;
                 break;
             case 2:
                 if (backPress != value)
-                    tcp.sendMessage(Communicator.SEND_DATA+","+"0," + (2 + flag));
+                    send("0," + (2 + flag));
                 backPress = value;
                 break;
             case 3:
                 if (leftPress != value)
-                    tcp.sendMessage(Communicator.SEND_DATA+","+"0," + (4 + flag));
+                    send("0," + (4 + flag));
                 leftPress = value;
                 break;
             case 4:
                 if (rightPress != value)
-                    tcp.sendMessage(Communicator.SEND_DATA+","+"0," + (6 + flag));
+                    send("0," + (6 + flag));
                 rightPress = value;
                 break;
         }
