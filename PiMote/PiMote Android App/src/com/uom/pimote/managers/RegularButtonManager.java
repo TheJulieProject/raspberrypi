@@ -83,7 +83,7 @@ public class RegularButtonManager extends PimoteManager {
                 addVoiceInput(setup);
                 break;
             case 7:
-                addRecurringInformation(setup, tcp);
+                addRecurringInformation(Integer.parseInt(setup[1]), Integer.parseInt(setup[2]), tcp);
                 break;
         }
     }

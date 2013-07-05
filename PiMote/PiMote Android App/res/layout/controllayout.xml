@@ -77,13 +77,15 @@
             android:layout_height="wrap_content"
             android:id="@+id/ultrasonicReading"
             android:layout_alignTop="@+id/left_motor_forward"
-            android:layout_centerHorizontal="true"/>
+            android:layout_centerHorizontal="true"
+            android:textColor="@color/red"/>
 
     <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:id="@+id/batteryReading"
             android:layout_alignTop="@+id/right_motor_forward"
-            android:layout_toLeftOf="@+id/right_motor_forward"/>
+            android:layout_toLeftOf="@+id/right_motor_forward"
+            android:textColor="@color/red"/>
 
 </RelativeLayout>
