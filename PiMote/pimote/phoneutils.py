@@ -126,7 +126,7 @@ class ControllerPhone():
       voiceV = 1
     if self.recurring == True:
       recurringV = 1
-    socket.send(str(Phone.SET_CONTROL_TYPE)+","+str(self.controltype) + "," + str(videoV) + "," + str(voiceV)+","+str(recurringV)+","+str(sleepTime))
+    socket.send(str(Phone.SET_CONTROL_TYPE)+","+str(self.controltype) + "," + str(videoV) + "," + str(voiceV)+","+str(recurringV)+","+str(self.sleepTime))
 
 
 
