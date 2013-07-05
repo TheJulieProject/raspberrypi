@@ -30,6 +30,9 @@ while True:
  # Use canny algorithm for edge detection
  canny = cv.CreateImage(cv.GetSize(image),8,1)
  cv.Canny(gray,canny,50,200)
+ 
+ # Save the image
+ cv.SaveImage("Canny.jpg", canny)
 
  # Show the images
  cv.ShowImage("Normal feed", image)

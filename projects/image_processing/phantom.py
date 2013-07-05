@@ -12,13 +12,19 @@ avg2 = np.float32(f)
 
 while True:
 	# Get image
-	_,f = c.read()
+	_,f = cam.read()
 
 	cv2.accumulateWeighted(f,avg1,0.1)
 	cv2.accumulateWeighted(f,avg2,0.01)
 
 	res1 = cv2.convertScaleAbs(avg1)
 	res2 = cv2.convertScaleAbs(avg2)
+	
+	# Save the images
+	cv2.imwrite("Phantom1.jpg", f)
+	cv2.imwrite("Phantom2.jpg", res1)
+	cv2.imwrite("Phantom3.jpg", res2)
+
 	
 	# Show images
 	cv2.imshow('img',f)
