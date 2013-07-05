@@ -7,7 +7,7 @@ Needs porting into python3 for use with PiFace
 
 # Import PhoneServer and Phone classes from pimoteutils.
 import sys
-from pimoteutils import *
+from pimote import *
 
 
 #
@@ -36,7 +36,7 @@ RIGHT_BACKWARDS_ON  = "7"
 
 BOTH_OFF = "-1"
 
-ROBOT_ENABLED = 0	# 0 = OFF, 1 == ON; for testing purposes
+ROBOT_ENABLED = 1	# 0 = OFF, 1 == ON; for testing purposes
 
 
 # Override Phone so you can control what you do with the messages
@@ -177,18 +177,25 @@ class PiDroid(ControllerPhone):
 
 		elif message == "goodbye":
 			self.conversation = False
-			self.say("This has been midly entertaining. Until next time, human.")
-		
+			self.say("This has been mildy entertaining. Until next time, human.")
+
+
+		elif message == "hand movement on":
+			pass
+		elif message == "hand movement off":
+			pass
+
+
 
 # Create the phone object
 PiDroid = PiDroid()
-PiDroid.setVideo(True)
-PiDroid.setVoice(True)
+PiDroid.setVideo()
+PiDroid.setVoice()
 
 # Enabling the NXT Lego Robot
 if ROBOT_ENABLED == 1:
 	import NXTinterface as r
-	nxt = r.NXTRobot()
+	nxt = r.NXTrobot()
 
 #Create the server
 myserver = PhoneServer()
