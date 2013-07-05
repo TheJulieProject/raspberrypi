@@ -56,8 +56,8 @@ public class PimoteManager {
         if (mv != null) mv.resume();
     }
 
-    public void addRecurringInformation(final String[] setup, TCPClient tcp) {
-        RecurringInfo t = new RecurringInfo(setup, tcp);
+    public void addRecurringInformation(int id, int sleepTime, TCPClient tcp) {
+        RecurringInfo t = new RecurringInfo(id, sleepTime, tcp);
         threads.add(t);
         t.start();
     }
@@ -108,14 +108,14 @@ public class PimoteManager {
 
     class RecurringInfo extends Thread {
         boolean running = true;
-        String id;
+        int id;
         int sleepTime;
         TCPClient tcp;
 
-        public RecurringInfo(String[] setup, TCPClient tcp) {
-            id = setup[1];
-            sleepTime = Integer.parseInt(setup[2]);
+        public RecurringInfo(int id, int sleepTime, TCPClient tcp) {
             this.tcp = tcp;
+            this.id = id;
+            this.sleepTime = sleepTime;
         }
 
         @Override

@@ -2,6 +2,7 @@ package com.uom.pimote.managers;
 
 import android.content.Context;
 import android.content.pm.ActivityInfo;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnTouchListener;
@@ -133,15 +134,15 @@ public class ControllerManager extends PimoteManager {
         }
 
         if(recurring){
-            String[] setup = {2+"", sleepTime+""};
-            RecurringInfo t = new RecurringInfo(setup, tcp);
-            t.start();
+            Log.e("RECURRING", "Sleep time: " + sleepTime);
+            addRecurringInformation(2, sleepTime, tcp);
         }
 
     }
     @Override
     public void onMessage(String[] message){
         //DO WHATEVER
+        Log.e("CONTROL", "Received message");
         battery.setText(message[0]);
         ultrasonic.setText(message[1]);
     }
