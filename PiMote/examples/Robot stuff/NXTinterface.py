@@ -8,17 +8,17 @@ from time import sleep
 
 
 #-----------------------------------------------------
-class NXTRobot:
+class NXTrobot:
 
 	def __init__(self):
 
-		nxtBrick = nxt.locator.find_one_brick()
+		self.nxtBrick = nxt.locator.find_one_brick()
 
-		self.leftMotor  = Motor(nxtBrick, PORT_C)
-		self.rightMotor = Motor(nxtBrick, PORT_A)
+		self.leftMotor  = Motor(self.nxtBrick, PORT_C)
+		self.rightMotor = Motor(self.nxtBrick, PORT_A)
 		
 		#self.lightSensor = Light(nxtBrick, PORT_3)
-		self.ultrasonicSensor = Ultrasonic(nxtBrick, PORT_4)
+		self.ultrasonicSensor = Ultrasonic(self.nxtBrick, PORT_4)
 
 
 	def leftMotor(self, enabled, direction):
@@ -51,6 +51,10 @@ class NXTRobot:
 
 	def getUltrasonicReading(self):
 		return self.ultrasonicSensor.get_sample()
+
+
+	def getBatteryPercentage(self):
+		return self.nxtBrick.get_battery_level() / 90
 
 
 #-----------------------------------------------------
