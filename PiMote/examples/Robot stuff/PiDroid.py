@@ -163,17 +163,17 @@ class PiDroid(ControllerPhone):
 
 		elif message == "speak to me":
 			self.speak = True
-			self.say("I can talk! Horay!")
+			self.say("I can talk! Hooray!")
 
 		elif message == "stop speaking":
 			self.self = False
 			self.conversation = False
-			self.say("You are being mean to PiDroid, human")
+			self.say("You are being mean to me, human.")
 
 		elif message == "let's talk":
 			self.speak = True
 			self.conversation = True
-			self.say("Very well, human. Let's have a chat.")
+			self.say("Very well, human.")
 
 		elif message == "goodbye":
 			self.conversation = False

@@ -20,6 +20,8 @@ public class ControllerManager extends PimoteManager {
     String URL;
     ImageView hud;
     private MjpegView mv = null;
+    final TextView ultrasonic;
+    final TextView battery;
 
     public ControllerManager(final Context c, final TCPClient tcp, String ip, int videoV, int voiceV, int recurringV, int sleepTime) {
         super();
@@ -34,8 +36,6 @@ public class ControllerManager extends PimoteManager {
         final ImageView rightForward;
         final ImageView rightBackwards;
         final ImageView microphone;
-        final TextView ultrasonic;
-        final TextView battery;
 
 
 
@@ -138,6 +138,12 @@ public class ControllerManager extends PimoteManager {
             t.start();
         }
 
+    }
+    @Override
+    public void onMessage(String[] message){
+        //DO WHATEVER
+        battery.setText(message[0]);
+        ultrasonic.setText(message[1]);
     }
 
     public void toggleControl(int position, boolean value) {

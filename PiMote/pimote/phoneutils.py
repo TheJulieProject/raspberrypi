@@ -115,7 +115,10 @@ class ControllerPhone():
   def setRecurring(self, sleepTime):
     self.recurring = True
     self.sleepTime = sleepTime
+  def sendMessage(self, message):
+    self.socket.send(str(PiMoteServer.MESSAGE_FOR_MANAGER)+","+message)
   def setup(self, socket):
+    self.socket = socket
     voiceV = videoV = recurringV = 0
     if self.video == True:
       videoV = 1
