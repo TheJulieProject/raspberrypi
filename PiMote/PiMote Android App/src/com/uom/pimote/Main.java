@@ -30,7 +30,7 @@ public class Main extends Activity implements OnClickListener {
         ipField = (EditText) findViewById(R.id.ipAddress);
         portField = (EditText) findViewById(R.id.portNo);
 
-        ipField.setText("10.0.2.7");
+        ipField.setText("10.0.2.5");
         portField.setText("8090");
 
         connect = (Button) findViewById(R.id.connectBtn);
