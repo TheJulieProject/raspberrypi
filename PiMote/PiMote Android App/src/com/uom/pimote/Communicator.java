@@ -225,11 +225,11 @@ public class Communicator extends Activity {
 
                 case SET_CONTROL_TYPE:
                     controlType = Integer.parseInt(info[1]);
-                    if (controlType == JOYSTICK_CONTROL) {
-                        manager = new ControllerManager(Communicator.this, tcp, ip, Integer.parseInt(info[1]), Integer.parseInt(info[2]),
-                                                        Integer.parseInt(info[3]), Integer.parseInt(info[4]));
-                    } else if (controlType == NORMAL_CONTROL) {
+                    if (controlType == NORMAL_CONTROL) {
                         manager = new RegularButtonManager(Communicator.this, tcp, ip);
+                    } else if (controlType == JOYSTICK_CONTROL) {
+                        manager = new ControllerManager(Communicator.this, tcp, ip, Integer.parseInt(info[1]), Integer.parseInt(info[2]),
+                                Integer.parseInt(info[3]), Integer.parseInt(info[4]));
                     }
                     break;
 

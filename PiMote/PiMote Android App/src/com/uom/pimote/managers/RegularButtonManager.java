@@ -33,7 +33,7 @@ public class RegularButtonManager extends PimoteManager {
     int viewPosition;
 
     public RegularButtonManager(Context c, TCPClient tcp, String ip) {
-        super();
+        super(tcp);
         this.c = c;
         this.tcp = tcp;
         this.ip = ip;
@@ -94,7 +94,7 @@ public class RegularButtonManager extends PimoteManager {
         button.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
                 if (tcp != null)
-                    tcp.sendMessage(Communicator.SEND_DATA + "," + setup[1] + "," + " ");
+                    send(setup[1] + "," + " ");
             }
         });
 
@@ -120,8 +120,7 @@ public class RegularButtonManager extends PimoteManager {
                 if (tcp != null) {
                     String text = addText.getText().toString();
                     if (text.equals("")) text = "null";
-                    tcp.sendMessage(Communicator.SEND_DATA + "," + setup[1] + ","
-                            + text);
+                    send(setup[1] + "," + text);
                 }
                 addText.setText("");
             }
@@ -150,7 +149,7 @@ public class RegularButtonManager extends PimoteManager {
             @Override
             public void onClick(View view) {
                 int tf = ((ToggleButton) view).isChecked() ? 1 : 0;
-                tcp.sendMessage(Communicator.SEND_DATA + "," + setup[1] + "," + tf);
+                send(setup[1] + "," + tf);
             }
         });
         textButtonLayout.addView(text);
