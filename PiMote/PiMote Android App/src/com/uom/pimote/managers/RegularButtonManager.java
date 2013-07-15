@@ -29,7 +29,8 @@ public class RegularButtonManager extends PimoteManager {
     private static final int SETUP = 1;
     private static final int REQUEST_OUTPUT_CHANGE = 2;
     private static final int BUTTON = 1, TEXT_INPUT = 2, TOGGLE_BUTTON = 3, TEXT_OUTPUT = 4,
-                             VIDEO_FEED = 5, VOICE_INPUT = 6, RECURRING_INFO = 7, PROGRESS_BAR = 8;
+                             VIDEO_FEED = 5, VOICE_INPUT = 6, RECURRING_INFO = 7, PROGRESS_BAR = 8,
+                             SPACER = 9;
     TCPClient tcp;
     Context c;
     LinearLayout layout;
@@ -44,7 +45,6 @@ public class RegularButtonManager extends PimoteManager {
         this.viewPosition = 0;
         ((Communicator) c).getActionBar().show();
         ((Communicator) c).getActionBar().setTitle(name);
-        Log.d("TITLE", name);
         ((Communicator) c).setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         ((Communicator) c).setContentView(R.layout.activity_main);
         this.layout = (LinearLayout) ((Communicator) c).findViewById(R.id.mainlayout);
@@ -76,30 +76,44 @@ public class RegularButtonManager extends PimoteManager {
     public void addButtons(final String[] setup) {
         switch (Integer.parseInt(setup[0])) {
             case BUTTON:
+                Log.e("SETUP", "Button");
                 addNewButton(setup);
                 break;
             case TEXT_INPUT:
+                Log.e("SETUP", "Text in");
                 addNewTextInput(setup);
                 break;
             case TOGGLE_BUTTON:
+                Log.e("SETUP", "Toggle");
                 addNewToggle(setup);
                 break;
             case TEXT_OUTPUT:
+                Log.e("SETUP", "Text Out");
                 addNewTextView(setup);
                 break;
             case VIDEO_FEED:
+                Log.e("SETUP", "Vid");
                 addNewFeed(setup, ip);
                 break;
             case VOICE_INPUT:
+                Log.e("SETUP", "Voice");
                 addVoiceInput(setup);
                 break;
             case RECURRING_INFO:
+                Log.e("SETUP", "Recurring");
                 addRecurringInformation(Integer.parseInt(setup[1]), Integer.parseInt(setup[2]), tcp);
                 break;
             case PROGRESS_BAR:
+                Log.e("SETUP", "Progress");
                 addProgressBar(Integer.parseInt(setup[1]), Integer.parseInt(setup[2]));
+                break;
+            case SPACER:
+                Log.e("SETUP", "Spacer");
+                addSpacer(Integer.parseInt(setup[1]));
+                break;
             default:
                 Log.e("SETUP", "Unknown component");
+                break;
         }
     }
 
@@ -196,13 +210,14 @@ public class RegularButtonManager extends PimoteManager {
         String feedIp = ip;
         if (Integer.parseInt(setup[3]) == 1) feedIp = setup[4];
         String URL = "http://" + feedIp + ":8080/?action=stream";
-        MjpegView mv = (MjpegView) ((Communicator) c).findViewById(R.id.mv2);
+        MjpegView mv = new MjpegView(c);
+        //MjpegView mv = (MjpegView) ((Communicator) c).findViewById(R.id.mv2);
         startVideo(mv, URL);
         LayoutParams params = new LayoutParams(Integer.parseInt(setup[1]), Integer.parseInt(setup[2]));
         params.setMargins(0, 10, 0, 10);
         mv.setLayoutParams(params);
         mv.setVisibility(View.VISIBLE);
-        viewPosition++;
+        layout.addView(mv, viewPosition++);
     }
 
     public void addVoiceInput(final String[] setup) {
@@ -226,7 +241,14 @@ public class RegularButtonManager extends PimoteManager {
         bar.setProgress(0);
         bar.setMax(maxValue);
         bar.setId(id);
-        layout.addView(bar);
+        layout.addView(bar, viewPosition++);
+    }
+
+    public void addSpacer(int size){
+        View v = new View(c);
+        LayoutParams params = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, size);
+        v.setLayoutParams(params);
+        layout.addView(v, viewPosition++);
     }
 
 
