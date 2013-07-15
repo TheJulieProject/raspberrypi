@@ -31,6 +31,7 @@ class PhoneServer(PiMoteServer):
 ################------PHONE TYPES--------####################
 
 class Phone():
+  name = "PiMote"
   buttons = [] #For user use
   outputs = []
   components = [] #To send to phone
@@ -47,6 +48,7 @@ class Phone():
   VIDEO_FEED = 5
   VOICE_INPUT = 6
   RECURRING_INFO = 7
+  PROGRESS_BAR = 8
   #Setup
   SET_CONTROL_TYPE = 0
   SETUP = 1
@@ -63,7 +65,7 @@ class Phone():
 
   #Add an output to the phone
   def addOutput(self, output):
-    if isinstance(output, OutputText):
+    if isinstance(output, OutputText) or isinstance(output, ProgressBar):
       output.id = len(self.components)
       self.components.append(output)
     else:
@@ -85,7 +87,7 @@ class Phone():
   #Used for setup
   def setup(self, socket):
     self.socket = socket
-    socket.send(str(Phone.SET_CONTROL_TYPE)+","+str(self.controltype))
+    socket.send(str(Phone.SET_CONTROL_TYPE)+","+str(self.controltype)+","+self.name)
     for c in self.components:
       c.setup(socket) #setup each component
   #Updates the state of buttons (toggle)
@@ -97,6 +99,8 @@ class Phone():
           if(int(message) == 1):
             value = True
           b.setValue(value)
+  def setTitle(self, title):
+    self.name = title
   
 
 
@@ -182,12 +186,25 @@ class OutputText():
     self.message = initialmessage
   def setText(self, message):
     self.message = message
-    self.socket.send(str(PiMoteServer.MESSAGE_FOR_MANAGER)+","+str(Phone.REQUEST_OUTPUT_CHANGE)+","+str(self.id)+","+str(self.message))
+    self.socket.send(str(PiMoteServer.MESSAGE_FOR_MANAGER)+","+str(Phone.REQUEST_OUTPUT_CHANGE)+","+str(self.type)+","+str(self.id)+","+str(self.message))
   def getText(self):
     return self.message
   def setup(self, socket):
     self.socket = socket
     socket.send(str(PiMoteServer.MESSAGE_FOR_MANAGER)+","+str(Phone.SETUP)+","+str(self.type)+","+str(self.id)+","+str(self.message)) 
+
+class ProgressBar():
+  def __init__(self, maxValue):
+    self.maxValue = maxValue
+    self.type = Phone.PROGRESS_BAR
+  def setup(self, socket):
+    self.socket = socket
+    socket.send(str(PiMoteServer.MESSAGE_FOR_MANAGER)+","+str(Phone.SETUP)+","+str(self.type)+","+str(self.id)+","+str(self.maxValue))
+  def setProgress(self, progress):
+    if progress <= self.maxValue:
+      self.socket.send(str(PiMoteServer.MESSAGE_FOR_MANAGER)+","+str(Phone.REQUEST_OUTPUT_CHANGE)+","+str(self.type)+","+str(self.id)+","+str(progress))
+    else:
+      print("Cannot set progress to higher than the max value specified")
 
 class VideoFeed():
   outsidefeed = 0;
