@@ -2,6 +2,7 @@ package com.uom.pimote.managers;
 
 import android.content.Context;
 import android.content.pm.ActivityInfo;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -11,6 +12,7 @@ import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
+import android.widget.ProgressBar;
 import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.ToggleButton;
@@ -26,19 +28,23 @@ public class RegularButtonManager extends PimoteManager {
 
     private static final int SETUP = 1;
     private static final int REQUEST_OUTPUT_CHANGE = 2;
+    private static final int BUTTON = 1, TEXT_INPUT = 2, TOGGLE_BUTTON = 3, TEXT_OUTPUT = 4,
+                             VIDEO_FEED = 5, VOICE_INPUT = 6, RECURRING_INFO = 7, PROGRESS_BAR = 8;
     TCPClient tcp;
     Context c;
     LinearLayout layout;
     String ip;
     int viewPosition;
 
-    public RegularButtonManager(Context c, TCPClient tcp, String ip) {
+    public RegularButtonManager(Context c, TCPClient tcp, String ip, String name) {
         super(tcp);
         this.c = c;
         this.tcp = tcp;
         this.ip = ip;
         this.viewPosition = 0;
         ((Communicator) c).getActionBar().show();
+        ((Communicator) c).getActionBar().setTitle(name);
+        Log.d("TITLE", name);
         ((Communicator) c).setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         ((Communicator) c).setContentView(R.layout.activity_main);
         this.layout = (LinearLayout) ((Communicator) c).findViewById(R.id.mainlayout);
@@ -56,35 +62,44 @@ public class RegularButtonManager extends PimoteManager {
                 break;
 
             case REQUEST_OUTPUT_CHANGE:
-                TextView output = getTextView(Integer.parseInt(message[1]));
-                output.setText(message[2]);
+                if (Integer.parseInt(message[1]) == TEXT_OUTPUT) {
+                    TextView output = getTextView(Integer.parseInt(message[2]));
+                    output.setText(message[3]);
+                } else if (Integer.parseInt(message[1]) == PROGRESS_BAR) {
+                    ProgressBar bar = getProgressBar(Integer.parseInt(message[2]));
+                    bar.setProgress(Integer.parseInt(message[3]));
+                }
                 break;
         }
     }
 
     public void addButtons(final String[] setup) {
         switch (Integer.parseInt(setup[0])) {
-            case 1:
+            case BUTTON:
                 addNewButton(setup);
                 break;
-            case 2:
+            case TEXT_INPUT:
                 addNewTextInput(setup);
                 break;
-            case 3:
+            case TOGGLE_BUTTON:
                 addNewToggle(setup);
                 break;
-            case 4:
+            case TEXT_OUTPUT:
                 addNewTextView(setup);
                 break;
-            case 5:
+            case VIDEO_FEED:
                 addNewFeed(setup, ip);
                 break;
-            case 6:
+            case VOICE_INPUT:
                 addVoiceInput(setup);
                 break;
-            case 7:
+            case RECURRING_INFO:
                 addRecurringInformation(Integer.parseInt(setup[1]), Integer.parseInt(setup[2]), tcp);
                 break;
+            case PROGRESS_BAR:
+                addProgressBar(Integer.parseInt(setup[1]), Integer.parseInt(setup[2]));
+            default:
+                Log.e("SETUP", "Unknown component");
         }
     }
 
@@ -173,6 +188,9 @@ public class RegularButtonManager extends PimoteManager {
     public TextView getTextView(int id) {
         return (TextView) ((Communicator) c).findViewById(id);
     }
+    public ProgressBar getProgressBar(int id){
+        return (ProgressBar) ((Communicator)c).findViewById(id);
+    }
 
     public void addNewFeed(String[] setup, String ip) {
         String feedIp = ip;
@@ -201,6 +219,14 @@ public class RegularButtonManager extends PimoteManager {
             } // onClick()
         });
         layout.addView(voice, viewPosition++);
+    }
+
+    public void addProgressBar(int id, int maxValue){
+        ProgressBar bar = new ProgressBar(c, null, android.R.attr.progressBarStyleHorizontal);
+        bar.setProgress(0);
+        bar.setMax(maxValue);
+        bar.setId(id);
+        layout.addView(bar);
     }
 
 
