@@ -79,13 +79,8 @@ class Phone():
 
   #Add a video feed to the phone
   def addVideoFeed(self, vid):
-    if self.video:
-      print("You can only have one video feed running..")
-      sys.exit(0)
-    else:
-      self.vid = vid
-      self.video = True
-      self.components.append(vid)
+    self.vid = vid
+    self.components.append(vid)
 
   #User overrides this. Called when a message is recieved
   def buttonPressed(self, id, msg):
