@@ -76,39 +76,31 @@ public class RegularButtonManager extends PimoteManager {
     public void addButtons(final String[] setup) {
         switch (Integer.parseInt(setup[0])) {
             case BUTTON:
-                Log.e("SETUP", "Button");
                 addNewButton(setup);
                 break;
             case TEXT_INPUT:
-                Log.e("SETUP", "Text in");
                 addNewTextInput(setup);
                 break;
             case TOGGLE_BUTTON:
-                Log.e("SETUP", "Toggle");
                 addNewToggle(setup);
                 break;
             case TEXT_OUTPUT:
-                Log.e("SETUP", "Text Out");
                 addNewTextView(setup);
                 break;
             case VIDEO_FEED:
-                Log.e("SETUP", "Vid");
                 addNewFeed(setup, ip);
                 break;
             case VOICE_INPUT:
-                Log.e("SETUP", "Voice");
                 addVoiceInput(setup);
                 break;
             case RECURRING_INFO:
-                Log.e("SETUP", "Recurring");
-                addRecurringInformation(Integer.parseInt(setup[1]), Integer.parseInt(setup[2]), tcp);
+                addRecurringInformation(Integer.parseInt(setup[1]),
+                        Integer.parseInt(setup[2]), tcp);
                 break;
             case PROGRESS_BAR:
-                Log.e("SETUP", "Progress");
                 addProgressBar(Integer.parseInt(setup[1]), Integer.parseInt(setup[2]));
                 break;
             case SPACER:
-                Log.e("SETUP", "Spacer");
                 addSpacer(Integer.parseInt(setup[1]));
                 break;
             default:
@@ -212,7 +204,8 @@ public class RegularButtonManager extends PimoteManager {
         String URL = "http://" + feedIp + ":8080/?action=stream";
         MjpegView mv = new MjpegView(c);
         startVideo(mv, URL);
-        LayoutParams params = new LayoutParams(Integer.parseInt(setup[1]), Integer.parseInt(setup[2]));
+        LayoutParams params = new LayoutParams(Integer.parseInt(setup[1]),
+                Integer.parseInt(setup[2]));
         params.setMargins(0, 10, 0, 10);
         mv.setLayoutParams(params);
         mv.setVisibility(View.VISIBLE);

@@ -1,8 +1,9 @@
 """
-An example application using pimoteutils
-To run: python app.py 0.0.0.0 8080
+An example application using pimote
+To run: python regular.py
+  this will run it on ip=0.0.0.0 port=8090
 
-Needs porting into python3 for use with PiFace
+Needs porting into python3 for use with the PiFace interface
 
 """
 
@@ -13,8 +14,12 @@ from pimote import *
 
 
 # Parse the IP address and port you wish to listen on.
-ip = sys.argv[1]
-port = int(sys.argv[2])
+try:
+	ip = sys.argv[1]
+	port = int(sys.argv[2])
+except:
+	ip = "0.0.0.0"
+	port = 8090
 
 # Override Phone so you can control what you do with the messages
 #   "id" - the ID of the button that has been pressed
@@ -72,4 +77,3 @@ myserver.setPassword("helloworld")
 myserver.addPhone(thisphone)
 # Start server
 myserver.start(ip, port)
-

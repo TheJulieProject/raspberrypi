@@ -228,7 +228,8 @@ public class Communicator extends Activity {
                     if (controlType == NORMAL_CONTROL) {
                         manager = new RegularButtonManager(Communicator.this, tcp, ip, info[2]);
                     } else if (controlType == JOYSTICK_CONTROL) {
-                        manager = new ControllerManager(Communicator.this, tcp, ip, Integer.parseInt(info[2]), Integer.parseInt(info[3]),
+                        manager = new ControllerManager(Communicator.this, tcp, ip,
+                                Integer.parseInt(info[2]), Integer.parseInt(info[3]),
                                 Integer.parseInt(info[4]), Integer.parseInt(info[5]));
                     }
                     break;
@@ -242,6 +243,7 @@ public class Communicator extends Activity {
 
                 default:
                     Log.e("ERROR", "Wut?!");
+                    break;
             }
         }
     }
