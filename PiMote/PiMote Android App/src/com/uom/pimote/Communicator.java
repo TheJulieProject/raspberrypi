@@ -234,7 +234,6 @@ public class Communicator extends Activity {
                     break;
 
                 case MESSAGE_FOR_MANAGER:
-                    Log.e("MSG", "For manager");
                     String[] message = new String[info.length - 1];
                     for (int i = 1; i < info.length; i++)
                         message[i - 1] = info[i];

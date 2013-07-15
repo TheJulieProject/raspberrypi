@@ -49,6 +49,7 @@ class Phone():
   VOICE_INPUT = 6
   RECURRING_INFO = 7
   PROGRESS_BAR = 8
+  SPACER = 9
   #Setup
   SET_CONTROL_TYPE = 0
   SETUP = 1
@@ -70,6 +71,11 @@ class Phone():
       self.components.append(output)
     else:
       print("Not an output")
+
+  def addSpace(self, spacer):
+    if isinstance(spacer, Spacer):
+      spacer.id = len(self.components)
+      self.components.append(spacer)
 
   #Add a video feed to the phone
   def addVideoFeed(self, vid):
@@ -226,3 +232,11 @@ class RecurringInfo(Button):
     self.sleepTime = sleepTime
   def setup(self, socket):
     socket.send(str(PiMoteServer.MESSAGE_FOR_MANAGER)+","+str(Phone.SETUP)+","+str(self.type)+","+str(self.id)+","+str(self.sleepTime))
+
+
+class Spacer():
+  def __init__(self, size):
+    self.size = size
+    self.type = Phone.SPACER
+  def setup(self, socket):
+    socket.send(str(PiMoteServer.MESSAGE_FOR_MANAGER)+","+str(Phone.SETUP)+","+str(self.type)+","+str(self.size))
