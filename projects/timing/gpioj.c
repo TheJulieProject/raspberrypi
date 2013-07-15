@@ -48,7 +48,7 @@ int main(int argc, char *argv[])
 	unsigned int t, *peripheral; // 32 bit gpio
 	int fd;
 	void *st_base; // byte ptr to simplify offset math
-	int seconds = 2; // time we want the progam to wait between intervals
+	int seconds = 3; // time we want the progam to wait between intervals
 	int offset = atoi(argv[1]);
 	char binary[33];
 	unsigned int i, j;
