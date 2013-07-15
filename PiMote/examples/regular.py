@@ -6,7 +6,7 @@ Needs porting into python3 for use with PiFace
 
 """
 
-import sys
+import sys, random
 # Import PhoneServer and Phone classes from pimoteutils.
 # Button only imported so we can access the variables
 from pimote import *
@@ -28,7 +28,9 @@ class MyPhone(Phone):
 		# and handle that button press as you wish.                      #
 		#########----------------------------------------------###########
 		if id == b1.getId():
-			o1.setText("Button pressed")
+			num = random.randint(0,120)
+			p.setProgress(num)
+			o1.setText(str(num))
 		elif id == b2.getId():
 			o1.setText("Toggle switched to " + message)
 		elif id == b3.getId():
@@ -41,22 +43,21 @@ class MyPhone(Phone):
 
 # Create the phone object
 thisphone = MyPhone()
-
+thisphone.setTitle("Test App")
+p = ProgressBar(120)
 b1 = Button("Hello") #Regular button
 b2 = ToggleButton("This is a toggle button", True) #Toggle
 b3 = InputText("Input text here") #Text Input
 o1 = OutputText("Hello") #Output field
 v = VideoFeed(320, 240) #Live video feed
 vi = VoiceInput() #Voice input
-r = RecurringInfo(2000)
 
 #Add the buttons to the phone
 thisphone.addButton(b1)
 thisphone.addButton(b2)
 thisphone.addButton(b3)
 thisphone.addOutput(o1)
-thisphone.addButton(r)
-
+thisphone.addOutput(p)
 thisphone.addButton(vi)
 #Create the server
 myserver = PhoneServer()
