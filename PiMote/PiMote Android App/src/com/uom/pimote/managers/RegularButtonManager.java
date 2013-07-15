@@ -211,7 +211,6 @@ public class RegularButtonManager extends PimoteManager {
         if (Integer.parseInt(setup[3]) == 1) feedIp = setup[4];
         String URL = "http://" + feedIp + ":8080/?action=stream";
         MjpegView mv = new MjpegView(c);
-        //MjpegView mv = (MjpegView) ((Communicator) c).findViewById(R.id.mv2);
         startVideo(mv, URL);
         LayoutParams params = new LayoutParams(Integer.parseInt(setup[1]), Integer.parseInt(setup[2]));
         params.setMargins(0, 10, 0, 10);

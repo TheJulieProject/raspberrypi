@@ -48,6 +48,7 @@ b3 = InputText("Input text here") #Text Input
 o1 = OutputText("Output")
 o2 = OutputText("0") #Output field
 v = VideoFeed(320, 240) #Live video feed
+v2 = VideoFeed(320, 240) #Live video feed
 vi = VoiceInput() #Voice input
 s = Spacer(100)
 r = RecurringInfo(2000)
@@ -63,6 +64,7 @@ thisphone.addOutput(o2)
 thisphone.addSpace(s)
 thisphone.addVideoFeed(v)
 thisphone.addButton(r)
+thisphone.addVideoFeed(v2)
 #Create the server
 myserver = PhoneServer()
 myserver.setPassword("helloworld")
