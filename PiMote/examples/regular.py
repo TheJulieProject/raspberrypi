@@ -26,7 +26,7 @@ except:
 #   "message" - the message sent by the phone. If no message it will be ""
 class MyPhone(Phone):
 	#Override
-	def buttonPressed(self, id, message):
+	def buttonPressed(self, id, message, phoneId):
 		#########----------------------------------------------###########
 		# Your code will go here! Check for the ID of the button pressed #
 		# and handle that button press as you wish.                      #
@@ -37,10 +37,8 @@ class MyPhone(Phone):
 			o1.setText("Toggle switched to " + message)
 		elif id == b3.getId():
 			o1.setText(message)
-		elif id == r.getId():
-			num = random.randint(0,120)
-			p.setProgress(num)
-			o2.setText(str(num))
+
+		o3.setText("Input from ID: " + str(phoneId))
 
 # Create the phone object
 thisphone = MyPhone()
@@ -56,8 +54,10 @@ v2 = VideoFeed(640, 480) #Live video feed
 vi = VoiceInput() #Voice input
 s = Spacer(100)
 r = RecurringInfo(2000)
+o3 = OutputText("Input from ID: ?")
 
 #Add the buttons to the phone
+thisphone.addOutput(o3)
 thisphone.addButton(b1)
 thisphone.addButton(b2)
 thisphone.addButton(b3)
@@ -65,11 +65,6 @@ thisphone.addOutput(o1)
 thisphone.addSpace(s)
 thisphone.addOutput(p)
 thisphone.addOutput(o2)
-thisphone.addSpace(s)
-thisphone.addVideoFeed(v)
-thisphone.addButton(r)
-thisphone.addSpace(s)
-thisphone.addVideoFeed(v2)
 #Create the server
 myserver = PhoneServer()
 myserver.setPassword("helloworld")

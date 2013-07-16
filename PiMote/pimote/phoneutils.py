@@ -4,7 +4,6 @@
 
 from pimoteutils import *
 
-
 ########################-------SERVER-------########################################
 #  This is the main server that runs on the pi. All messages are sorted here and sent
 #  to the phone that handles them.
@@ -17,16 +16,27 @@ class PhoneServer(PiMoteServer):
   def addPhone(self, thephone): 
     self.phone = thephone
 
-  def messageReceived(self, message):
+  def messageReceived(self, message, socket):
     if isinstance(self.phone, Phone): #Regular phone
       (id, sep, msg) = message.strip().partition(",") #Strip component ID and message apart
-      self.phone.updateButtons(int(id), msg) #Update buttons if needed
-      self.phone.buttonPressed(int(id), msg) #Allow the user to handle the message
+      self.phone.updateButtons(int(id), msg, self) #Update buttons if needed
+      self.phone.buttonPressed(int(id), msg, socket.id) #Allow the user to handle the message
     elif isinstance(self.phone, ControllerPhone): #Controller
       self.phone.controlPress(message) #Controller handler
 
   def clientConnected(self, socket):
-    self.phone.setup(socket)
+    self.phone.setup(socket, self)
+
+  def clientDisconnected(self, socket):
+    pass
+
+  def notifyAll(self):
+    for client in self.clients:
+      client.send("Hello")
+
+  def send(self, msg):
+    for client in self.clients:
+      client.send(msg)
 
 ################------PHONE TYPES--------####################
 
@@ -82,24 +92,27 @@ class Phone():
     self.vid = vid
     self.components.append(vid)
 
+  def clearComponents(self):
+    self.components = []
+
   #User overrides this. Called when a message is recieved
   def buttonPressed(self, id, msg):
     pass
   #Used for setup
-  def setup(self, socket):
+  def setup(self, socket, server):
     self.socket = socket
     socket.send(str(Phone.SET_CONTROL_TYPE)+","+str(self.controltype)+","+self.name)
     for c in self.components:
-      c.setup(socket) #setup each component
+      c.setup(socket, server) #setup each component
   #Updates the state of buttons (toggle)
-  def updateButtons(self, id, message):
-    for b in self.buttons:
-      if b.id == id:
-        if isinstance(b, ToggleButton):
-          value = False
-          if(int(message) == 1):
-            value = True
-          b.setValue(value)
+  def updateButtons(self, id, message, server):
+    for c in self.components:
+      if isinstance(c, ToggleButton) and c.id == id:
+        server.send(str(PiMoteServer.MESSAGE_FOR_MANAGER)+","+str(Phone.REQUEST_OUTPUT_CHANGE)+","+str(Phone.INPUT_TOGGLE)+","+str(id)+","+str(message))
+        if int(message) == 1:
+          c.value = True
+        else:
+          c.value = False
   def setTitle(self, title):
     self.name = title
   
@@ -147,14 +160,14 @@ class Button():
     return self.name
   def getType(self):
     return self.type
-  def setup(self, socket):
+  def setup(self, socket, server):
     socket.send(str(PiMoteServer.MESSAGE_FOR_MANAGER)+","+str(Phone.SETUP)+","+str(self.type) + "," + str(self.id) + "," + str(self.name))
 
 class InputText(Button):
   def __init__(self, name):
     self.name = name
     self.type = Phone.INPUT_TEXT
-  def setup(self, socket):
+  def setup(self, socket, server):
     socket.send(str(PiMoteServer.MESSAGE_FOR_MANAGER)+","+str(Phone.SETUP)+","+str(self.type) + "," + str(self.id) + "," + str(self.name))
 
 class ToggleButton(Button):
@@ -166,7 +179,7 @@ class ToggleButton(Button):
     return self.value
   def setValue(self, value):
     self.value = value
-  def setup(self, socket):
+  def setup(self, socket, server):
     tf = 0
     if self.value == True:
       tf=1
@@ -175,8 +188,8 @@ class ToggleButton(Button):
 class VoiceInput(Button):
   def __init__(self):
     self.type = Phone.VOICE_INPUT
-  def setup(self, socket):
-    socket.send(str(PiMoteServer.MESSAGE_FOR_MANAGER)+","+str(Phone.SETUP)+","+str(self.type)+","+str(self.id))
+  def setup(self, socket, server):
+    server.send(str(PiMoteServer.MESSAGE_FOR_MANAGER)+","+str(Phone.SETUP)+","+str(self.type)+","+str(self.id))
 
 
 
@@ -187,23 +200,26 @@ class OutputText():
     self.message = initialmessage
   def setText(self, message):
     self.message = message
-    self.socket.send(str(PiMoteServer.MESSAGE_FOR_MANAGER)+","+str(Phone.REQUEST_OUTPUT_CHANGE)+","+str(self.type)+","+str(self.id)+","+str(self.message))
+    try:
+      self.server.send(str(PiMoteServer.MESSAGE_FOR_MANAGER)+","+str(Phone.REQUEST_OUTPUT_CHANGE)+","+str(self.type)+","+str(self.id)+","+str(self.message))
+    except:
+      pass
   def getText(self):
     return self.message
-  def setup(self, socket):
-    self.socket = socket
+  def setup(self, socket, server):
+    self.server = server
     socket.send(str(PiMoteServer.MESSAGE_FOR_MANAGER)+","+str(Phone.SETUP)+","+str(self.type)+","+str(self.id)+","+str(self.message)) 
 
 class ProgressBar():
   def __init__(self, maxValue):
     self.maxValue = maxValue
     self.type = Phone.PROGRESS_BAR
-  def setup(self, socket):
-    self.socket = socket
+  def setup(self, socket, server):
+    self.server = server
     socket.send(str(PiMoteServer.MESSAGE_FOR_MANAGER)+","+str(Phone.SETUP)+","+str(self.type)+","+str(self.id)+","+str(self.maxValue))
   def setProgress(self, progress):
     if progress <= self.maxValue:
-      self.socket.send(str(PiMoteServer.MESSAGE_FOR_MANAGER)+","+str(Phone.REQUEST_OUTPUT_CHANGE)+","+str(self.type)+","+str(self.id)+","+str(progress))
+      self.server.send(str(PiMoteServer.MESSAGE_FOR_MANAGER)+","+str(Phone.REQUEST_OUTPUT_CHANGE)+","+str(self.type)+","+str(self.id)+","+str(progress))
     else:
       print("Cannot set progress to higher than the max value specified")
 
@@ -217,7 +233,7 @@ class VideoFeed():
   def setIp(self, ip):
     self.ip = ip
     self.outsidefeed = 1
-  def setup(self, socket):
+  def setup(self, socket, server):
     socket.send(str(PiMoteServer.MESSAGE_FOR_MANAGER)+","+str(Phone.SETUP)+","+str(self.type)+","+str(self.width)+","+str(self.height)+","+str(self.outsidefeed)+","+self.ip)
 
 #Counts as a button as it sends information
@@ -225,7 +241,7 @@ class RecurringInfo(Button):
   def __init__(self, sleepTime):
     self.type = Phone.RECURRING_INFO
     self.sleepTime = sleepTime
-  def setup(self, socket):
+  def setup(self, socket, server):
     socket.send(str(PiMoteServer.MESSAGE_FOR_MANAGER)+","+str(Phone.SETUP)+","+str(self.type)+","+str(self.id)+","+str(self.sleepTime))
 
 
@@ -233,5 +249,5 @@ class Spacer():
   def __init__(self, size):
     self.size = size
     self.type = Phone.SPACER
-  def setup(self, socket):
+  def setup(self, socket, server):
     socket.send(str(PiMoteServer.MESSAGE_FOR_MANAGER)+","+str(Phone.SETUP)+","+str(self.type)+","+str(self.size))
