@@ -29,7 +29,8 @@ public class RegularButtonManager extends PimoteManager {
     private static final int SETUP = 1;
     private static final int REQUEST_OUTPUT_CHANGE = 2;
     private static final int BUTTON = 1, TEXT_INPUT = 2, TOGGLE_BUTTON = 3, TEXT_OUTPUT = 4,
-                             VIDEO_FEED = 5, VOICE_INPUT = 6, RECURRING_INFO = 7, PROGRESS_BAR = 8;
+            VIDEO_FEED = 5, VOICE_INPUT = 6, RECURRING_INFO = 7, PROGRESS_BAR = 8,
+            SPACER = 9;
     TCPClient tcp;
     Context c;
     LinearLayout layout;
@@ -44,7 +45,6 @@ public class RegularButtonManager extends PimoteManager {
         this.viewPosition = 0;
         ((Communicator) c).getActionBar().show();
         ((Communicator) c).getActionBar().setTitle(name);
-        Log.d("TITLE", name);
         ((Communicator) c).setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         ((Communicator) c).setContentView(R.layout.activity_main);
         this.layout = (LinearLayout) ((Communicator) c).findViewById(R.id.mainlayout);
@@ -64,10 +64,15 @@ public class RegularButtonManager extends PimoteManager {
             case REQUEST_OUTPUT_CHANGE:
                 if (Integer.parseInt(message[1]) == TEXT_OUTPUT) {
                     TextView output = getTextView(Integer.parseInt(message[2]));
-                    output.setText(message[3]);
+                    Log.d("SETUP", message[3]);
+                    String out = message[3].replace("&/", "\n");
+                    output.setText(out);
                 } else if (Integer.parseInt(message[1]) == PROGRESS_BAR) {
                     ProgressBar bar = getProgressBar(Integer.parseInt(message[2]));
                     bar.setProgress(Integer.parseInt(message[3]));
+                } else if (Integer.parseInt(message[1]) == TOGGLE_BUTTON) {
+                    ToggleButton t = getToggleButton(Integer.parseInt(message[2]));
+                    t.setChecked(Integer.parseInt(message[3]) == 1);
                 }
                 break;
         }
@@ -94,12 +99,18 @@ public class RegularButtonManager extends PimoteManager {
                 addVoiceInput(setup);
                 break;
             case RECURRING_INFO:
-                addRecurringInformation(Integer.parseInt(setup[1]), Integer.parseInt(setup[2]), tcp);
+                addRecurringInformation(Integer.parseInt(setup[1]),
+                        Integer.parseInt(setup[2]), tcp);
                 break;
             case PROGRESS_BAR:
                 addProgressBar(Integer.parseInt(setup[1]), Integer.parseInt(setup[2]));
+                break;
+            case SPACER:
+                addSpacer(Integer.parseInt(setup[1]));
+                break;
             default:
                 Log.e("SETUP", "Unknown component");
+                break;
         }
     }
 
@@ -169,6 +180,7 @@ public class RegularButtonManager extends PimoteManager {
         });
         textButtonLayout.addView(text);
         textButtonLayout.addView(button);
+        button.setId(Integer.parseInt(setup[1]));
         layout.addView(textButtonLayout, viewPosition++);
     }
 
@@ -179,8 +191,10 @@ public class RegularButtonManager extends PimoteManager {
         TextView text = new TextView(c);
         text.setTextSize(18);
         text.setLayoutParams(params);
-        if (setup.length == 3)
-            text.setText(setup[2]);
+        if (setup.length == 3) {
+            String out = setup[2].replace("&/", "\n");
+            text.setText(out);
+        }
         layout.addView(text, viewPosition++);
         text.setId(Integer.parseInt(setup[1]));
     }
@@ -188,21 +202,27 @@ public class RegularButtonManager extends PimoteManager {
     public TextView getTextView(int id) {
         return (TextView) ((Communicator) c).findViewById(id);
     }
-    public ProgressBar getProgressBar(int id){
-        return (ProgressBar) ((Communicator)c).findViewById(id);
+
+    public ProgressBar getProgressBar(int id) {
+        return (ProgressBar) ((Communicator) c).findViewById(id);
+    }
+
+    public ToggleButton getToggleButton(int id) {
+        return (ToggleButton) ((Communicator) c).findViewById(id);
     }
 
     public void addNewFeed(String[] setup, String ip) {
         String feedIp = ip;
         if (Integer.parseInt(setup[3]) == 1) feedIp = setup[4];
         String URL = "http://" + feedIp + ":8080/?action=stream";
-        MjpegView mv = (MjpegView) ((Communicator) c).findViewById(R.id.mv2);
+        MjpegView mv = new MjpegView(c);
         startVideo(mv, URL);
-        LayoutParams params = new LayoutParams(Integer.parseInt(setup[1]), Integer.parseInt(setup[2]));
+        LayoutParams params = new LayoutParams(Integer.parseInt(setup[1]),
+                Integer.parseInt(setup[2]));
         params.setMargins(0, 10, 0, 10);
         mv.setLayoutParams(params);
         mv.setVisibility(View.VISIBLE);
-        viewPosition++;
+        layout.addView(mv, viewPosition++);
     }
 
     public void addVoiceInput(final String[] setup) {
@@ -221,12 +241,19 @@ public class RegularButtonManager extends PimoteManager {
         layout.addView(voice, viewPosition++);
     }
 
-    public void addProgressBar(int id, int maxValue){
+    public void addProgressBar(int id, int maxValue) {
         ProgressBar bar = new ProgressBar(c, null, android.R.attr.progressBarStyleHorizontal);
         bar.setProgress(0);
         bar.setMax(maxValue);
         bar.setId(id);
-        layout.addView(bar);
+        layout.addView(bar, viewPosition++);
+    }
+
+    public void addSpacer(int size) {
+        View v = new View(c);
+        LayoutParams params = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, size);
+        v.setLayoutParams(params);
+        layout.addView(v, viewPosition++);
     }
 
 
