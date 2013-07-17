@@ -49,6 +49,7 @@ public class MjpegView extends SurfaceView implements SurfaceHolder.Callback {
     public MjpegView(Context context) {
         super(context);
         init(context);
+        mPauseLock = new Object();
     }
 
     private void init(Context context) {
