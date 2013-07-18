@@ -37,6 +37,10 @@ class MyPhone(Phone):
 			o1.setText("Toggle switched to " + message)
 		elif id == b3.getId():
 			o1.setText(message)
+		elif id == r.getId():
+			i = random.randint(0, 100)
+			p.setProgress(i)
+			o2.setText(str(i)+"%")
 
 		o3.setText("Input from ID: " + str(phoneId))
 
@@ -57,7 +61,6 @@ r = RecurringInfo(2000)
 o3 = OutputText("Input from ID: ?")
 
 #Add the buttons to the phone
-thisphone.addOutput(o3)
 thisphone.addButton(b1)
 thisphone.addButton(b2)
 thisphone.addButton(b3)
@@ -65,6 +68,8 @@ thisphone.addOutput(o1)
 thisphone.addSpace(s)
 thisphone.addOutput(p)
 thisphone.addOutput(o2)
+thisphone.addButton(r)
+thisphone.addButton(vi)
 #Create the server
 myserver = PhoneServer()
 myserver.setPassword("helloworld")
