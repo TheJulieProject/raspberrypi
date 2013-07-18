@@ -66,6 +66,7 @@ public class RegularButtonManager extends PimoteManager {
                     TextView output = getTextView(Integer.parseInt(message[2]));
                     Log.d("SETUP", message[3]);
                     String out = message[3].replace("&/", "\n");
+                    out = out.replace("%/", ",");
                     output.setText(out);
                 } else if (Integer.parseInt(message[1]) == PROGRESS_BAR) {
                     ProgressBar bar = getProgressBar(Integer.parseInt(message[2]));

@@ -33,6 +33,7 @@ class MyPhone(Phone):
 		#########----------------------------------------------###########
 		if id == a.getId() and Globals.ready == False:
 			Globals.ready = True
+			l.start()
 
 		if id == a.getId() and Globals.correct == "A":
 			Globals.thisQuestionAnswers[phoneId] = 1
@@ -47,7 +48,6 @@ class MyPhone(Phone):
 			Globals.thisQuestionAnswers[phoneId] = 0
 
 	def clientConnected(self, id):
-		print("Connect lol")
 		Globals.playersConnected+=1
 		if Globals.playersConnected > len(Globals.playersTotals):
 			Globals.playersTotals.append(0)
@@ -78,7 +78,6 @@ thisphone.addSpace(s)
 thisphone.addOutput(t)
 #Create the server
 myserver = PhoneServer()
-myserver.setPassword("helloworld")
 myserver.setMaxClients(2)
 
 #Add the phone
@@ -93,37 +92,35 @@ class Questioner(threading.Thread):
 		lineCount = 0
 
 		while Globals.running and lineCount < len(lines):
-			while Globals.ready==True and lineCount < len(lines):
-				try:
-					Globals.answer = False
-					q = lines[lineCount]
-					a = lines[lineCount+1]
-					b = lines[lineCount+2]
-					c = lines[lineCount+3]
-					k = lines[lineCount+4]
-					lineCount += 5
-					#display
-					que = str(str(q)+"&/&/"+str(a)+"&/"+str(b)+"&/"+str(c))
-					outputQA.setText(que)
-					Globals.correct = k
-					#Wait for answer
-					timeLeft = 10
-					while timeLeft > 0:
-						t.setText(str(timeLeft)+"s")
-						timeLeft -= 1
-						time.sleep(1)
-					x = 0
-					while x < len(Globals.thisQuestionAnswers):
-						if(Globals.thisQuestionAnswers[x] == 1):
-							Globals.playersTotals[x] += 1
-						Globals.thisQuestionAnswers[x] = 0
-						x+=1
-					print(Globals.playersTotals)
+			try:
+				Globals.answer = False
+				q = lines[lineCount]
+				a = lines[lineCount+1]
+				b = lines[lineCount+2]
+				c = lines[lineCount+3]
+				k = lines[lineCount+4]
+				lineCount += 5
+				#display
+				que = str(str(q)+"&/&/"+str(a)+"&/"+str(b)+"&/"+str(c))
+				outputQA.setText(que)
+				Globals.correct = k
+				#Wait for answer
+				timeLeft = 10
+				while timeLeft > 0:
+					t.setText(str(timeLeft)+"s")
+					timeLeft -= 1
+					time.sleep(1)
+				x = 0
+				while x < len(Globals.thisQuestionAnswers):
+					if(Globals.thisQuestionAnswers[x] == 1):
+						Globals.playersTotals[x] += 1
+					Globals.thisQuestionAnswers[x] = 0
+					x+=1
+				print(Globals.playersTotals)
 
-				except Exception, e:
-					print("Error:" + str(e))
-					Globals.running = False
-					Globals.ready = False
+			except Exception, e:
+				print("Error:" + str(e))
+				Globals.running = False
 
 		print("DONE")
 		highest = 0
@@ -150,6 +147,5 @@ class Globals:
 	playersTotals = []
 
 l = Questioner()
-l.start()
 # Start server
 myserver.start(ip, port)
