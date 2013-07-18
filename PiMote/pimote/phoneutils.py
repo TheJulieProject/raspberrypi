@@ -205,7 +205,8 @@ class OutputText():
     self.type = Phone.OUTPUT_TEXT
     self.message = initialmessage
   def setText(self, message):
-    self.message = message
+    self.message = str(message).replace(',', '%/')
+    self.message = str(self.message).replace('\n', '&/')
     try:
       self.server.send(str(PiMoteServer.MESSAGE_FOR_MANAGER)+","+str(Phone.REQUEST_OUTPUT_CHANGE)+","+str(self.type)+","+str(self.id)+","+str(self.message))
     except:
