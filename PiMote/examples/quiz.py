@@ -1,6 +1,6 @@
 """
 An example application using pimote
-To run: python regular.py
+To run: python quiz.py
   this will run it on ip=0.0.0.0 port=8090
 
 Needs porting into python3 for use with the PiFace interface
