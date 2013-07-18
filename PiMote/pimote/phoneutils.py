@@ -26,9 +26,10 @@ class PhoneServer(PiMoteServer):
 
   def clientConnected(self, socket):
     self.phone.setup(socket, self)
+    self.phone.clientConnected(socket.id)
 
   def clientDisconnected(self, socket):
-    pass
+    self.phone.clientDisconnected(socket.id)
 
   def notifyAll(self):
     for client in self.clients:
@@ -101,7 +102,7 @@ class Phone():
   #Used for setup
   def setup(self, socket, server):
     self.socket = socket
-    socket.send(str(Phone.SET_CONTROL_TYPE)+","+str(self.controltype)+","+self.name)
+    socket.send(str(Phone.SET_CONTROL_TYPE)+","+str(self.controltype)+","+self.name+","+str(socket.id))
     for c in self.components:
       c.setup(socket, server) #setup each component
   #Updates the state of buttons (toggle)
@@ -115,6 +116,11 @@ class Phone():
           c.value = False
   def setTitle(self, title):
     self.name = title
+
+  def clientConnected(self, socket):
+    pass
+  def clientDisconnected(self, socket):
+    pass
   
 
 

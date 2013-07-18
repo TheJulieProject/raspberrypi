@@ -37,14 +37,14 @@ public class RegularButtonManager extends PimoteManager {
     String ip;
     int viewPosition;
 
-    public RegularButtonManager(Context c, TCPClient tcp, String ip, String name) {
+    public RegularButtonManager(Context c, TCPClient tcp, String ip, String name, int id) {
         super(tcp);
         this.c = c;
         this.tcp = tcp;
         this.ip = ip;
         this.viewPosition = 0;
         ((Communicator) c).getActionBar().show();
-        ((Communicator) c).getActionBar().setTitle(name);
+        ((Communicator) c).getActionBar().setTitle(name+"("+id+")");
         ((Communicator) c).setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         ((Communicator) c).setContentView(R.layout.activity_main);
         this.layout = (LinearLayout) ((Communicator) c).findViewById(R.id.mainlayout);

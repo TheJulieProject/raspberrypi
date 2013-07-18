@@ -274,7 +274,7 @@ class PiMoteServer(Server):
     if self.isPassword: #if the server has password, request it
       socket.send(str(PiMoteServer.REQUEST_PASSWORD))
     else: #otherwise setup
-      socket.id = len(self.clients)
+      socket.id = self.setId()
       self.clients.append(socket)
       self.clientConnected(socket)
     return True
@@ -289,6 +289,16 @@ class PiMoteServer(Server):
         self.clients.remove(client)
     return True
 
+  def setId(self):
+    id=0
+    x = 0
+    while x < len(self.clients):
+      if self.clients[x].id == id:
+        id+=1
+        x = 0
+      else:
+        x+=1
+    return id
   #Used to set a password for the server
   def setPassword(self, pswd):
     self.isPassword = True
@@ -298,11 +308,11 @@ class PiMoteServer(Server):
   def managePassword(self, password, socket):
     if password == self.password: #Password was right, tell them to store key
       socket.send(str(PiMoteServer.STORE_KEY)+","+self.key)
-      socket.id = len(self.clients)
+      socket.id = self.setId()
       self.clients.append(socket)
       self.clientConnected(socket)
     elif password == self.key:#they had a key
-      socket.id = len(self.clients)
+      socket.id = self.setId()
       self.clients.append(socket)
       self.clientConnected(socket)
     else:#wrong password
