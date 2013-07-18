@@ -323,6 +323,9 @@ class PiMoteServer(Server):
     self.clientMax = True
     self.maxClients = x
 
+  def getClients(self):
+    return clients
+
   def messageReceived(self, message, socket):
     pass
   def clientConnected(self, socket):
