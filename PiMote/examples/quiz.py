@@ -60,13 +60,13 @@ class MyPhone(Phone):
 			Globals.thisQuestionAnswers.append(0)
 		Globals.thisQuestionAnswers[id] = 0
 
-outputQA = OutputText("QA")
+outputQA = OutputText("Quiz: Press A when all players are ready")
 a = Button("A")
 b = Button("B")
 c = Button("C")
 s = Spacer(100)
 s2 = Spacer(50)
-t = OutputText("Time")
+t = OutputText("Time to answer question shown here")
 
 # Create the phone object
 thisphone = MyPhone()
@@ -111,12 +111,11 @@ class Questioner(threading.Thread):
 					outputQA.setText(que)
 					Globals.correct = k
 					#Wait for answer
-					timeLeft = 20
+					timeLeft = 10
 					while timeLeft > 0:
 						t.setText(str(timeLeft)+"s")
 						timeLeft -= 1
 						time.sleep(1)
-
 					x = 0
 					while x < len(Globals.thisQuestionAnswers):
 						if(Globals.thisQuestionAnswers[x] == 1):
@@ -137,6 +136,13 @@ class Questioner(threading.Thread):
 				highest = x
 
 		outputQA.setText("THE WINNER IS PLAYER " + str(highest))
+		timeToExit = 3
+		while timeToExit > -1:
+			t.setText("Exiting in "+str(timeToExit) +"..")
+			time.sleep(1)
+			timeToExit-=1
+		myserver.stop()
+		sys.exit(0)
 
 class Globals:
 	ready = False
