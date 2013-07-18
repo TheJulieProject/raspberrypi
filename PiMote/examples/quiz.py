@@ -35,19 +35,15 @@ class MyPhone(Phone):
 			Globals.ready = True
 
 		if id == a.getId() and Globals.correct == "A":
-			print("Correct!")
 			Globals.thisQuestionAnswers[phoneId] = 1
 			Globals.answer = True
 		elif id == b.getId() and Globals.correct == "B":
-			print("Correct!")
 			Globals.answer = True
 			Globals.thisQuestionAnswers[phoneId] = 1
 		elif id == c.getId() and Globals.correct == "C":
-			print("Correct!")
 			Globals.answer = True
 			Globals.thisQuestionAnswers[phoneId] = 1
 		else:
-			print("Wrong")
 			Globals.thisQuestionAnswers[phoneId] = 0
 
 	def clientConnected(self, id):
