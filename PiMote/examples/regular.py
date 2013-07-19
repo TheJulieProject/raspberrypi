@@ -32,7 +32,12 @@ class MyPhone(Phone):
 		# and handle that button press as you wish.                      #
 		#########----------------------------------------------###########
 		if id == b1.getId():
-			o1.setText("Hello world")
+			if b2.getValue() == True:
+				b2.setValue(False)
+			else:
+				b2.setValue(True)
+
+			self.updateDisplay()
 		elif id == b2.getId():
 			o1.setText("Toggle switched to " + message)
 		elif id == b3.getId():
@@ -70,6 +75,7 @@ thisphone.addOutput(p)
 thisphone.addOutput(o2)
 thisphone.addButton(r)
 thisphone.addButton(vi)
+
 #Create the server
 myserver = PhoneServer()
 myserver.setPassword("helloworld")
