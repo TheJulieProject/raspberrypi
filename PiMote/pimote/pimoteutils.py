@@ -324,7 +324,12 @@ class PiMoteServer(Server):
     self.maxClients = x
 
   def getClients(self):
-    return clients
+    return self.clients
+
+  def send(self, msg):
+    ''' Used to send a message to all connected clients '''
+    for client in self.getClients():
+      client.send(msg)
 
   def messageReceived(self, message, socket):
     pass

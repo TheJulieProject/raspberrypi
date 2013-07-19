@@ -94,6 +94,7 @@ public class PimoteManager {
         }
 
         public void stopThread() {
+            Log.e("SETUP", "Thread stopped");
             running = false;
         }
     }

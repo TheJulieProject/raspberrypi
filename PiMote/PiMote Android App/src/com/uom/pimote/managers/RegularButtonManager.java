@@ -30,7 +30,7 @@ public class RegularButtonManager extends PimoteManager {
     private static final int REQUEST_OUTPUT_CHANGE = 2;
     private static final int BUTTON = 1, TEXT_INPUT = 2, TOGGLE_BUTTON = 3, TEXT_OUTPUT = 4,
             VIDEO_FEED = 5, VOICE_INPUT = 6, RECURRING_INFO = 7, PROGRESS_BAR = 8,
-            SPACER = 9;
+            SPACER = 9, CLEAR_ALL = 0;
     TCPClient tcp;
     Context c;
     LinearLayout layout;
@@ -81,6 +81,11 @@ public class RegularButtonManager extends PimoteManager {
 
     public void addButtons(final String[] setup) {
         switch (Integer.parseInt(setup[0])) {
+            case CLEAR_ALL:
+                Log.e("SETUP", "Clearing");
+                layout.removeAllViews();
+                stopAllThreads();
+                break;
             case BUTTON:
                 addNewButton(setup);
                 break;
