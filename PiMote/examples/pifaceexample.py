@@ -17,9 +17,9 @@ class MyPhone(Phone):
 		#########----------------------------------------------###########
 		if id == b.getId():
 			if b.getValue():
-				pfd.leds[0].turnOn()
+				pfd.leds[0].turn_on()
 			else:
-				pfd.leds[0].turnOff()
+				pfd.leds[0].turn_off()
 
 # Create the phone object
 thisphone = MyPhone()
