@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 import cv
 from cv2 import *
-import numpy as np
 
 # Represent a point with the x (width) and y (height) coordinates and if it 
 # is active or not.

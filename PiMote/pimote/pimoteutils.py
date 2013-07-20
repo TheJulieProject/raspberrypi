@@ -236,6 +236,7 @@ class PiMoteServer(Server):
   isPassword = False
   clientMax = False
   noOfClients = 0
+  clients = []
 
   #Called when the server is started
   def onStart(self):
@@ -257,7 +258,7 @@ class PiMoteServer(Server):
     if int(sentType) == PiMoteServer.SENT_PASSWORD: #Password data
       self.managePassword(msg, socket)
     elif int(sentType) == PiMoteServer.SENT_DATA: #Input data
-      self.messageReceived(msg)
+      self.messageReceived(msg, socket)
     
     # Signify all is well
     return True
@@ -273,6 +274,8 @@ class PiMoteServer(Server):
     if self.isPassword: #if the server has password, request it
       socket.send(str(PiMoteServer.REQUEST_PASSWORD))
     else: #otherwise setup
+      socket.id = self.setId()
+      self.clients.append(socket)
       self.clientConnected(socket)
     return True
 
@@ -281,8 +284,21 @@ class PiMoteServer(Server):
     print("Client disconnected")
     self.noOfClients-=1 #tracking clients
     self.clientDisconnected(socket)
+    for client in self.clients:
+      if client.id == socket.id:
+        self.clients.remove(client)
     return True
 
+  def setId(self):
+    id=0
+    x = 0
+    while x < len(self.clients):
+      if self.clients[x].id == id:
+        id+=1
+        x = 0
+      else:
+        x+=1
+    return id
   #Used to set a password for the server
   def setPassword(self, pswd):
     self.isPassword = True
@@ -292,8 +308,12 @@ class PiMoteServer(Server):
   def managePassword(self, password, socket):
     if password == self.password: #Password was right, tell them to store key
       socket.send(str(PiMoteServer.STORE_KEY)+","+self.key)
+      socket.id = self.setId()
+      self.clients.append(socket)
       self.clientConnected(socket)
     elif password == self.key:#they had a key
+      socket.id = self.setId()
+      self.clients.append(socket)
       self.clientConnected(socket)
     else:#wrong password
       socket.send(str(PiMoteServer.PASSWORD_FAIL)) #kick them
@@ -303,7 +323,15 @@ class PiMoteServer(Server):
     self.clientMax = True
     self.maxClients = x
 
-  def messageReceived(self, message):
+  def getClients(self):
+    return self.clients
+
+  def send(self, msg):
+    ''' Used to send a message to all connected clients '''
+    for client in self.getClients():
+      client.send(msg)
+
+  def messageReceived(self, message, socket):
     pass
   def clientConnected(self, socket):
     pass
