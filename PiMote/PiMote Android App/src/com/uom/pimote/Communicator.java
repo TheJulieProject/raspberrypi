@@ -19,7 +19,7 @@ import java.util.ArrayList;
 
 public class Communicator extends Activity {
 
-
+    // ALL PROTOCOL VARIABLES
     public static final int SEND_PASSWORD = 0;
     public static final int SEND_DATA = 1;
     private static final int NORMAL_CONTROL = 0;
@@ -32,14 +32,15 @@ public class Communicator extends Activity {
     private static final int DISCONNECTED_BY_SERVER = 6234;
     private static final int MESSAGE_FOR_MANAGER = 7335;
     private static int controlType = -1;
-    TCPClient tcp;
-    String ip;
-    int port;
-    AsyncTask<String, String, TCPClient> task = null;
-    PimoteManager manager = null;
-    private boolean authTypeKey = false;
-    private int lastvoicepress = -1;
-    private boolean voiceRecognition = false;
+    // Global variables
+    TCPClient tcp; // TCP Client for communication with Pi
+    String ip; // IP of the Pi
+    int port; // Port the application is running on
+    AsyncTask<String, String, TCPClient> task = null; // Communication thread
+    PimoteManager manager = null; // Screen manager to be used
+    private boolean authTypeKey = false; // Key used as authentication
+    private int lastvoicepress = -1; // ID of voice button
+    private boolean voiceRecognition = false; // If paused for voice recognition
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -47,17 +48,18 @@ public class Communicator extends Activity {
 
         try {
             Bundle b = getIntent().getExtras();
-            port = b.getInt("port");
-            ip = b.getString("ip");
+            port = b.getInt("port"); // get Port
+            ip = b.getString("ip"); // get IP
         } catch (Exception e) {
             endActivity("Bad Arguments", true);
         }
 
+        // Create a new communication thread to run in parallel
         if (task == null)
             task = new connectTask().executeOnExecutor(AsyncTask.THREAD_POOL_EXECUTOR, "");
     }
 
-    /* Fire an intent to start the voice recognition activity. */
+    // Fire an intent to start the voice recognition activity.
     public void startVoiceRecognition(int id) {
         lastvoicepress = id;
         voiceRecognition = true;
@@ -69,7 +71,7 @@ public class Communicator extends Activity {
         startActivityForResult(intent, REQUEST_CODE);
     } // startRecording()
 
-    /* Handle the results from the voice recognition activity. */
+    // Handle the results from the voice recognition activity.
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_CODE && resultCode == RESULT_OK) {
@@ -130,6 +132,7 @@ public class Communicator extends Activity {
         endActivity("", true);
     }
 
+    // Used to input the server password
     public void passwordDialog() {
         //new dialog
         AlertDialog.Builder alert = new AlertDialog.Builder(Communicator.this);
@@ -155,6 +158,7 @@ public class Communicator extends Activity {
         alert.show();
     }
 
+    // Class for parallel communication
     public class connectTask extends AsyncTask<String, String, TCPClient> {
 
         @Override
@@ -185,7 +189,7 @@ public class Communicator extends Activity {
             Log.d("pi", info[0]);
 
             switch (Integer.parseInt(info[0])) {
-                case REQUEST_PASSWORD: {
+                case REQUEST_PASSWORD: { // Server asking for password
                     SharedPreferences prefs = getSharedPreferences("pimotePrefs", MODE_PRIVATE);
                     if (prefs.contains(ip)) {
                         Log.e("SETUP", "Key used");
@@ -197,7 +201,7 @@ public class Communicator extends Activity {
                     }
                 }
                 break;
-                case STORE_KEY: {
+                case STORE_KEY: { // Password accepted, store key
                     Log.e("SETUP", "Storing password");
                     SharedPreferences prefs = getSharedPreferences("pimotePrefs", MODE_PRIVATE);
                     SharedPreferences.Editor edit = prefs.edit();
@@ -205,7 +209,7 @@ public class Communicator extends Activity {
                     edit.commit();
                 }
                 break;
-                case PASSWORD_FAIL:
+                case PASSWORD_FAIL: // Password/Key fail
                     if (authTypeKey) {
                         Log.e("SETUP", "Key fail");
                         SharedPreferences prefs = getSharedPreferences("pimotePrefs", MODE_PRIVATE);
@@ -219,14 +223,14 @@ public class Communicator extends Activity {
                     }
                     break;
 
-                case DISCONNECTED_BY_SERVER:
+                case DISCONNECTED_BY_SERVER: // Kicked by server
                     endActivity("Disconnected by server", true);
                     break;
 
-                case SET_CONTROL_TYPE:
+                case SET_CONTROL_TYPE: // Set the manager
                     controlType = Integer.parseInt(info[1]);
                     if (controlType == NORMAL_CONTROL) {
-                        manager = new RegularButtonManager(Communicator.this, tcp, ip, info[2]);
+                        manager = new RegularButtonManager(Communicator.this, tcp, ip, info[2], Integer.parseInt(info[3]));
                     } else if (controlType == JOYSTICK_CONTROL) {
                         manager = new ControllerManager(Communicator.this, tcp, ip,
                                 Integer.parseInt(info[2]), Integer.parseInt(info[3]),
@@ -234,14 +238,14 @@ public class Communicator extends Activity {
                     }
                     break;
 
-                case MESSAGE_FOR_MANAGER:
+                case MESSAGE_FOR_MANAGER: // Message to go through to manager
                     String[] message = new String[info.length - 1];
                     for (int i = 1; i < info.length; i++)
                         message[i - 1] = info[i];
                     manager.onMessage(message);
                     break;
 
-                default:
+                default: // Something random
                     Log.e("ERROR", "Wut?!");
                     break;
             }

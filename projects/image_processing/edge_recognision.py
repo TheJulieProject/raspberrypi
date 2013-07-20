@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 import cv
 from cv2 import *
-import numpy as np
 
 # Set windows to show results
 namedWindow("Normal feed", cv.CV_WINDOW_AUTOSIZE)
