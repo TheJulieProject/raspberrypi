@@ -76,6 +76,8 @@ def flashLeds():
 
 # Setting up the phone
 thisphone = MyPhone()
+thisphone.setTitle("Simons Game")	# Title to be displayed on the phone
+
 # Add the buttons and output
 b1 = Button("LED 0")
 b2 = Button("LED 1")
@@ -90,6 +92,7 @@ thisphone.addOutput(o)
 
 # Create the server
 server = PhoneServer()
-server.addPhone(thisphone)
+setver.setMaxClients(1)				# Max clients that can connect
+server.addPhone(thisphone)			# Add the phone to the server
 # Start the server
 server.start("0.0.0.0", 8090)
