@@ -21,16 +21,16 @@ class PhoneServer(PiMoteServer):
     This method is called when a message comes from the phone to the Pi.
     Included are the message sent, and the socket which sent it
     '''
-    if isinstance(self.phone, Phone): #Regular phone
-      (id, sep, msg) = message.strip().partition(",") #Strip component ID and message apart
-      self.phone.updateButtons(int(id), msg, self) #Update buttons if needed
-      self.phone.buttonPressed(int(id), msg, socket.id) #Allow the user to handle the message + client
-    elif isinstance(self.phone, ControllerPhone): #Controller
-      self.phone.controlPress(message) #Controller handler
+    if isinstance(self.phone, Phone):                     #Regular phone
+      (id, sep, msg) = message.strip().partition(",")     #Strip component ID and message apart
+      self.phone.updateButtons(int(id), msg, self)        #Update buttons if needed
+      self.phone.buttonPressed(int(id), msg, socket.id)   #Allow the user to handle the message + client
+    elif isinstance(self.phone, ControllerPhone):         #Controller
+      self.phone.controlPress(message)                    #Controller handler
 
   def clientConnected(self, socket):
     ''' A client has connected to the server '''
-    self.phone.setup(socket, self) #Send them setup information
+    self.phone.setup(socket, self)                        #Send them setup information
     self.phone.clientConnected(socket.id)
 
   def clientDisconnected(self, socket):
@@ -46,28 +46,28 @@ class Phone():
       Also contains an array which contains all components (ordered) to be shown on the phone.
       The user treats this as a phone and specifies what they would like displayed on it.
   '''
-  name = "PiMote" #Default app name
+  name = "PiMote"                                         #Default app name
 
-  components = [] #All components to be displayed on the phone
+  components = []                                         #All components to be displayed on the phone
 
-  controltype = 0 #Type of phone
+  controltype = 0                                         #Type of phone
 
   #More protocol variables for component setup
   CLEAR_ALL = 0
-  INPUT_REGULAR = 1 #Specify regular input (Button)
-  INPUT_TEXT = 2 #Specify an InputText (Editable)
-  INPUT_TOGGLE = 3 #Specify a Toggle Button (ToggleButton)
-  OUTPUT_TEXT = 4 #Specify an OutputText (TextView)
-  VIDEO_FEED = 5 #Specify a VideoFeed (MjpgView)
-  VOICE_INPUT = 6 #Specify a VoiceInput (Google Voice Recognition button)
-  RECURRING_INFO = 7 #Specify a recurring poll from phone to pi
-  PROGRESS_BAR = 8 #Specify a ProgressBar (ProgressBar)
-  SPACER = 9 #Specify a Spacer (blank View with specified height)
+  INPUT_REGULAR = 1                                       #Specify regular input (Button)
+  INPUT_TEXT = 2                                          #Specify an InputText (Editable)
+  INPUT_TOGGLE = 3                                        #Specify a Toggle Button (ToggleButton)
+  OUTPUT_TEXT = 4                                         #Specify an OutputText (TextView)
+  VIDEO_FEED = 5                                          #Specify a VideoFeed (MjpgView)
+  VOICE_INPUT = 6                                         #Specify a VoiceInput (Google Voice Recognition button)
+  RECURRING_INFO = 7                                      #Specify a recurring poll from phone to pi
+  PROGRESS_BAR = 8                                        #Specify a ProgressBar (ProgressBar)
+  SPACER = 9                                              #Specify a Spacer (blank View with specified height)
   #Setup
-  SET_CONTROL_TYPE = 0 #Set the control type
-  SETUP = 1 #Setup information
+  SET_CONTROL_TYPE = 0                                    #Set the control type
+  SETUP = 1                                               #Setup information
   #Data being sent
-  REQUEST_OUTPUT_CHANGE = 2 #Request a change to an output component
+  REQUEST_OUTPUT_CHANGE = 2                               #Request a change to an output component
 
   def addButton(self, button):
     ''' Add an input to the phone '''
@@ -119,6 +119,7 @@ class Phone():
           c.value = False
 
   def updateDisplay(self):
+    ''' Clear the display and repopulate with the components '''
     self.server.send(str(PiMoteServer.MESSAGE_FOR_MANAGER)+","+str(Phone.SETUP)+","+str(Phone.CLEAR_ALL))
     for c in self.server.getClients():
       self.setup(c, self.server)
