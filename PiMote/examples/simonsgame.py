@@ -62,6 +62,7 @@ class MyPhone(Phone):
 	# When a user disconnects from the game
 	def clientDisconnected(self, socket):
 		self.reset()									#Reset the game
+		o.setText("Press any button to start")
 
 # Flash the LED's in the correct pattern
 def flashLeds():
