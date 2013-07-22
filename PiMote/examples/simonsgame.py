@@ -13,6 +13,7 @@ position = 0			# Where the user is up to with the input
 sleeping = False		# Whether to accept input
 
 class MyPhone(Phone):
+
 	def buttonPressed(self, id, message, phoneId):
 		# Declare global for access in this method
 		global started
@@ -20,15 +21,14 @@ class MyPhone(Phone):
 		global position
 		global sleeping
 
-		# If the game has not started, and we are accepting input
-		if not started and not sleeping:
+		if not started and not sleeping:				# If the game has not started, and we are accepting input
 			started = True 								# Start
 			pattern.append(random.randint(0, 3))		# Add a new random number to the pattern
 			sleeping = True								# Stop accepting input
 			t1 = threading.Thread(target=flashLeds)		# Flash the LED pattern
 			t1.start()
-		# If the game has begun, and we're accepting input
-		elif not sleeping:							
+		
+		elif not sleeping:								# If the game has begun, and we're accepting input					
 			if id == b1.getId() and pattern[position] == 0:
 				position += 1							# Correct in the pattern
 			elif id == b2.getId() and pattern[position] == 1:
@@ -41,8 +41,7 @@ class MyPhone(Phone):
 				o.setText("Incorrect! You reached level " + str(len(pattern))+".&/Press any button to start again")
 				self.reset()			# Reset the game
 
-			# If we reached the end of the pattern
-			if position == len(pattern) and started:
+			if position == len(pattern) and started:	# If we reached the end of the pattern
 				pattern.append(random.randint(0,3))		# Add a new random number to the pattern
 				position = 0							# Wait for the whole input again
 				sleeping = True							# Stop accepting input
@@ -78,7 +77,6 @@ def flashLeds():
 	sleeping = False			# We now accept input
 	o.setText("Input the pattern!")		# Visual indicator
 
-
 # Setting up the phone
 thisphone = MyPhone()
 thisphone.setTitle("Simons Game")	# Title to be displayed on the phone
@@ -99,5 +97,4 @@ thisphone.addOutput(o)
 server = PhoneServer()
 server.setMaxClients(1)				# Max clients that can connect
 server.addPhone(thisphone)			# Add the phone to the server
-# Start the server
-server.start("0.0.0.0", 8090)
+server.start("0.0.0.0", 8090)		# Start the server
