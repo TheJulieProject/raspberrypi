@@ -7,7 +7,7 @@ p.init()
 pfd = p.PiFaceDigital()
 
 # Variables to be used globally
-started = False 		# Has the game begun
+started = False 		# Has the game begun?
 pattern = []			# The current pattern in the game
 position = 0			# Where the user is up to with the input
 sleeping = False		# Whether to accept input
@@ -60,26 +60,26 @@ class MyPhone(Phone):
 
 	# When a user disconnects from the game
 	def clientDisconnected(self, socket):
-		self.reset()									#Reset the game
+		self.reset()						#Reset the game
 		o.setText("Press any button to start")
 
 # Flash the LED's in the correct pattern
 def flashLeds():
 	global sleeping
-	n = 0 						# So we know when we're on the last one
-	for i in pattern:			# Loop through the pattern
-		pfd.leds[i].turn_on()	# Switch the LED on
-		time.sleep(1)			# Sleep for 1 second
-		pfd.leds[i].turn_off()	# Switch the LED off
-		if n != len(pattern)-1:	# Check if we are at the end
-			time.sleep(1)		# If we're not at the end, sleep for 1 second
+	n = 0 									# So we know when we're on the last one
+	for i in pattern:						# Loop through the pattern
+		pfd.leds[i].turn_on()				# Switch the LED on
+		time.sleep(1)						# Sleep for 1 second
+		pfd.leds[i].turn_off()				# Switch the LED off
+		if n != len(pattern)-1:				# Check if we are at the end
+			time.sleep(1)					# If we're not at the end, sleep for 1 second
 		n+=1			
-	sleeping = False			# We now accept input
-	o.setText("Input the pattern!")		# Visual indicator
+	sleeping = False						# We now accept input
+	o.setText("Input the pattern!")			# Visual indicator
 
 # Setting up the phone
 thisphone = MyPhone()
-thisphone.setTitle("Simons Game")	# Title to be displayed on the phone
+thisphone.setTitle("Simons Game")			# Title to be displayed on the phone
 
 # Add the buttons and output
 b1 = Button("LED 0")
@@ -95,6 +95,6 @@ thisphone.addOutput(o)
 
 # Create the server
 server = PhoneServer()
-server.setMaxClients(1)				# Max clients that can connect
-server.addPhone(thisphone)			# Add the phone to the server
-server.start("0.0.0.0", 8090)		# Start the server
+server.setMaxClients(1)						# Max clients that can connect
+server.addPhone(thisphone)					# Add the phone to the server
+server.start("0.0.0.0", 8090)				# Start the server
