@@ -1,9 +1,9 @@
 """
-An example application using pimote
-To run: python quiz.py
-  this will run it on ip=0.0.0.0 port=8090
-
-Needs porting into python3 for use with the PiFace interface
+	An example application using pimote. This is a quiz that can be played by up to 2 players.
+	To edit questions, change the 'qa.txt' file. Ensure the layout is 'Q, A, B, C, AnswerLetter' on separate lines
+	Written by Tom Richardson 2013
+	To run: python quiz.py
+	  It will run on the local IP of the Pi on port 8090
 
 """
 

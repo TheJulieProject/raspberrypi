@@ -1,4 +1,8 @@
-''' An example application to toggle the LED's on a PiFace '''
+''' An example application to toggle the LED's on a PiFace 
+	Written by Tom Richardson 2013
+	To run, type 'python pifaceexample.py'
+		It will run on the Pi's local IP on port 8090
+'''
 
 import pifacedigitalio as p
 from pimote import *
