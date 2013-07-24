@@ -71,7 +71,7 @@ public class MjpegStreamManager {
         protected void onPostExecute(MjpegInputStream result) {
             mv.setSource(result);
             mv.setDisplayMode(MjpegView.SIZE_BEST_FIT);
-            mv.showFps(true);
+            mv.showFps(false);
         }
     }
 }
