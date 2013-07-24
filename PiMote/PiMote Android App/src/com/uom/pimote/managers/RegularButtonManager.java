@@ -2,6 +2,7 @@ package com.uom.pimote.managers;
 
 import android.content.Context;
 import android.content.pm.ActivityInfo;
+import android.text.Html;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -28,12 +29,10 @@ public class RegularButtonManager extends PimoteManager {
     // Protocol Variables
     private static final int SETUP = 1;
     private static final int REQUEST_OUTPUT_CHANGE = 2;
-
     // Protocol Variables to decide what components to use
     private static final int BUTTON = 1, TEXT_INPUT = 2, TOGGLE_BUTTON = 3, TEXT_OUTPUT = 4,
             VIDEO_FEED = 5, VOICE_INPUT = 6, RECURRING_INFO = 7, PROGRESS_BAR = 8,
             SPACER = 9, CLEAR_ALL = 0;
-
     // Global Variables
     TCPClient tcp; // TCP Client for communication
     Context c; // Communicator context
@@ -49,7 +48,7 @@ public class RegularButtonManager extends PimoteManager {
         this.ip = ip;
         this.viewPosition = 0;
         ((Communicator) c).getActionBar().show();
-        ((Communicator) c).getActionBar().setTitle(name+"("+id+")");
+        ((Communicator) c).getActionBar().setTitle(name + "(" + id + ")");
         ((Communicator) c).setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         ((Communicator) c).setContentView(R.layout.activity_main);
         this.layout = (LinearLayout) ((Communicator) c).findViewById(R.id.mainlayout);
@@ -73,7 +72,7 @@ public class RegularButtonManager extends PimoteManager {
                     Log.d("SETUP", message[3]);
                     String out = message[3].replace("&/", "\n");
                     out = out.replace("%/", ",");
-                    output.setText(out);
+                    output.setText(Html.fromHtml(out));
                 } else if (Integer.parseInt(message[1]) == PROGRESS_BAR) {
                     ProgressBar bar = getProgressBar(Integer.parseInt(message[2]));
                     bar.setProgress(Integer.parseInt(message[3]));
@@ -137,7 +136,9 @@ public class RegularButtonManager extends PimoteManager {
                     send(setup[1] + "," + " ");
             }
         });
-
+        LayoutParams params = new LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT);
+        params.setMargins(10, 5, 10, 5);
+        button.setLayoutParams(params);
         layout.addView(button, viewPosition++);
     }
 
@@ -179,7 +180,7 @@ public class RegularButtonManager extends PimoteManager {
         params.setMargins(0, 10, 0, 10);
         textButtonLayout.setLayoutParams(params);
         TextView text = new TextView(c);
-        text.setTextSize(18);
+        text.setTextSize(16);
         text.setText(setup[2]);
         LayoutParams params2 = new TableRow.LayoutParams(0,
                 LayoutParams.WRAP_CONTENT, 1f);
@@ -208,10 +209,12 @@ public class RegularButtonManager extends PimoteManager {
         TextView text = new TextView(c);
         text.setTextSize(18);
         text.setLayoutParams(params);
-        if (setup.length == 3) {
+        if (setup.length >= 3) {
             String out = setup[2].replace("&/", "\n");
-            text.setText(out);
+            out = out.replace("%/", ",");
+            text.setText(Html.fromHtml(out));
         }
+        text.setTextSize(Integer.parseInt(setup[3]));
         layout.addView(text, viewPosition++);
         text.setId(Integer.parseInt(setup[1]));
     }
@@ -220,10 +223,12 @@ public class RegularButtonManager extends PimoteManager {
     public TextView getTextView(int id) {
         return (TextView) ((Communicator) c).findViewById(id);
     }
+
     // Returns the ProgressBar with the matching ID
     public ProgressBar getProgressBar(int id) {
         return (ProgressBar) ((Communicator) c).findViewById(id);
     }
+
     // Returns the ToggleButton with the matching ID
     public ToggleButton getToggleButton(int id) {
         return (ToggleButton) ((Communicator) c).findViewById(id);
