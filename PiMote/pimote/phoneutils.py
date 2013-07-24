@@ -232,7 +232,7 @@ class VoiceInput(Button):
     self.type = Phone.VOICE_INPUT
   def setup(self, socket, server):
     ''' Send setup information for this Button to the phone '''
-    server.send(str(PiMoteServer.MESSAGE_FOR_MANAGER)+","+str(Phone.SETUP)+","+str(self.type)+","+str(self.id))
+    socket.send(str(PiMoteServer.MESSAGE_FOR_MANAGER)+","+str(Phone.SETUP)+","+str(self.type)+","+str(self.id))
 
 
 ''' A simple TextView where text can be output '''
