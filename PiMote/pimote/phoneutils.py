@@ -35,7 +35,10 @@ class PhoneServer(PiMoteServer):
 
   def clientDisconnected(self, socket):
     ''' A client has disconnected from the server '''
-    self.phone.clientDisconnected(socket.id)
+    try:
+      self.phone.clientDisconnected(socket.id)
+    except:
+      pass
 
 
 
@@ -235,9 +238,11 @@ class VoiceInput(Button):
 ''' A simple TextView where text can be output '''
 class OutputText():
   message = ""
+  textSize = 16
   def __init__(self, initialmessage):
     self.type = Phone.OUTPUT_TEXT
-    self.message = initialmessage
+    self.message = str(initialmessage).replace(',', '%/')
+    self.message = str(self.message).replace('\n', '&/')
   def setText(self, message):
     ''' Change the text displayed on the TextView '''
     self.message = str(message).replace(',', '%/')
@@ -249,10 +254,12 @@ class OutputText():
   def getText(self):
     ''' Get the current text being displayed '''
     return self.message
+  def setTextSize(self, size):
+    self.textSize = size
   def setup(self, socket, server):
     ''' Send setup information for this Output to the phone '''
     self.server = server
-    socket.send(str(PiMoteServer.MESSAGE_FOR_MANAGER)+","+str(Phone.SETUP)+","+str(self.type)+","+str(self.id)+","+str(self.message)) 
+    socket.send(str(PiMoteServer.MESSAGE_FOR_MANAGER)+","+str(Phone.SETUP)+","+str(self.type)+","+str(self.id)+","+str(self.message)+","+str(self.textSize))
 
 ''' A progress bar from 0 to maxValue which is shaded up the the current level of progress '''
 class ProgressBar():
