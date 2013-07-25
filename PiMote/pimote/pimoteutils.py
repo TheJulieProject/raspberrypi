@@ -267,6 +267,7 @@ class PiMoteServer(Server):
   def onConnect(self, socket):
     print("Client connected")
     self.noOfClients+=1 #Counting clients
+    socket.id = self.setId()
     if self.clientMax:
       if self.noOfClients > self.maxClients:
         socket.send(str(PiMoteServer.DISCONNECT_USER)) #Kick them if full
@@ -274,7 +275,6 @@ class PiMoteServer(Server):
     if self.isPassword: #if the server has password, request it
       socket.send(str(PiMoteServer.REQUEST_PASSWORD))
     else: #otherwise setup
-      socket.id = self.setId()
       self.clients.append(socket)
       self.clientConnected(socket)
     return True
