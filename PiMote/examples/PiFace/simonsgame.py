@@ -45,7 +45,7 @@ class MyPhone(Phone):
 			elif id == b4.getId() and pattern[position] == 3:
 				position += 1							# Correct in the pattern
 			else:		# They got the pattern wrong
-				o.setText("Incorrect! You reached level " + str(len(pattern))+".&/Press any button to start again")
+				o.setText("Incorrect! You reached level <b>" + str(len(pattern))+"</b>.<br>Press any button to start again")
 				self.reset()			# Reset the game
 
 			if position == len(pattern) and started:	# If we reached the end of the pattern
