@@ -53,8 +53,8 @@ cmdIn = InputText("Type Command Here")
 cmdOut = OutputText("-")
 
 #Add the buttons to the phone
-thisphone.addButton(cmdIn)
-thisphone.addOutput(cmdOut)
+thisphone.add(cmdIn)
+thisphone.add(cmdOut)
 #Create the server
 myserver = PhoneServer()
 #Add the phone

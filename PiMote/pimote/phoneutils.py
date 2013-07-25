@@ -72,32 +72,13 @@ class Phone():
   #Data being sent
   REQUEST_OUTPUT_CHANGE = 2                               #Request a change to an output component
 
-  def addButton(self, button):
-    ''' Add an input to the phone '''
-    if isinstance(button, Button):
-      button.id = len(self.components)
-      self.components.append(button)
+  def add(self, component):
+    ''' Add a component to the phone screen '''
+    if isinstance(component, Component):
+      component.id = len(self.components)
+      self.components.append(component)
     else:
-      print("Button not provided")
-
-  def addOutput(self, output):
-    ''' Add an Output to the phone '''
-    if isinstance(output, OutputText) or isinstance(output, ProgressBar):
-      output.id = len(self.components)
-      self.components.append(output)
-    else:
-      print("Not an output")
-
-  def addSpace(self, spacer):
-    ''' Add a Spacer to the phone '''
-    if isinstance(spacer, Spacer):
-      spacer.id = len(self.components)
-      self.components.append(spacer)
-
-  def addVideoFeed(self, vid):
-    ''' Add a VideoFeed to the phone '''
-    self.vid = vid
-    self.components.append(vid)
+      print("You can only add a Component to the phone")
 
   def buttonPressed(self, id, msg):
     ''' Overridden by user so they can handle messages received from phone '''
@@ -120,6 +101,10 @@ class Phone():
           c.value = True
         else:
           c.value = False
+
+  def clearComponents(self):
+    ''' Clear all the components from the components array '''
+    components = []
 
   def updateDisplay(self):
     ''' Clear the display and repopulate with the components '''
@@ -180,14 +165,18 @@ class ControllerPhone():
 
 ''' ####################----COMPONENTS----###################### '''
 
+class Component():
+  def setup(self, socket, server):
+    pass
+  def getId(self): 
+    return self.id
+
+
 ''' Button class: a simple input. Regular button that can be pressed '''
-class Button():
+class Button(Component):
   def __init__(self, name):
     self.name = name
     self.type = Phone.INPUT_REGULAR
-  def getId(self):
-    ''' Return the ID of this component '''
-    return self.id
   def getName(self):
     ''' Return the name of this component '''
     return self.name
@@ -234,9 +223,18 @@ class VoiceInput(Button):
     ''' Send setup information for this Button to the phone '''
     socket.send(str(PiMoteServer.MESSAGE_FOR_MANAGER)+","+str(Phone.SETUP)+","+str(self.type)+","+str(self.id))
 
+''' A recurring message is sent to the Pi from the phone. (The phone polls the pi)'''
+class RecurringInfo(Button):
+  def __init__(self, sleepTime):
+    self.type = Phone.RECURRING_INFO
+    self.sleepTime = sleepTime
+  def setup(self, socket, server):
+    ''' Send setup information for this Button to the phone '''
+    socket.send(str(PiMoteServer.MESSAGE_FOR_MANAGER)+","+str(Phone.SETUP)+","+str(self.type)+","+str(self.id)+","+str(self.sleepTime))
 
-''' A simple TextView where text can be output '''
-class OutputText():
+
+''' A simple TextView where text can be output. Accepts HTML markup '''
+class OutputText(Component):
   message = ""
   textSize = 16
   def __init__(self, initialmessage):
@@ -262,7 +260,7 @@ class OutputText():
     socket.send(str(PiMoteServer.MESSAGE_FOR_MANAGER)+","+str(Phone.SETUP)+","+str(self.type)+","+str(self.id)+","+str(self.message)+","+str(self.textSize))
 
 ''' A progress bar from 0 to maxValue which is shaded up the the current level of progress '''
-class ProgressBar():
+class ProgressBar(Component):
   def __init__(self, maxValue):
     self.maxValue = maxValue
     self.type = Phone.PROGRESS_BAR
@@ -278,7 +276,7 @@ class ProgressBar():
       print("Cannot set progress to higher than the max value specified")
 
 ''' A video feed pulled from mjpeg-viewer '''
-class VideoFeed():
+class VideoFeed(Component):
   outsidefeed = 0;
   ip = "-"
   def __init__(self, width, height):
@@ -293,17 +291,8 @@ class VideoFeed():
     ''' Send the setup information from the pi to the phone '''
     socket.send(str(PiMoteServer.MESSAGE_FOR_MANAGER)+","+str(Phone.SETUP)+","+str(self.type)+","+str(self.width)+","+str(self.height)+","+str(self.outsidefeed)+","+self.ip)
 
-''' A recurring message is sent to the Pi from the phone. (The phone polls the pi)'''
-class RecurringInfo(Button):
-  def __init__(self, sleepTime):
-    self.type = Phone.RECURRING_INFO
-    self.sleepTime = sleepTime
-  def setup(self, socket, server):
-    ''' Send setup information for this Button to the phone '''
-    socket.send(str(PiMoteServer.MESSAGE_FOR_MANAGER)+","+str(Phone.SETUP)+","+str(self.type)+","+str(self.id)+","+str(self.sleepTime))
-
 ''' A simple aestetic component. Places a vertical space between two components '''
-class Spacer():
+class Spacer(Component):
   def __init__(self, size):
     self.size = size
     self.type = Phone.SPACER
