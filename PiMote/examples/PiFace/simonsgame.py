@@ -1,3 +1,10 @@
+'''
+	A Python version of the Simon Game using the PiFace and pimote
+	Written by Tom Richardson 2013
+	To run, type 'python simonsgame.py'. 
+		It will run on the local IP of the Pi on port 8090
+'''
+
 from pimote import *
 import pifacedigitalio as p
 import random, time, threading
@@ -38,7 +45,7 @@ class MyPhone(Phone):
 			elif id == b4.getId() and pattern[position] == 3:
 				position += 1							# Correct in the pattern
 			else:		# They got the pattern wrong
-				o.setText("Incorrect! You reached level " + str(len(pattern))+".&/Press any button to start again")
+				o.setText("Incorrect! You reached level <b>" + str(len(pattern))+"</b>.<br>Press any button to start again")
 				self.reset()			# Reset the game
 
 			if position == len(pattern) and started:	# If we reached the end of the pattern

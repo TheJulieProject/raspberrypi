@@ -113,7 +113,6 @@ public class TCPClient {
             }
 
         } catch (Exception e) {
-
             //Log.e("TCP Client", "C: Error, unable to connect", e);
             mMessageListener.failActivity("Cannot connect to host");
 

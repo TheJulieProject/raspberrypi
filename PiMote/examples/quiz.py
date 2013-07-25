@@ -1,9 +1,9 @@
 """
-An example application using pimote
-To run: python quiz.py
-  this will run it on ip=0.0.0.0 port=8090
-
-Needs porting into python3 for use with the PiFace interface
+	An example application using pimote. This is a quiz that can be played by up to 2 players.
+	To edit questions, change the 'qa.txt' file. Ensure the layout is 'Q, A, B, C, AnswerLetter' on separate lines
+	Written by Tom Richardson 2013
+	To run: python quiz.py
+	  It will run on the local IP of the Pi on port 8090
 
 """
 
@@ -11,15 +11,6 @@ import sys, threading, time
 # Import PhoneServer and Phone classes from pimoteutils.
 # Button only imported so we can access the variables
 from pimote import *
-
-
-# Parse the IP address and port you wish to listen on.
-try:
-	ip = sys.argv[1]
-	port = int(sys.argv[2])
-except:
-	ip = "0.0.0.0"
-	port = 8090
 
 # Override Phone so you can control what you do with the messages
 #   "id" - the ID of the button that has been pressed
@@ -101,7 +92,7 @@ class Questioner(threading.Thread):
 				k = lines[lineCount+4]
 				lineCount += 5
 				#display
-				que = str(str(q)+"&/&/"+str(a)+"&/"+str(b)+"&/"+str(c))
+				que = str(str(q)+"<br><br>"+str(a)+"<br>"+str(b)+"<br>"+str(c))
 				outputQA.setText(que)
 				Globals.correct = k
 				#Wait for answer
@@ -148,4 +139,4 @@ class Globals:
 
 l = Questioner()
 # Start server
-myserver.start(ip, port)
+myserver.start("0.0.0.0", 8090)
