@@ -43,7 +43,7 @@ i=0
 for i in range(0, 8):
 	b = ToggleButton("Toggle LED " + str(i), False)
 	buttons.append(b)
-	thisphone.addButton(b)
+	thisphone.add(b)
 
 # Create the server
 myserver = PhoneServer()
