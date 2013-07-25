@@ -12,15 +12,6 @@ import sys, threading, time
 # Button only imported so we can access the variables
 from pimote import *
 
-
-# Parse the IP address and port you wish to listen on.
-try:
-	ip = sys.argv[1]
-	port = int(sys.argv[2])
-except:
-	ip = "0.0.0.0"
-	port = 8090
-
 # Override Phone so you can control what you do with the messages
 #   "id" - the ID of the button that has been pressed
 #   "message" - the message sent by the phone. If no message it will be ""
@@ -101,7 +92,7 @@ class Questioner(threading.Thread):
 				k = lines[lineCount+4]
 				lineCount += 5
 				#display
-				que = str(str(q)+"&/&/"+str(a)+"&/"+str(b)+"&/"+str(c))
+				que = str(str(q)+"<br><br>"+str(a)+"<br>"+str(b)+"<br>"+str(c))
 				outputQA.setText(que)
 				Globals.correct = k
 				#Wait for answer
@@ -148,4 +139,4 @@ class Globals:
 
 l = Questioner()
 # Start server
-myserver.start(ip, port)
+myserver.start("0.0.0.0", 8090)
