@@ -24,3 +24,5 @@ PiMote/PiMote Android App/out/production/PiMote/classes.dex
 .DS_Store
 
 PiMote/build/*
+
+PiMote/GUI/myprogram.py
