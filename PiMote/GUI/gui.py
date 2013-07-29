@@ -4,9 +4,11 @@ import pimote as pm
 
 master = tk.Tk()
 master.wm_title("PiMote Program Generator")
-default_head = "from pimote import *\nclass MyPhone(Phone):\n\t#########----------------------------------------------###########\n\t"
+default_head = "from pimote import *\n\nclass MyPhone(Phone):\n\t#########----------------------------------------------###########\n\t"
 default_head += "# Your code will go here! Check for the ID of the button pressed #\n\t# and handle that button press as you wish.                      #\n\t"
 default_head += "#########----------------------------------------------###########\n\tdef buttonPressed(self, id, message, phoneId):\n"
+
+notice = "This program is still a very early build. No validation has been added to the fields, so be careful with input!"
 
 def nameExists(name):
 	for c in components:
@@ -198,17 +200,22 @@ def show_properties(comp):
 		delete_button = tk.Button(master=properties_inner, text="Delete", command=lambda:delete_component(comp=comp)).grid(row=2, column=0)
 
 def save_component(comp = None, value="", initial_value=None):
+	global info_label
 	if comp[0] == 0 or comp[0] == 2 or comp[0] == 4 or comp[0] == 5 or comp[0] == 6 or comp[0] == 8:
 		comp[2] = value
+		info_label.config(text="Saved '" + comp[1] + "' {Value: " + str(comp[2])+"}")
 	elif comp[0] == 1:
 		comp[2] = value
 		if initial_value == 1:
 			comp[3] = True
 		else:
 			comp[3] = False
+		info_label.config(text="Saved '" + comp[1] + "' {Value: " + str(comp[2])+", Initial Value: "+str(comp[3])+"}")
 def delete_component(comp = None):
+	global info_label
 	global properties_inner
 	global properties_frame
+	info_label.config(text="Deleted '" + comp[1]+"'")
 	components.remove(comp)
 	refresh_layout()
 
@@ -246,6 +253,8 @@ def generate_program():
 			my_program.write(c[1] + " = Spacer("+str(c[2])+")\nphone.add("+c[1]+")\n\n")
 	my_program.write("server = PhoneServer()\nserver.addPhone(phone)\nserver.start('0.0.0.0', 8090)")
 
+	info_label.config(text="Generated program, saved as myprogram.py. To run type python myprogram.py into a terminal.")
+
 
 
 
@@ -254,50 +263,56 @@ def generate_program():
 
 components = []
 
-buttons_label = tk.Label(master, text="Add Components", height=3).grid(row=0, column=0)
-add_button = tk.Button(master, text="Add Button", command=add_new_button)
+main_frame = tk.Frame(master)
+main_frame.grid(row=0, column=0)
+
+info_label = tk.Label(master, text=notice, anchor=tk.W, height=5)
+info_label.grid(row=1, column=0, sticky=tk.E+tk.W+tk.N+tk.S)
+
+buttons_label = tk.Label(master=main_frame, text="Add Components", height=3).grid(row=0, column=0)
+add_button = tk.Button(master=main_frame, text="Add Button", command=add_new_button)
 add_button.grid(row=1, column=0, sticky=tk.W+tk.E+tk.N+tk.S)
-add_toggle = tk.Button(master, text="Add Toggle Button", command=add_new_toggle)
+add_toggle = tk.Button(master=main_frame, text="Add Toggle Button", command=add_new_toggle)
 add_toggle.grid(row=2, column=0, sticky=tk.W+tk.E+tk.N+tk.S)
-add_input = tk.Button(master, text="Add Text Input", command=add_new_input)
+add_input = tk.Button(master=main_frame, text="Add Text Input", command=add_new_input)
 add_input.grid(row=3, column=0, sticky=tk.W+tk.E+tk.N+tk.S)
-add_voice = tk.Button(master, text="Add Voice Input", command=add_new_voice)
+add_voice = tk.Button(master=main_frame, text="Add Voice Input", command=add_new_voice)
 add_voice.grid(row=4, column=0, sticky=tk.W+tk.E+tk.N+tk.S)
-add_recurring = tk.Button(master, text="Add poll", command=add_new_recurring)
+add_recurring = tk.Button(master=main_frame, text="Add poll", command=add_new_recurring)
 add_recurring.grid(row=5, column=0, sticky=tk.W+tk.E+tk.N+tk.S)
-add_output = tk.Button(master, text="Add Output Text", command=add_new_output)
+add_output = tk.Button(master=main_frame, text="Add Output Text", command=add_new_output)
 add_output.grid(row=6, column=0, sticky=tk.W+tk.E+tk.N+tk.S)
-add_progress = tk.Button(master, text="Add Progress Bar", command=add_new_progress)
+add_progress = tk.Button(master=main_frame, text="Add Progress Bar", command=add_new_progress)
 add_progress.grid(row=7, column=0, sticky=tk.W+tk.E+tk.N+tk.S)
-add_video = tk.Button(master, text="Add Video Feed", command=add_new_video)
+add_video = tk.Button(master=main_frame, text="Add Video Feed", command=add_new_video)
 add_video.grid(row=8, column=0, sticky=tk.W+tk.E+tk.N+tk.S)
-add_spacer = tk.Button(master, text="Add Space", command=add_new_spacer)
+add_spacer = tk.Button(master=main_frame, text="Add Space", command=add_new_spacer)
 add_spacer.grid(row=9, column=0, sticky=tk.W+tk.E+tk.N+tk.S)
 
-space = tk.Label(master, width=10).grid(row=0, column=1)
+space = tk.Label(master=main_frame, width=10).grid(row=0, column=1)
 
-layout_label = tk.Label(master, text="Phone Layout").grid(row=0, column=2)
-layout_frame = tk.Frame(master)
+layout_label = tk.Label(master=main_frame, text="Phone Layout").grid(row=0, column=2)
+layout_frame = tk.Frame(master=main_frame)
 layout_frame.grid(row=1, column=2, rowspan=10, sticky=tk.N+tk.S+tk.W+tk.E)
 inner_frame = tk.Frame(master=layout_frame)
 inner_frame.grid(row=0, column=0, rowspan=10, sticky=tk.N+tk.S+tk.W+tk.E)
 
-space2 = tk.Label(master, width=10, height=3).grid(row=0, column=3)
+space2 = tk.Label(master=main_frame, width=10, height=3).grid(row=0, column=3)
 
-properties_label = tk.Label(master, text="Properties", width=35).grid(row=0, column=4)
-properties_frame = tk.Frame(master)
+properties_label = tk.Label(master=main_frame, text="Properties", width=35).grid(row=0, column=4)
+properties_frame = tk.Frame(master=main_frame)
 properties_frame.grid(row=1, column=4, rowspan=99, sticky=tk.N+tk.S+tk.W+tk.E)
 properties_inner = tk.Frame(master=properties_frame)
 properties_inner.grid(row=0, column=0, rowspan=9, sticky=tk.N+tk.S+tk.W+tk.E)
 
-space3 = tk.Label(master, width=10, height=3).grid(row=0, column=5)
+space3 = tk.Label(master=main_frame, width=10, height=3).grid(row=0, column=5)
 
-server_label = tk.Label(master, text="Server Controls").grid(row=0, column=6)
-start_server = tk.Button(master, text="Generate Program", command=generate_program)
+server_label = tk.Label(master=main_frame, text="Server Controls").grid(row=0, column=6)
+start_server = tk.Button(master=main_frame, text="Generate Program", command=generate_program)
 start_server.grid(row=1, column=6, sticky=tk.N+tk.S+tk.W+tk.E)
 # stop_server = tk.Button(master, text="Stop server", state="disabled")
 # stop_server.grid(row=2, column=6, sticky=tk.N+tk.S+tk.W+tk.E)
 
-space4 = tk.Label(master, width=10, height=3).grid(row=0, column=7)
+space4 = tk.Label(master=main_frame, width=10, height=3).grid(row=0, column=7)
 
 tk.mainloop()
