@@ -3,6 +3,10 @@ import pimote as pm
 
 
 master = tk.Tk()
+master.wm_title("PiMote Program Generator")
+default_head = "from pimote import *\nclass MyPhone(Phone):\n\t#########----------------------------------------------###########\n\t"
+default_head += "# Your code will go here! Check for the ID of the button pressed #\n\t# and handle that button press as you wish.                      #\n\t"
+default_head += "#########----------------------------------------------###########\n\tdef buttonPressed(self, id, message, phoneId):\n"
 
 def nameExists(name):
 	for c in components:
@@ -100,7 +104,7 @@ def refresh_layout():
 	except Exception, e:
 		print("Problem when destroying, " + str(e))
 	inner_frame = tk.Frame(master=layout_frame)
-	inner_frame.grid(row=1, column=2, rowspan=9, sticky=tk.N+tk.S+tk.W+tk.E)
+	inner_frame.grid(row=1, column=2, rowspan=10, sticky=tk.N+tk.S+tk.W+tk.E)
 	row = 0
 	for c in components:
 		comp_label = tk.Button(master=inner_frame, text=c[1], command= lambda c=c: show_properties(c))
@@ -120,36 +124,132 @@ def show_properties(comp):
 	properties_inner.grid(row=0, column=0, rowspan=9, sticky=tk.N+tk.S+tk.W+tk.E)
 
 	if comp[0] == 0:
-		current_name = ""
-		name_label = tk.Label(master=properties_inner, text="Name: ").grid(row=0, column=0)
+		variable_name_label = tk.Label(master=properties_inner, text="Variable name: "+comp[1], anchor=tk.W, height=2).grid(row=0, column=0, columnspan=2, sticky=tk.N+tk.S+tk.E+tk.W)
+		name_label = tk.Label(master=properties_inner, text="Name: ").grid(row=1, column=0)
 		name_entry = tk.Entry(master=properties_inner)
-		name_entry.grid(row=0, column=1)
+		name_entry.grid(row=1, column=1)
 		name_entry.insert(0, comp[2])
-		save_button = tk.Button(master=properties_inner, text="Save", command=lambda:save_component(comp=comp, name=name_entry.get()))
-		save_button.grid(row=1, column = 1)
-		edit_pressed = tk.Button(master=properties_inner, text="Handle Press")
-		edit_pressed.grid(row=1, column=0)
+		save_button = tk.Button(master=properties_inner, text="Save", command=lambda:save_component(comp=comp, value=name_entry.get()))
+		save_button.grid(row=2, column = 1)
+		delete_button = tk.Button(master=properties_inner, text="Delete", command=lambda:delete_component(comp=comp)).grid(row=2, column=0)
 	elif comp[0] == 1:
-		pass
+		variable_name_label = tk.Label(master=properties_inner, text="Variable name: "+comp[1], anchor=tk.W, height=2).grid(row=0, column=0, columnspan=2, sticky=tk.N+tk.S+tk.E+tk.W)
+		name_label = tk.Label(master=properties_inner, text="Name: ").grid(row=1, column=0)
+		name_entry = tk.Entry(master=properties_inner)
+		name_entry.grid(row=1, column=1)
+		name_entry.insert(0, comp[2])
+		selected = tk.BooleanVar()
+		selected_box = tk.Checkbutton(master=properties_inner, text="Initial Value", variable=selected, onvalue=True, offvalue=False)
+		selected.set(comp[3])
+		selected_box.grid(row=2, column=1)
+		save_button = tk.Button(master=properties_inner, text="Save", command=lambda:save_component(comp=comp, value=name_entry.get(), initial_value=selected.get()))
+		save_button.grid(row=3, column = 1)
+		delete_button = tk.Button(master=properties_inner, text="Delete", command=lambda:delete_component(comp=comp)).grid(row=3, column=0)
 	elif comp[0] == 2:
-		pass
+		variable_name_label = tk.Label(master=properties_inner, text="Variable name: "+comp[1], anchor=tk.W, height=2).grid(row=0, column=0, columnspan=2, sticky=tk.N+tk.S+tk.E+tk.W)
+		name_label = tk.Label(master=properties_inner, text="Name: ").grid(row=1, column=0)
+		name_entry = tk.Entry(master=properties_inner)
+		name_entry.grid(row=1, column=1)
+		name_entry.insert(0, comp[2])
+		save_button = tk.Button(master=properties_inner, text="Save", command=lambda:save_component(comp=comp, value=name_entry.get()))
+		save_button.grid(row=2, column = 1)
+		delete_button = tk.Button(master=properties_inner, text="Delete", command=lambda:delete_component(comp=comp)).grid(row=2, column=0)
 	elif comp[0] == 3:
-		pass
+		variable_name_label = tk.Label(master=properties_inner, text="Variable name: "+comp[1], anchor=tk.W, height=2).grid(row=0, column=0, columnspan=2, sticky=tk.N+tk.S+tk.E+tk.W)
+		name_label = tk.Label(master=properties_inner, text="No properties for Voice Input").grid(row=1, column=0)
+		delete_button = tk.Button(master=properties_inner, text="Delete", command=lambda:delete_component(comp=comp)).grid(row=2, column=0)
 	elif comp[0] == 4:
-		pass
+		variable_name_label = tk.Label(master=properties_inner, text="Variable name: "+comp[1], anchor=tk.W, height=2).grid(row=0, column=0, columnspan=2, sticky=tk.N+tk.S+tk.E+tk.W)
+		name_label = tk.Label(master=properties_inner, text="Time Period: ").grid(row=1, column=0)
+		name_entry = tk.Entry(master=properties_inner)
+		name_entry.grid(row=1, column=1)
+		name_entry.insert(0, comp[2])
+		save_button = tk.Button(master=properties_inner, text="Save", command=lambda:save_component(comp=comp, value=int(name_entry.get())))
+		save_button.grid(row=2, column = 1)
+		delete_button = tk.Button(master=properties_inner, text="Delete", command=lambda:delete_component(comp=comp)).grid(row=2, column=0)
 	elif comp[0] == 5:
-		pass
+		variable_name_label = tk.Label(master=properties_inner, text="Variable name: "+comp[1], anchor=tk.W, height=2).grid(row=0, column=0, columnspan=2, sticky=tk.N+tk.S+tk.E+tk.W)
+		name_label = tk.Label(master=properties_inner, text="Initial Text: ").grid(row=1, column=0)
+		name_entry = tk.Entry(master=properties_inner)
+		name_entry.grid(row=1, column=1)
+		name_entry.insert(0, comp[2])
+		save_button = tk.Button(master=properties_inner, text="Save", command=lambda:save_component(comp=comp, value=name_entry.get()))
+		save_button.grid(row=2, column = 1)
+		delete_button = tk.Button(master=properties_inner, text="Delete", command=lambda:delete_component(comp=comp)).grid(row=2, column=0)
 	elif comp[0] == 6:
-		pass
+		variable_name_label = tk.Label(master=properties_inner, text="Variable name: "+comp[1], anchor=tk.W, height=2).grid(row=0, column=0, columnspan=2, sticky=tk.N+tk.S+tk.E+tk.W)
+		name_label = tk.Label(master=properties_inner, text="Max Value: ").grid(row=1, column=0)
+		name_entry = tk.Entry(master=properties_inner)
+		name_entry.grid(row=1, column=1)
+		name_entry.insert(0, comp[2])
+		save_button = tk.Button(master=properties_inner, text="Save", command=lambda:save_component(comp=comp, value=int(name_entry.get())))
+		save_button.grid(row=2, column = 1)
+		delete_button = tk.Button(master=properties_inner, text="Delete", command=lambda:delete_component(comp=comp)).grid(row=2, column=0)
 	elif comp[0] == 7:
 		pass
 	elif comp[0] == 8:
-		pass
+		variable_name_label = tk.Label(master=properties_inner, text="Variable name: "+comp[1], anchor=tk.W, height=2).grid(row=0, column=0, columnspan=2, sticky=tk.N+tk.S+tk.E+tk.W)
+		name_label = tk.Label(master=properties_inner, text="Height: ").grid(row=1, column=0)
+		name_entry = tk.Entry(master=properties_inner)
+		name_entry.grid(row=1, column=1)
+		name_entry.insert(0, comp[2])
+		save_button = tk.Button(master=properties_inner, text="Save", command=lambda:save_component(comp=comp, value=int(name_entry.get())))
+		save_button.grid(row=2, column = 1)
+		delete_button = tk.Button(master=properties_inner, text="Delete", command=lambda:delete_component(comp=comp)).grid(row=2, column=0)
 
-def save_component(comp = None, name=""):
-	print("Saving name as " + name)
-	if comp[0] == 0:
-		comp[2] = name
+def save_component(comp = None, value="", initial_value=None):
+	if comp[0] == 0 or comp[0] == 2 or comp[0] == 4 or comp[0] == 5 or comp[0] == 6 or comp[0] == 8:
+		comp[2] = value
+	elif comp[0] == 1:
+		comp[2] = value
+		if initial_value == 1:
+			comp[3] = True
+		else:
+			comp[3] = False
+def delete_component(comp = None):
+	global properties_inner
+	global properties_frame
+	components.remove(comp)
+	refresh_layout()
+
+	try:
+		properties_inner.destroy()
+	except:
+		pass
+	properties_inner = tk.Frame(master=properties_frame)
+	properties_inner.grid(row=0, column=0, rowspan=9, sticky=tk.N+tk.S+tk.W+tk.E)
+
+def generate_program():
+	my_program = open("myprogram.py", "w+")
+	my_program.write(default_head)
+	for c in components:
+		my_program.write("\t\tif id == " + c[1] + ".getId():\n\t\t\tpass\n")
+	my_program.write("\nphone = MyPhone()   # The phone object\n\n")
+	for c in components:
+		if c[0] == 0:
+			my_program.write(c[1] + " = Button('"+c[2]+"')\nphone.add("+c[1]+")\n")
+		elif c[0] == 1:
+			my_program.write(c[1] + " = ToggleButton('"+c[2]+"', "+str(c[3])+")\nphone.add("+c[1]+")\n\n")
+		elif c[0] == 2:
+			my_program.write(c[1] + " = InputText('"+c[2]+"')\nphone.add("+c[1]+")\n\n")
+		elif c[0] == 3:
+			my_program.write(c[1] + " = VoiceInput()\nphone.add("+c[1]+")\n\n")
+		elif c[0] == 4:
+			my_program.write(c[1] + " = RecurringInfo("+str(c[2])+")\nphone.add("+c[1]+")\n\n")
+		elif c[0] == 5:
+			my_program.write(c[1] + " = OutputText('"+c[2]+"')\nphone.add("+c[1]+")\n\n")
+		elif c[0] == 6:
+			my_program.write(c[1] + " = ProgressBar("+str(c[2])+")\nphone.add("+c[1]+")\n\n")
+		elif c[0] == 7:
+			my_program.write(c[1] + " = VideoFeed("+c[2]+")\nphone.add("+c[1]+")\n\n")
+		elif c[0] == 8:
+			my_program.write(c[1] + " = Spacer("+str(c[2])+")\nphone.add("+c[1]+")\n\n")
+	my_program.write("server = PhoneServer()\nserver.addPhone(phone)\nserver.start('0.0.0.0', 8090)")
+
+
+
+
+
 	
 
 components = []
@@ -178,13 +278,13 @@ space = tk.Label(master, width=10).grid(row=0, column=1)
 
 layout_label = tk.Label(master, text="Phone Layout").grid(row=0, column=2)
 layout_frame = tk.Frame(master)
-layout_frame.grid(row=1, column=2, rowspan=9, sticky=tk.N+tk.S+tk.W+tk.E)
+layout_frame.grid(row=1, column=2, rowspan=10, sticky=tk.N+tk.S+tk.W+tk.E)
 inner_frame = tk.Frame(master=layout_frame)
-inner_frame.grid(row=0, column=0, rowspan=9, sticky=tk.N+tk.S+tk.W+tk.E)
+inner_frame.grid(row=0, column=0, rowspan=10, sticky=tk.N+tk.S+tk.W+tk.E)
 
 space2 = tk.Label(master, width=10, height=3).grid(row=0, column=3)
 
-properties_label = tk.Label(master, text="Properties").grid(row=0, column=4)
+properties_label = tk.Label(master, text="Properties", width=35).grid(row=0, column=4)
 properties_frame = tk.Frame(master)
 properties_frame.grid(row=1, column=4, rowspan=99, sticky=tk.N+tk.S+tk.W+tk.E)
 properties_inner = tk.Frame(master=properties_frame)
@@ -193,10 +293,10 @@ properties_inner.grid(row=0, column=0, rowspan=9, sticky=tk.N+tk.S+tk.W+tk.E)
 space3 = tk.Label(master, width=10, height=3).grid(row=0, column=5)
 
 server_label = tk.Label(master, text="Server Controls").grid(row=0, column=6)
-start_server = tk.Button(master, text="Start server")
+start_server = tk.Button(master, text="Generate Program", command=generate_program)
 start_server.grid(row=1, column=6, sticky=tk.N+tk.S+tk.W+tk.E)
-stop_server = tk.Button(master, text="Stop server", state="disabled")
-stop_server.grid(row=2, column=6, sticky=tk.N+tk.S+tk.W+tk.E)
+# stop_server = tk.Button(master, text="Stop server", state="disabled")
+# stop_server.grid(row=2, column=6, sticky=tk.N+tk.S+tk.W+tk.E)
 
 space4 = tk.Label(master, width=10, height=3).grid(row=0, column=7)
 
