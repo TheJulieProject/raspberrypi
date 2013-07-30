@@ -240,11 +240,11 @@ class OutputText(Component):
   def __init__(self, initialmessage):
     self.type = Phone.OUTPUT_TEXT
     self.message = str(initialmessage).replace(',', '%/')
-    self.message = str(self.message).replace('\n', '&/')
+    self.message = str(self.message).replace('\n', '<br>')
   def setText(self, message):
     ''' Change the text displayed on the TextView '''
     self.message = str(message).replace(',', '%/')
-    self.message = str(self.message).replace('\n', '&/')
+    self.message = str(self.message).replace('\n', '<br>')
     try:
       self.server.send(str(PiMoteServer.MESSAGE_FOR_MANAGER)+","+str(Phone.REQUEST_OUTPUT_CHANGE)+","+str(self.type)+","+str(self.id)+","+str(self.message))
     except:

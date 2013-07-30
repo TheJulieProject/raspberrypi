@@ -1,10 +1,13 @@
 import Tkinter as tk
+import ScrolledText
 import pimote as pm
+import subprocess
 
 
 master = tk.Tk()
 master.wm_title("PiMote Program Generator")
-default_head = "from pimote import *\n\nclass MyPhone(Phone):\n\t#########----------------------------------------------###########\n\t"
+default_head = "# An auto-generated PiMote program made by PiMote Program Generator. Tom Richardson 2013\n\n"
+default_head += "from pimote import *\n\nclass MyPhone(Phone):\n\t#########----------------------------------------------###########\n\t"
 default_head += "# Your code will go here! Check for the ID of the button pressed #\n\t# and handle that button press as you wish.                      #\n\t"
 default_head += "#########----------------------------------------------###########\n\tdef buttonPressed(self, id, message, phoneId):\n"
 
@@ -15,6 +18,7 @@ def nameExists(name):
 		if c[1] == name:
 			return True
 	return False
+
 def add_new_button():
 	name = "button_"
 	num=1
@@ -22,7 +26,6 @@ def add_new_button():
 		num+=1
 	name = name+str(num)
 	components.append([0, name, "Button"])
-	print(name)
 	refresh_layout()
 def add_new_toggle():
 	name = "toggle_"
@@ -31,7 +34,6 @@ def add_new_toggle():
 		num+=1
 	name = name+str(num)
 	components.append([1, name, "Toggle button", False])
-	print(name)
 	refresh_layout()
 def add_new_input():
 	name = "input_"
@@ -40,7 +42,6 @@ def add_new_input():
 		num+=1
 	name = name+str(num)
 	components.append([2, name, "Input Text"])
-	print(name)
 	refresh_layout()
 def add_new_voice():
 	name = "voice_"
@@ -49,7 +50,6 @@ def add_new_voice():
 		num+=1
 	name = name+str(num)
 	components.append([3, name])
-	print(name)
 	refresh_layout()
 def add_new_recurring():
 	name = "recurring_"
@@ -58,7 +58,6 @@ def add_new_recurring():
 		num+=1
 	name = name+str(num)
 	components.append([4, name, 1000])
-	print(name)
 	refresh_layout()
 def add_new_output():
 	name = "output_"
@@ -67,7 +66,6 @@ def add_new_output():
 		num+=1
 	name = name+str(num)
 	components.append([5, name, "Output Field"])
-	print(name)
 	refresh_layout()
 def add_new_progress():
 	name = "progress_"
@@ -76,7 +74,6 @@ def add_new_progress():
 		num+=1
 	name = name+str(num)
 	components.append([6, name, 100])
-	print(name)
 	refresh_layout()
 def add_new_video():
 	name = "video_"
@@ -84,10 +81,8 @@ def add_new_video():
 	while nameExists(name+str(num)):
 		num+=1
 	name = name+str(num)
-	# b = pm.VideoFeed(640, 480)
-	# components.append([7, name, "0.0.0.0"])
-	# print(name)
-	# refresh_layout()
+	components.append([7, name])
+	refresh_layout()
 def add_new_spacer():
 	name = "spacer_"
 	num=1
@@ -95,7 +90,6 @@ def add_new_spacer():
 		num+=1
 	name = name+str(num)
 	components.append([8, name, 50])
-	print(name)
 	refresh_layout()
 
 def refresh_layout():
@@ -114,7 +108,6 @@ def refresh_layout():
 		row += 1
 
 def show_properties(comp):
-	print("Called: " + str(comp[0]))
 	global properties_frame
 	global properties_inner
 	
@@ -171,11 +164,11 @@ def show_properties(comp):
 		delete_button = tk.Button(master=properties_inner, text="Delete", command=lambda:delete_component(comp=comp)).grid(row=2, column=0)
 	elif comp[0] == 5:
 		variable_name_label = tk.Label(master=properties_inner, text="Variable name: "+comp[1], anchor=tk.W, height=2).grid(row=0, column=0, columnspan=2, sticky=tk.N+tk.S+tk.E+tk.W)
-		name_label = tk.Label(master=properties_inner, text="Initial Text: ").grid(row=1, column=0)
-		name_entry = tk.Entry(master=properties_inner)
+		name_label = tk.Label(master=properties_inner, text="Text: ").grid(row=1, column=0)
+		name_entry = ScrolledText.ScrolledText(master=properties_inner, height=8, width=30)
 		name_entry.grid(row=1, column=1)
-		name_entry.insert(0, comp[2])
-		save_button = tk.Button(master=properties_inner, text="Save", command=lambda:save_component(comp=comp, value=name_entry.get()))
+		name_entry.insert(tk.END, comp[2])
+		save_button = tk.Button(master=properties_inner, text="Save", command=lambda:save_component(comp=comp, value=name_entry.get(1.0, tk.END)[:-1].replace("\n", "<br>")))
 		save_button.grid(row=2, column = 1)
 		delete_button = tk.Button(master=properties_inner, text="Delete", command=lambda:delete_component(comp=comp)).grid(row=2, column=0)
 	elif comp[0] == 6:
@@ -188,7 +181,9 @@ def show_properties(comp):
 		save_button.grid(row=2, column = 1)
 		delete_button = tk.Button(master=properties_inner, text="Delete", command=lambda:delete_component(comp=comp)).grid(row=2, column=0)
 	elif comp[0] == 7:
-		pass
+		variable_name_label = tk.Label(master=properties_inner, text="Variable name: "+comp[1], anchor=tk.W, height=2).grid(row=0, column=0, columnspan=2, sticky=tk.N+tk.S+tk.E+tk.W)
+		name_label = tk.Label(master=properties_inner, text="No properties for Video Feed").grid(row=1, column=0)
+		delete_button = tk.Button(master=properties_inner, text="Delete", command=lambda:delete_component(comp=comp)).grid(row=2, column=0)
 	elif comp[0] == 8:
 		variable_name_label = tk.Label(master=properties_inner, text="Variable name: "+comp[1], anchor=tk.W, height=2).grid(row=0, column=0, columnspan=2, sticky=tk.N+tk.S+tk.E+tk.W)
 		name_label = tk.Label(master=properties_inner, text="Height: ").grid(row=1, column=0)
@@ -227,10 +222,20 @@ def delete_component(comp = None):
 	properties_inner.grid(row=0, column=0, rowspan=9, sticky=tk.N+tk.S+tk.W+tk.E)
 
 def generate_program():
+	global info_label
+	global password_value
+	global password_entry
+	global max_value
+	global max_entry
+
+	if len(components) == 0:
+		info_label.config(text="You have not populated the phone with components")
+		return
 	my_program = open("myprogram.py", "w+")
 	my_program.write(default_head)
 	for c in components:
-		my_program.write("\t\tif id == " + c[1] + ".getId():\n\t\t\tpass\n")
+		if c[0] == 0 or c[0] == 1 or c[0] == 2 or c[0] == 4:
+			my_program.write("\t\tif id == " + c[1] + ".getId():\n\t\t\tpass\n")
 	my_program.write("\nphone = MyPhone()   # The phone object\n\n")
 	for c in components:
 		if c[0] == 0:
@@ -248,15 +253,35 @@ def generate_program():
 		elif c[0] == 6:
 			my_program.write(c[1] + " = ProgressBar("+str(c[2])+")\nphone.add("+c[1]+")\n\n")
 		elif c[0] == 7:
-			my_program.write(c[1] + " = VideoFeed("+c[2]+")\nphone.add("+c[1]+")\n\n")
+			my_program.write(c[1] + " = VideoFeed()\nphone.add("+c[1]+")\n\n")
 		elif c[0] == 8:
 			my_program.write(c[1] + " = Spacer("+str(c[2])+")\nphone.add("+c[1]+")\n\n")
+
+	if max_value.get():
+		my_program.write("server.maxClients("+str(max_entry.get())+")\n")
+	if password_value.get():
+		my_program.write("server.setPassword('"+str(password_entry.get())+"')\n")
 	my_program.write("server = PhoneServer()\nserver.addPhone(phone)\nserver.start('0.0.0.0', 8090)")
+	proc = subprocess.Popen('pwd', stdout=subprocess.PIPE)
+	directory = proc.stdout.read()
+	directory = directory[:-1]
+	generate_text = "Generated program, saved as '"+directory+"/myprogram.py'.\nTo run, 'cd' into that directory and type 'python myprogram.py' into a terminal.\n"
+	generate_text += "Make sure you add your code to the 'buttonPressed()' method to handle when a button is pressed!"
+	info_label.config(text=generate_text)
 
-	info_label.config(text="Generated program, saved as myprogram.py. To run type python myprogram.py into a terminal.")
+def toggle_password(value):
+	global password_entry
+	if not value:
+		password_entry.config(state="disabled")
+	else:
+		password_entry.config(state="normal")
 
-
-
+def toggle_max_clients(value):
+	global max_entry
+	if not value:
+		max_entry.config(state="disabled")
+	else:
+		max_entry.config(state="normal")
 
 
 	
@@ -266,7 +291,7 @@ components = []
 main_frame = tk.Frame(master)
 main_frame.grid(row=0, column=0)
 
-info_label = tk.Label(master, text=notice, anchor=tk.W, height=5)
+info_label = tk.Label(master, text=notice, anchor=tk.W, height=5, justify=tk.LEFT)
 info_label.grid(row=1, column=0, sticky=tk.E+tk.W+tk.N+tk.S)
 
 buttons_label = tk.Label(master=main_frame, text="Add Components", height=3).grid(row=0, column=0)
@@ -307,12 +332,27 @@ properties_inner.grid(row=0, column=0, rowspan=9, sticky=tk.N+tk.S+tk.W+tk.E)
 
 space3 = tk.Label(master=main_frame, width=10, height=3).grid(row=0, column=5)
 
-server_label = tk.Label(master=main_frame, text="Server Controls").grid(row=0, column=6)
+server_label = tk.Label(master=main_frame, text="Server Controls", anchor="center").grid(row=0, column=6, columnspan=2)
+password_value = tk.BooleanVar()
+password_box = tk.Checkbutton(master=main_frame, text="Password ", variable=password_value, onvalue=True, offvalue=False, command=lambda:toggle_password(password_value.get()))
+password_box.grid(row=1, column=7, sticky=tk.E)
+password_value.set(False)
+password_label = tk.Label(master=main_frame, text="Password:").grid(row=2, column=6)
+password_entry = tk.Entry(master=main_frame, state="disabled")
+password_entry.grid(row=2, column=7)
+max_value = tk.BooleanVar()
+max_box = tk.Checkbutton(master=main_frame, text="Max Clients ", variable=max_value, onvalue=True, offvalue=False, command=lambda:toggle_max_clients(max_value.get()))
+max_box.grid(row=3, column=7, sticky=tk.E)
+max_value.set(False)
+max_label = tk.Label(master=main_frame, text="Max Clients:").grid(row=4, column=6)
+max_entry = tk.Entry(master=main_frame, state="disabled")
+max_entry.grid(row=4, column=7)
+
 start_server = tk.Button(master=main_frame, text="Generate Program", command=generate_program)
-start_server.grid(row=1, column=6, sticky=tk.N+tk.S+tk.W+tk.E)
+start_server.grid(row=6, column=7, sticky=tk.N+tk.S+tk.W+tk.E)
 # stop_server = tk.Button(master, text="Stop server", state="disabled")
 # stop_server.grid(row=2, column=6, sticky=tk.N+tk.S+tk.W+tk.E)
 
-space4 = tk.Label(master=main_frame, width=10, height=3).grid(row=0, column=7)
+space4 = tk.Label(master=main_frame, width=10, height=3).grid(row=0, column=8)
 
 tk.mainloop()
