@@ -70,8 +70,7 @@ public class RegularButtonManager extends PimoteManager {
                 if (Integer.parseInt(message[1]) == TEXT_OUTPUT) {
                     TextView output = getTextView(Integer.parseInt(message[2]));
                     Log.d("SETUP", message[3]);
-                    String out = message[3].replace("&/", "\n");
-                    out = out.replace("%/", ",");
+                    String out = message[3].replace("%/", ",");
                     output.setText(Html.fromHtml(out));
                 } else if (Integer.parseInt(message[1]) == PROGRESS_BAR) {
                     ProgressBar bar = getProgressBar(Integer.parseInt(message[2]));
@@ -210,8 +209,7 @@ public class RegularButtonManager extends PimoteManager {
         text.setTextSize(18);
         text.setLayoutParams(params);
         if (setup.length >= 3) {
-            String out = setup[2].replace("&/", "\n");
-            out = out.replace("%/", ",");
+            String out = setup[2].replace("%/", ",");
             text.setText(Html.fromHtml(out));
         }
         text.setTextSize(Integer.parseInt(setup[3]));

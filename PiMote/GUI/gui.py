@@ -1,4 +1,5 @@
 import Tkinter as tk
+import tkFont
 import ScrolledText
 import pimote as pm
 import subprocess
@@ -95,17 +96,45 @@ def add_new_spacer():
 def refresh_layout():
 	global inner_frame
 	global layout_frame
+	height = inner_frame.winfo_height()
 	try:
 		inner_frame.destroy()
 	except Exception, e:
 		print("Problem when destroying, " + str(e))
-	inner_frame = tk.Frame(master=layout_frame)
-	inner_frame.grid(row=1, column=2, rowspan=10, sticky=tk.N+tk.S+tk.W+tk.E)
+
+	inner_frame = tk.Frame(master=layout_frame, height=height)
+	
 	row = 0
 	for c in components:
-		comp_label = tk.Button(master=inner_frame, text=c[1], command= lambda c=c: show_properties(c))
-		comp_label.grid(row=row, column=0, sticky=tk.N+tk.S+tk.W+tk.E)
+		comp_frame = tk.Frame(master=inner_frame, bd=1, relief="groove", pady=2, padx=2)
+		font = tkFont.Font(size=8)
+		comp_button = tk.Button(master=comp_frame, text=c[1], command= lambda c=c: show_properties(c))
+		comp_button.grid(row=0, column=0, sticky=tk.W+tk.E)
+		control_frame = tk.Frame(master=comp_frame)
+		control_frame.grid(row=0, column=1)
+		up_button = tk.Button(master=control_frame, text="^", font=font, height=1, command = lambda row=row: move_up(row))
+		up_button.grid(row=0, column=0)
+		if row == 0:
+			up_button.config(state="disabled")
+		down_button=tk.Button(master=control_frame, text="v", height=1, font=font, command = lambda row=row: move_down(row))
+		down_button.grid(row=1, column=0)
+		if row == len(components)-1:
+			down_button.config(state="disabled")
+		tk.Grid.columnconfigure(comp_frame,0, weight=2)
+		comp_frame.pack(fill="x")
 		row += 1
+
+	inner_frame.pack(fill="both")
+
+def move_up(row):
+	a, b = components[row], components[row-1]
+	components[row], components[row-1] = b, a
+	refresh_layout()
+
+def move_down(row):
+	a, b = components[row], components[row+1]
+	components[row], components[row+1] = b, a
+	refresh_layout()
 
 def show_properties(comp):
 	global properties_frame
@@ -165,7 +194,7 @@ def show_properties(comp):
 	elif comp[0] == 5:
 		variable_name_label = tk.Label(master=properties_inner, text="Variable name: "+comp[1], anchor=tk.W, height=2).grid(row=0, column=0, columnspan=2, sticky=tk.N+tk.S+tk.E+tk.W)
 		name_label = tk.Label(master=properties_inner, text="Text: ").grid(row=1, column=0)
-		name_entry = ScrolledText.ScrolledText(master=properties_inner, height=8, width=30)
+		name_entry = ScrolledText.ScrolledText(master=properties_inner, height=8, width=30, bd=2, relief="sunken")
 		name_entry.grid(row=1, column=1)
 		name_entry.insert(tk.END, comp[2])
 		save_button = tk.Button(master=properties_inner, text="Save", command=lambda:save_component(comp=comp, value=name_entry.get(1.0, tk.END)[:-1].replace("\n", "<br>")))
@@ -234,7 +263,7 @@ def generate_program():
 	my_program = open("myprogram.py", "w+")
 	my_program.write(default_head)
 	for c in components:
-		if c[0] == 0 or c[0] == 1 or c[0] == 2 or c[0] == 4:
+		if c[0] == 0 or c[0] == 1 or c[0] == 2 or c[0] == 3 or c[0] == 4:
 			my_program.write("\t\tif id == " + c[1] + ".getId():\n\t\t\tpass\n")
 	my_program.write("\nphone = MyPhone()   # The phone object\n\n")
 	for c in components:
@@ -290,66 +319,70 @@ components = []
 
 main_frame = tk.Frame(master)
 main_frame.grid(row=0, column=0)
-
-info_label = tk.Label(master, text=notice, anchor=tk.W, height=5, justify=tk.LEFT)
-info_label.grid(row=1, column=0, sticky=tk.E+tk.W+tk.N+tk.S)
+space5 = tk.Label(master, height=4).grid(row=1, column=0)
+info_label = tk.Label(master, text=notice, anchor=tk.NW, height=5, justify=tk.LEFT, padx=8)
+info_label.grid(row=2, column=0, sticky=tk.E+tk.W+tk.N+tk.S)
 
 buttons_label = tk.Label(master=main_frame, text="Add Components", height=3).grid(row=0, column=0)
-add_button = tk.Button(master=main_frame, text="Add Button", command=add_new_button)
+button_frame = tk.Frame(master=main_frame)
+button_frame.grid(row=1, column=0, rowspan=9, sticky=tk.W+tk.E+tk.N+tk.S)
+add_button = tk.Button(master=button_frame, text="Add Button", command=add_new_button)
 add_button.grid(row=1, column=0, sticky=tk.W+tk.E+tk.N+tk.S)
-add_toggle = tk.Button(master=main_frame, text="Add Toggle Button", command=add_new_toggle)
+add_toggle = tk.Button(master=button_frame, text="Add Toggle Button", command=add_new_toggle)
 add_toggle.grid(row=2, column=0, sticky=tk.W+tk.E+tk.N+tk.S)
-add_input = tk.Button(master=main_frame, text="Add Text Input", command=add_new_input)
+add_input = tk.Button(master=button_frame, text="Add Text Input", command=add_new_input)
 add_input.grid(row=3, column=0, sticky=tk.W+tk.E+tk.N+tk.S)
-add_voice = tk.Button(master=main_frame, text="Add Voice Input", command=add_new_voice)
+add_voice = tk.Button(master=button_frame, text="Add Voice Input", command=add_new_voice)
 add_voice.grid(row=4, column=0, sticky=tk.W+tk.E+tk.N+tk.S)
-add_recurring = tk.Button(master=main_frame, text="Add poll", command=add_new_recurring)
+add_recurring = tk.Button(master=button_frame, text="Add poll", command=add_new_recurring)
 add_recurring.grid(row=5, column=0, sticky=tk.W+tk.E+tk.N+tk.S)
-add_output = tk.Button(master=main_frame, text="Add Output Text", command=add_new_output)
+add_output = tk.Button(master=button_frame, text="Add Output Text", command=add_new_output)
 add_output.grid(row=6, column=0, sticky=tk.W+tk.E+tk.N+tk.S)
-add_progress = tk.Button(master=main_frame, text="Add Progress Bar", command=add_new_progress)
+add_progress = tk.Button(master=button_frame, text="Add Progress Bar", command=add_new_progress)
 add_progress.grid(row=7, column=0, sticky=tk.W+tk.E+tk.N+tk.S)
-add_video = tk.Button(master=main_frame, text="Add Video Feed", command=add_new_video)
+add_video = tk.Button(master=button_frame, text="Add Video Feed", command=add_new_video)
 add_video.grid(row=8, column=0, sticky=tk.W+tk.E+tk.N+tk.S)
-add_spacer = tk.Button(master=main_frame, text="Add Space", command=add_new_spacer)
+add_spacer = tk.Button(master=button_frame, text="Add Space", command=add_new_spacer)
 add_spacer.grid(row=9, column=0, sticky=tk.W+tk.E+tk.N+tk.S)
 
 space = tk.Label(master=main_frame, width=10).grid(row=0, column=1)
 
-layout_label = tk.Label(master=main_frame, text="Phone Layout").grid(row=0, column=2)
-layout_frame = tk.Frame(master=main_frame)
-layout_frame.grid(row=1, column=2, rowspan=10, sticky=tk.N+tk.S+tk.W+tk.E)
+layout_label = tk.Label(master=main_frame, text="Phone Layout", width=20).grid(row=0, column=2)
+layout_frame = tk.Frame(master=main_frame, relief="raised", borderwidth=2, padx=5, pady=5)
+layout_frame.grid(row=1, column=2, rowspan=10, sticky=tk.N+tk.S+tk.E+tk.W)
 inner_frame = tk.Frame(master=layout_frame)
-inner_frame.grid(row=0, column=0, rowspan=10, sticky=tk.N+tk.S+tk.W+tk.E)
+inner_frame.pack(fill="both")
 
 space2 = tk.Label(master=main_frame, width=10, height=3).grid(row=0, column=3)
 
 properties_label = tk.Label(master=main_frame, text="Properties", width=35).grid(row=0, column=4)
 properties_frame = tk.Frame(master=main_frame)
-properties_frame.grid(row=1, column=4, rowspan=99, sticky=tk.N+tk.S+tk.W+tk.E)
+properties_frame.grid(row=1, column=4, rowspan=9, sticky=tk.N+tk.S+tk.W+tk.E)
 properties_inner = tk.Frame(master=properties_frame)
 properties_inner.grid(row=0, column=0, rowspan=9, sticky=tk.N+tk.S+tk.W+tk.E)
 
-space3 = tk.Label(master=main_frame, width=10, height=3).grid(row=0, column=5)
+space3 = tk.Label(master=main_frame, width=6, height=3).grid(row=0, column=5)
 
+server_frame = tk.Frame(master=main_frame)
+server_frame.grid(row=1, column=6, sticky=tk.W+tk.E+tk.N+tk.S, rowspan=9)
 server_label = tk.Label(master=main_frame, text="Server Controls", anchor="center").grid(row=0, column=6, columnspan=2)
 password_value = tk.BooleanVar()
-password_box = tk.Checkbutton(master=main_frame, text="Password ", variable=password_value, onvalue=True, offvalue=False, command=lambda:toggle_password(password_value.get()))
-password_box.grid(row=1, column=7, sticky=tk.E)
+password_box = tk.Checkbutton(master=server_frame, text="Password ", variable=password_value, onvalue=True, offvalue=False, command=lambda:toggle_password(password_value.get()))
+password_box.grid(row=2, column=1, sticky=tk.E)
 password_value.set(False)
-password_label = tk.Label(master=main_frame, text="Password:").grid(row=2, column=6)
-password_entry = tk.Entry(master=main_frame, state="disabled")
-password_entry.grid(row=2, column=7)
+password_label = tk.Label(master=server_frame, text="Password:").grid(row=3, column=0)
+password_entry = tk.Entry(master=server_frame, state="disabled")
+password_entry.grid(row=3, column=1)
 max_value = tk.BooleanVar()
-max_box = tk.Checkbutton(master=main_frame, text="Max Clients ", variable=max_value, onvalue=True, offvalue=False, command=lambda:toggle_max_clients(max_value.get()))
-max_box.grid(row=3, column=7, sticky=tk.E)
+max_box = tk.Checkbutton(master=server_frame, text="Max Clients ", variable=max_value, onvalue=True, offvalue=False, command=lambda:toggle_max_clients(max_value.get()))
+max_box.grid(row=4, column=1, sticky=tk.E)
 max_value.set(False)
-max_label = tk.Label(master=main_frame, text="Max Clients:").grid(row=4, column=6)
-max_entry = tk.Entry(master=main_frame, state="disabled")
-max_entry.grid(row=4, column=7)
+max_label = tk.Label(master=server_frame, text="Max Clients:").grid(row=5, column=0)
+max_entry = tk.Entry(master=server_frame, state="disabled")
+max_entry.grid(row=5, column=1)
 
-start_server = tk.Button(master=main_frame, text="Generate Program", command=generate_program)
-start_server.grid(row=6, column=7, sticky=tk.N+tk.S+tk.W+tk.E)
+start_server = tk.Button(master=server_frame, text="Generate Program", command=generate_program)
+start_server.grid(row=7, column=1, sticky=tk.N+tk.S+tk.W+tk.E)
 # stop_server = tk.Button(master, text="Stop server", state="disabled")
 # stop_server.grid(row=2, column=6, sticky=tk.N+tk.S+tk.W+tk.E)
 
