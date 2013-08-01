@@ -393,14 +393,14 @@ add_video.grid(row=8, column=0, sticky=tk.W+tk.E+tk.N+tk.S)
 add_spacer = tk.Button(master=button_frame, text="Add Space", command=add_new_spacer)
 add_spacer.grid(row=9, column=0, sticky=tk.W+tk.E+tk.N+tk.S)
 
-space = tk.Label(master=main_frame, width=10).grid(row=0, column=1)
+space = tk.Label(master=main_frame, width=6).grid(row=0, column=1)
 
-layout_label = tk.Label(master=main_frame, text="Phone Layout", width=20).grid(row=0, column=2)
+layout_label = tk.Label(master=main_frame, text="Phone Layout", width=25).grid(row=0, column=2)
 layout_frame = VerticalScrolledFrame(main_frame, relief="raised", borderwidth=2, padx=5, pady=5)
 layout_frame.grid(row=1, column=2, rowspan=10, sticky=tk.N+tk.S+tk.E+tk.W)
 inner_frame = tk.Frame(master=layout_frame.interior)
 inner_frame.pack(fill="both")
-space2 = tk.Label(master=main_frame, width=10, height=3).grid(row=0, column=3)
+space2 = tk.Label(master=main_frame, width=6, height=3).grid(row=0, column=3)
 
 properties_label = tk.Label(master=main_frame, text="Properties", width=35).grid(row=0, column=4)
 properties_frame = tk.Frame(master=main_frame)
@@ -433,6 +433,6 @@ start_server.grid(row=7, column=1, sticky=tk.N+tk.S+tk.W+tk.E)
 # stop_server = tk.Button(master, text="Stop server", state="disabled")
 # stop_server.grid(row=2, column=6, sticky=tk.N+tk.S+tk.W+tk.E)
 
-space4 = tk.Label(master=main_frame, width=10, height=3).grid(row=0, column=8)
+space4 = tk.Label(master=main_frame, width=6, height=3).grid(row=0, column=8)
 
 tk.mainloop()
