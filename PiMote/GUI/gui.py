@@ -1,4 +1,5 @@
 import Tkinter as tk
+import tkFileDialog
 import tkFont
 import ScrolledText
 import pimote as pm
@@ -308,7 +309,9 @@ def generate_program():
 	if len(components) == 0:
 		info_label.config(text="You have not populated the phone with components")
 		return
-	my_program = open("myprogram.py", "w+")
+
+	fileName = tkFileDialog.asksaveasfilename(parent=master, defaultextension=[".py"], filetypes=[("Python File", ".py")], title="Generate to..")
+	my_program = open(fileName, "w+")
 	my_program.write(default_head)
 	for c in components:
 		if c[0] == 0 or c[0] == 1 or c[0] == 2 or c[0] == 3 or c[0] == 4:
@@ -335,14 +338,12 @@ def generate_program():
 			my_program.write(c[1] + " = Spacer("+str(c[2])+")\nphone.add("+c[1]+")\n\n")
 
 	if max_value.get():
-		my_program.write("server.maxClients("+str(max_entry.get())+")\n")
+		my_program.write("server.setMaxClients("+str(max_entry.get())+")\n")
 	if password_value.get():
 		my_program.write("server.setPassword('"+str(password_entry.get())+"')\n")
 	my_program.write("server = PhoneServer()\nserver.addPhone(phone)\nserver.start('0.0.0.0', 8090)")
 	proc = subprocess.Popen('pwd', stdout=subprocess.PIPE)
-	directory = proc.stdout.read()
-	directory = directory[:-1]
-	generate_text = "Generated program, saved as '"+directory+"/myprogram.py'.\nTo run, 'cd' into that directory and type 'python myprogram.py' into a terminal.\n"
+	generate_text = "Generated program, saved as '"+fileName+"'.\nTo run, 'cd' into that directory and type 'python myprogram.py' into a terminal.\n"
 	generate_text += "Make sure you add your code to the 'buttonPressed()' method to handle when a button is pressed!"
 	info_label.config(text=generate_text)
 
@@ -360,10 +361,88 @@ def toggle_max_clients(value):
 	else:
 		max_entry.config(state="normal")
 
+def save_program():
+	global components
+	global password_value
+	global password_entry
+	global max_value
+	global max_entry
+	fileName = tkFileDialog.asksaveasfilename(parent=master, defaultextension=[".pmg"], filetypes=[("PiMote File", ".pmg")], title="Save the program as...")
+	if len(fileName ) > 0:
+		file = open(fileName, "w")
+		file.write(str(password_value.get())+","+password_entry.get()+",\n")
+		file.write(str(max_value.get())+","+max_entry.get()+",\n")
+		for c in components:
+			for inf in c:
+				file.write(str(inf)+",")
+			file.write("\n")
+
+def open_program():
+	global components
+	global password_value
+	global password_entry
+	global max_value
+	global max_entry
+	fileName = tkFileDialog.askopenfilename(parent=master, filetypes=[("PiMote File", ".pmg")], title="Open file")
+	if len(fileName) > 0:
+		file = open(fileName, "r")
+		components = []
+		p = file.readline().split(",")
+		
+		if int(p[0]) == 1:
+			password_value.set(True)
+			toggle_password(password_value.get())
+			password_entry.delete(0, tk.END)
+			password_entry.insert(0, p[1])
+		else:
+			password_value.set(False)
+			toggle_password(password_value.get())
+
+		m = file.readline().split(",")
+		print(m)
+		if int(m[0]) == 1:
+			max_value.set(True)
+			toggle_max_clients(max_value.get())
+			max_entry.delete(0, tk.END)
+			max_entry.insert(0, m[1])
+		else:
+			max_value.set(False)
+			toggle_max_clients(max_value.get())
+		
+		c = file.readline().split(",")
+		c.remove(c[len(c)-1])
+		while len(c)!=0:
+			fix_component(c)
+			components.append(c)
+			c = file.readline().split(",")
+			c.remove(c[len(c)-1])
+
+	for i in components:
+		print(i)
+	print("Refreshing")
+	refresh_layout()
+
+def fix_component(c):
+	c[0] = int(c[0])
+	if c[0] == 4 or c[0] == 6 or c[0] == 8:
+		c[2] = int(c[2])
+	elif c[0] == 1:
+		if c[3] == "True":
+			c[3] = True
+		else:
+			c[3] = False
+
 
 	
 
 components = []
+
+menubar = tk.Menu(master)
+filemenu = tk.Menu(menubar, tearoff=0)
+filemenu.add_command(label="Open", command=open_program)
+filemenu.add_command(label="Save as", command=save_program)
+filemenu.add_command(label="Quit", command=master.quit)
+menubar.add_cascade(label="File", menu=filemenu)
 
 main_frame = tk.Frame(master)
 main_frame.grid(row=0, column=0)
@@ -435,4 +514,5 @@ start_server.grid(row=7, column=1, sticky=tk.N+tk.S+tk.W+tk.E)
 
 space4 = tk.Label(master=main_frame, width=6, height=3).grid(row=0, column=8)
 
+master.config(menu=menubar)
 tk.mainloop()
