@@ -247,6 +247,7 @@ class PiMoteServer(Server):
         try:
           file = open("privatekey.data", "r")
           self.key = file.read() #Read the key
+          file.close()
           read = True
         except: #No such file so generate key and file
           createKey()

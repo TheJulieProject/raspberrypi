@@ -346,6 +346,7 @@ def generate_program():
 	generate_text = "Generated program, saved as '"+fileName+"'.\nTo run, 'cd' into that directory and type 'python myprogram.py' into a terminal.\n"
 	generate_text += "Make sure you add your code to the 'buttonPressed()' method to handle when a button is pressed!"
 	info_label.config(text=generate_text)
+	my_program.close()
 
 def toggle_password(value):
 	global password_entry
@@ -376,6 +377,7 @@ def save_program():
 			for inf in c:
 				file.write(str(inf)+",")
 			file.write("\n")
+		file.close()
 
 def open_program():
 	global components
@@ -416,6 +418,7 @@ def open_program():
 			components.append(c)
 			c = file.readline().split(",")
 			c.remove(c[len(c)-1])
+		file.close()
 
 	for i in components:
 		print(i)
