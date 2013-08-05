@@ -2,6 +2,10 @@ University of Manchester
 Raspberry Pi projects
 
 PiMote (Work in progress)
+Still to come:
+	Grid Layout
+	More sensor readings
+	Images
 
 How to install
 

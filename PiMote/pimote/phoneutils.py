@@ -24,7 +24,10 @@ class PhoneServer(PiMoteServer):
     if isinstance(self.phone, Phone):                     #Regular phone
       (id, sep, msg) = message.strip().partition(",")     #Strip component ID and message apart
       self.phone.updateButtons(int(id), msg, self)        #Update buttons if needed
-      self.phone.buttonPressed(int(id), msg, socket.id)   #Allow the user to handle the message + client
+      if int(id) == 8827:
+        self.phone.updateSensors(msg)
+      else:
+        self.phone.buttonPressed(int(id), msg, socket.id) #Allow the user to handle the message + client
     elif isinstance(self.phone, ControllerPhone):         #Controller
       self.phone.controlPress(message)                    #Controller handler
 
@@ -54,6 +57,12 @@ class Phone():
   components = []                                         #All components to be displayed on the phone
 
   controltype = 0                                         #Type of phone
+
+  sensorvalue = 0                                         #Accellerometer. 0 = off, 1 = normal, 2 = game
+  SENSOR_NORMAL = 1
+  SENSOR_GAME = 2
+  sensorX = 0
+  sensorY = 0
 
   #More protocol variables for component setup
   CLEAR_ALL = 0
@@ -88,9 +97,15 @@ class Phone():
     ''' Sends all setup information to the phone '''
     self.socket = socket
     self.server = server
-    socket.send(str(Phone.SET_CONTROL_TYPE)+","+str(self.controltype)+","+self.name+","+str(socket.id))
+    socket.send(str(Phone.SET_CONTROL_TYPE)+","+str(self.controltype)+","+self.name+","+str(socket.id)+","+str(self.sensorvalue))
     for c in self.components:
       c.setup(socket, server) #setup each component
+
+  def setSensor(self, value):
+    self.sensorvalue = value
+
+  def getSensorValues(self):
+    return [self.sensorX, self.sensorY]
 
   def updateButtons(self, id, message, server):
     ''' Update button state if necessary '''
@@ -101,6 +116,15 @@ class Phone():
           c.value = True
         else:
           c.value = False
+
+  def updateSensors(self, message):
+    (x, sep, y) = message.strip().partition(",")
+    self.sensorX = x
+    self.sensorY = y
+    self.sensorUpdate(self.sensorX, self.sensorY)
+
+  def sensorUpdate(self, x, y):
+    pass
 
   def clearComponents(self):
     ''' Clear all the components from the components array '''

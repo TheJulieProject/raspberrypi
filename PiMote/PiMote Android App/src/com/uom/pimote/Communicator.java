@@ -99,14 +99,14 @@ public class Communicator extends Activity {
         super.onPause();
         if (!voiceRecognition) endActivity("", false);
         else {
-            if (manager != null) manager.pauseVideo();
+            if (manager != null) manager.pause();
         }
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        if (manager != null) manager.resumeVideo();
+        if (manager != null) manager.resume();
     }
 
     @Override
@@ -230,7 +230,8 @@ public class Communicator extends Activity {
                 case SET_CONTROL_TYPE: // Set the manager
                     controlType = Integer.parseInt(info[1]);
                     if (controlType == NORMAL_CONTROL) {
-                        manager = new RegularButtonManager(Communicator.this, tcp, ip, info[2], Integer.parseInt(info[3]));
+                        manager = new RegularButtonManager(Communicator.this, tcp, ip, info[2],
+                                Integer.parseInt(info[3]), Integer.parseInt(info[4]));
                     } else if (controlType == JOYSTICK_CONTROL) {
                         manager = new ControllerManager(Communicator.this, tcp, ip,
                                 Integer.parseInt(info[2]), Integer.parseInt(info[3]),

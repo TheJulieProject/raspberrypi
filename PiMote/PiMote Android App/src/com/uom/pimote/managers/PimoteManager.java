@@ -1,8 +1,10 @@
 package com.uom.pimote.managers;
 
+import android.content.Context;
 import android.util.Log;
 
 import com.uom.pimote.Communicator;
+import com.uom.pimote.SensorManagement;
 import com.uom.pimote.TCPClient;
 import com.uom.pimote.mjpegvideo.MjpegStreamManager;
 import com.uom.pimote.mjpegvideo.MjpegView;
@@ -18,12 +20,16 @@ public class PimoteManager {
     ArrayList<RecurringInfo> threads; // All threads
     TCPClient tcp; // TCP Client for communication with Pi
     ArrayList<MjpegStreamManager> streams; // All streams
+    Context c;
+    SensorManagement sensors = null;
+
 
     // Constructor (takes tcp client)
-    public PimoteManager(TCPClient tcp) {
+    public PimoteManager(TCPClient tcp, Context c) {
         this.tcp = tcp;
         threads = new ArrayList<RecurringInfo>();
         streams = new ArrayList<MjpegStreamManager>();
+        this.c = c;
     }
 
     // Called when a message is received. Overridden by manager
@@ -43,16 +49,22 @@ public class PimoteManager {
         }
     }
 
-    public void pauseVideo() {
+    public void pause() {
         for(MjpegStreamManager s : streams){
             s.pauseVideo();
         }
+        if(sensors!=null)sensors.pause();
     }
 
-    public void resumeVideo() {
+    public void resume() {
         for(MjpegStreamManager s : streams){
             s.resumeVideo();
         }
+        if(sensors!=null)sensors.resume();
+    }
+
+    public void startSensors(int speed, TCPClient tcp){
+        sensors = new SensorManagement(c, speed, tcp);
     }
 
     // Recurring poll to the Pi
@@ -68,6 +80,7 @@ public class PimoteManager {
             threads.get(i).stopThread();
         }
         stopVideo();
+        if(sensors!= null)sensors.pause();
     }
 
 

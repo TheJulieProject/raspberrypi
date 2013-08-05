@@ -34,7 +34,7 @@ public class Main extends Activity implements OnClickListener {
         ipField = (EditText) findViewById(R.id.ipAddress);
         portField = (EditText) findViewById(R.id.portNo);
 
-        ipField.setText("192.168.2.22");
+        ipField.setText("10.0.2.4");
         portField.setText("8090");
 
         connect = (Button) findViewById(R.id.connectBtn);
@@ -42,16 +42,15 @@ public class Main extends Activity implements OnClickListener {
     }
 
     @Override
-    public boolean onCreateOptionsMenu(Menu menu)
-    {
+    public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater menuInflater = getMenuInflater();
         menuInflater.inflate(R.menu.main, menu);
         return true;
     }
 
     @Override
-    public boolean onOptionsItemSelected(MenuItem item){
-        switch(item.getItemId()){
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
             case R.id.action_settings:
                 AlertDialog.Builder alert = new AlertDialog.Builder(this);
 
@@ -64,7 +63,6 @@ public class Main extends Activity implements OnClickListener {
         }
         return true;
     }
-
 
 
     @Override

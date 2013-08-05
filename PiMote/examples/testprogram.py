@@ -23,7 +23,9 @@ class MyPhone(Phone):
 		#########----------------------------------------------###########
 		if id == b1.getId():
 			self.buttonPress+=1
-			o1.setText("<font color=#CC0000><b>Regular Button</b></font>: you have pressed it " + str(self.buttonPress) + " times")
+			values = self.getSensorValues()
+			o1.setText("X:"+str(values[0])+", Y:"+values[1])
+			#o1.setText("<font color=#CC0000><b>Regular Button</b></font>: you have pressed it " + str(self.buttonPress) + " times")
 		elif id == b2.getId():
 			o2.setText("<font color=#CC0000><b>Toggle Button</b></font>: " + message)
 		elif id == b3.getId():
@@ -34,12 +36,14 @@ class MyPhone(Phone):
 			o4.setText("<font color=#CC0000><b>Progress Bar</b></font>: <b>"+str(i)+"</b>%")
 		elif id == vi.getId():
 			o5.setText("<font color=#CC0000><b>Voice Input</b></font>: '" + message + "'")
+	def sensorUpdate(self, x, y):
+		print("X: "+str(x)+", Y: "+str(y))
 
 # Create the phone object
 thisphone = MyPhone()
 thisphone.setTitle("Example PiMote App")
 p = ProgressBar(100)
-b1 = Button("Hello") #Regular button
+b1 = Button("Get Readings") #Regular button
 b2 = ToggleButton("This is a toggle button", True) #Toggle
 b3 = InputText("Input text here") #Text Input
 title = OutputText("<font color=#35B5E5><b>Test Application</b></font>")
@@ -81,6 +85,8 @@ thisphone.add(vi)
 #thisphone.add(s)
 #thisphone.add(o7)
 #thisphone.add(v)
+
+thisphone.setSensor(Phone.SENSOR_NORMAL)
 
 #Create the server
 myserver = PhoneServer()

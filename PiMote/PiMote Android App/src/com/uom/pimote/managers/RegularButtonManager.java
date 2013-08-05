@@ -41,8 +41,8 @@ public class RegularButtonManager extends PimoteManager {
     int viewPosition; // Current position
 
     // Constructor. Sets up variables and action bar
-    public RegularButtonManager(Context c, TCPClient tcp, String ip, String name, int id) {
-        super(tcp);
+    public RegularButtonManager(Context c, TCPClient tcp, String ip, String name, int id, int sensors) {
+        super(tcp, c);
         this.c = c;
         this.tcp = tcp;
         this.ip = ip;
@@ -53,6 +53,9 @@ public class RegularButtonManager extends PimoteManager {
         ((Communicator) c).setContentView(R.layout.activity_main);
         this.layout = (LinearLayout) ((Communicator) c).findViewById(R.id.mainlayout);
         threads = new ArrayList<RecurringInfo>();
+        if(sensors!=0){
+            startSensors(sensors, tcp);
+        }
     }
 
     @Override
