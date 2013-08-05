@@ -132,34 +132,37 @@ namedWindow("Corner detection", cv.CV_WINDOW_AUTOSIZE)
 cam = VideoCapture(0)
 
 while True:
-
+	# Capture image
 	s, image = cam.read()
 	if s:
-	 imwrite('cam_image.jpg', image)
+		# *** USER: change name of file
+		imwrite('cam_image.jpg', image)
 
-	# Code from Glowing python.
+	# Code from Glowing python (glowingpython.blogspot.co.uk/2011/10/corner-detection-with-opencv.html)
+	# will be commented as GP.
+	# *** GP: Load image in colour and in grey scale.
 	imcolor = cv.LoadImage('cam_image.jpg')
 	image = cv.LoadImage('cam_image.jpg',cv.CV_LOAD_IMAGE_GRAYSCALE)
 
 	# Initialise the octagon
 	octagon(imcolor)	
 	
-	# Destination of the harris algorithm
+	# *** GP: Destination of the harris algorithm
 	cornerMap = cv.CreateMat(image.height, image.width, cv.CV_32FC1)
 	
-	# OpenCV corner detection
+	# *** GP: OpenCV corner detection
 	cv.CornerHarris(image,cornerMap,3)
 	
-	# Iterate through each pixel to get the final command.
+	# *** GP: Iterate through each pixel to get the final command.
 	for y in range(0, image.height):
  	 for x in range(0, image.width):
 	  harris = cv.Get2D(cornerMap, y, x) # get the x,y value
  	  
-	  # check the corner detector response
+	  # *** GP: check the corner detector response
 	  if harris[0] > 10e-06:
  	  
-	   # draw a small circle on the original image to represent the corner
-           cv.Circle(imcolor,(x,y),2,cv.RGB(155, 0, 25))
+	   # *** GP: draw a small circle on the original image to represent the corner
+       cv.Circle(imcolor,(x,y),2,cv.RGB(155, 0, 25))
 
 	   # Check if that corner is in one of the 8 points.
 	   active(x,y)
