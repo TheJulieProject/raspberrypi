@@ -1,4 +1,5 @@
 #!/usr/bin/python
+# Code from code.google.com/p/pycam/sourc/browse/#svn/branches/windows-branch/pycam
 """
 This program is demonstration for face and object detection using haar-like features.
 The program finds faces in a camera image or video stream and displays a red box around them.
@@ -10,9 +11,11 @@ TODO: use optparser
 Original C implementation by:  ?
 Python implementation by: Roman Stanchak
 Modified for pygame by: Brian Thorne
-Modified for Raspberry Pi by: Diego Abel
+Modified for Raspberry Pi by: Diego Abel (Marked as MOD)
 """
 import sys
+
+# *** MOD: Fixed imports
 import cv as opencv
 from cv import *
 
@@ -20,6 +23,7 @@ from cv import *
 cascade = None
 storage = CreateMemStorage(0)
 
+# *** MOD: Deleted unnecesary links.
 #cascade_name = "haarcascade_frontalface_alt.xml"
 cascade_name = "haarcascade_eye.xml"
 #cascade_name =  "haarcascade_frontalface_default.xml"
@@ -44,15 +48,18 @@ cascade = Load(cascade_name)
 # images the settings are: 
 # scale_factor=1.2, min_neighbors=2, flags=CV_HAAR_DO_CANNY_PRUNING, 
 # min_size=<minimum possible face size
-mat = CreateMat(20,20, CV_32FC1)
 min_size = GetSize(mat)
 image_scale = 1.3
 haar_scale = 1.1
 min_neighbors = 3
 haar_flags = 0
 
+# *** MOD: Create matrix to use later.
+mat = CreateMat(20,20, CV_32FC1)
 
-def detectObject(img):
+# *** MOD: Use correct commands to get the program working as code was
+# using C commands.
+def detectObject(img):	
     gray = CreateImage( GetSize(img), 8, 1 )
     small_img = CreateImage(GetSize(img),8, 1 )
     CvtColor(img, gray, CV_BGR2GRAY)
@@ -60,6 +67,7 @@ def detectObject(img):
 
     EqualizeHist( small_img, small_img )
     
+    # *** MOD: unnecesary command
     #ClearMemStorage( storage )
 
     if( cascade ):
@@ -78,12 +86,16 @@ def detect_and_draw( img ):
     """
     faces = detectObject(img)
     if faces:
+		# *** MOD: changed to tuple in order to be able to access the parameters.
         for (x,y,w,h),n in faces:
-	    print "Face found at (x,y) = (%i,%i)" % (x,y)	                
+			print "Face found at (x,y) = (%i,%i)" % (x,y)
+			# *** MOD: Get points at the moment.
             Rectangle( img, (x,y), (x+w,y+h), CV_RGB(255,0,0))
+    # *** MOD: changed from C comand to python one.
     ShowImage( "result", img ) # TODO is this reqd if pygame renders?
     return img
 
+# *** MOD: wrote correspondant python command were C one was used instead.
 def main():
     if len(sys.argv) > 1:
 

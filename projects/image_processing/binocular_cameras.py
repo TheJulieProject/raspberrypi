@@ -2,8 +2,9 @@
 import cv
 from cv2 import *
 
-# Code from glowing python
-# Keep objects whsoe disparity is above the set threshold
+# Code from glowing python (glowingpython.blogspot.co.uk/2011/11/computing-disparity-map-in-opencv.html
+# will be marked as GP.
+# *** GP: Keep objects whose disparity is above the set threshold
 def cut(disparity, image, threshold):
  for i in range(0, image.height):
   for j in range(0, image.width):
@@ -19,13 +20,16 @@ camr = VideoCapture(1)
 # grab an image from the left camera
 s, image = caml.read()
 if s:
- imwrite('scene_l.bmp', image)
+	# *** USER: change name of file
+	imwrite('scene_l.bmp', image)
 
 # grab an image from the right camera
 s, image = camr.read()
 if s:
- imwrite('scene_r.bmp', image)
+	# *** USER: change name of file
+	imwrite('scene_r.bmp', image)
 
+# *** GP: from here until the end (except user line)
 # Load each image in grey
 left = cv.LoadImage('scene_l.bmp',cv.CV_LOAD_IMAGE_GRAYSCALE)
 right = cv.LoadImage('scene_r.bmp',cv.CV_LOAD_IMAGE_GRAYSCALE)
@@ -44,7 +48,7 @@ cv.ConvertScale(disparity_left,disp_left_visual,-16)
 # cutting the object farthest of a threshold
 cut(disp_left_visual,left,80)
 
-# Save image if you want to
+# *** USER: Save image if you want to
 cv.SaveImage("Binocular_vision.jpg", disp_left_visual)
 
 # Show result

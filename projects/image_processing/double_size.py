@@ -14,7 +14,8 @@ while True:
 	# Read an image adn save it
 	s, image = cam.read()
 	if s:
-	 imwrite('cam_image.jpg', image)
+		# *** USER: change the name of file
+		imwrite('cam_image.jpg', image)
 
 	# read the image
 	image = cv.LoadImageM('cam_image.jpg')
@@ -25,7 +26,7 @@ while True:
 	# Change the size of the image
 	cv.Resize(image, doubleimg)	
 
-	# Save the image if you want
+	# *** USER: Save the image if you want
 	cv.SaveImage("double_image.jpg",doubleimg)
 	
 	# Show images

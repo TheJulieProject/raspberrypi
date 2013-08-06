@@ -9,13 +9,14 @@ namedWindow("Edge detection", cv.CV_WINDOW_AUTOSIZE)
 # Set camera
 cam = VideoCapture(0)
 
-# Read from the camera
 while True:
+ # Read from the camera
  s, image = cam.read()
  if s:
-  imwrite('cam_image.jpg', image)
+	# *** USER: change name of file
+	imwrite('cam_image.jpg', image)
 
- # Code from stack overflow
+ # Code from stack overflow (# TODO: find the link)
  # Open the image
  image = cv.LoadImage('cam_image.jpg') 
 
@@ -30,7 +31,7 @@ while True:
  canny = cv.CreateImage(cv.GetSize(image),8,1)
  cv.Canny(gray,canny,50,200)
  
- # Save the image
+ # *** USER: Save the image
  cv.SaveImage("Canny.jpg", canny)
 
  # Show the images

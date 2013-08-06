@@ -17,16 +17,17 @@ while True:
 	acc_count = 0
 
 	# grab an image from the camera
-        s, image = cam.read()
-        if s:
-         imwrite('cam_image.jpg', image)
-
-        image = cv.LoadImage('cam_image.jpg')	
+    s, image = cam.read()
+    if s:
+		# *** USER: change name of file
+		imwrite('cam_image.jpg', image)
+		
+	image = cv.LoadImage('cam_image.jpg')	
 
 	for x in range(0, image.height):
   	  for y in range(0, image.width):
-    		# get the value of the current pixel
-    		blue, green, red = image[x, y]
+    	# get the value of the current pixel
+    	blue, green, red = image[x, y]
 
    		# check if the blue intensity is greater than the green
    		if blue > green and blue > red and blue > 128:
