@@ -267,12 +267,9 @@ static void camera_control_callback(MMAL_PORT_T *port, MMAL_BUFFER_HEADER_T *buf
  */
 static void encoder_buffer_callback(MMAL_PORT_T *port, MMAL_BUFFER_HEADER_T *buffer)
 {   
-	// MODIFICATION: OpenCV modifications
+	// *** MODIFICATION: OpenCV modifications
 	if(!executed)
 	{
-		// Indexs for loops.
-		int x, y;
-		
 		// Create an empty matrix with the size of the buffer.
 		CvMat* buf = cvCreateMat(1,buffer->length,CV_8UC1);
    
@@ -280,64 +277,11 @@ static void encoder_buffer_callback(MMAL_PORT_T *port, MMAL_BUFFER_HEADER_T *buf
 		buf->data.ptr = buffer->data;
    
 		// Decode the image and display it.
-		IplImage* image = cvDecodeImage(buf, CV_LOAD_IMAGE_COLOR);		
-		
-		// View for the final image
-		cvNamedWindow("Webcam feed", CV_WINDOW_AUTOSIZE);
-		
-		// x and y position accumulators
-		int acc_x = 0;
-		int acc_y = 0;
-
-		// number of pixels accumulated
-		int acc_count = 0;
-
-		// iterate over ever pixel in the image by iterating 
-		// over each row and column
-		for (y = 0; y < image->height; ++y)
-		{		
-			for(x = 0; x < image->width; ++x)
-			{
-				CvScalar s = cvGet2D(image, y, x);
-				
-				// Keep 3 color channels separated
-				int blue = s.val[0];
-				int green = s.val[1];
-				int red = s.val[2];
-				
-				// check if the intensities are near to white colour
-				if (blue > green && blue > red && blue > 128)      		 
-				{
-					// add x and y to accumulators
-					acc_x += x;
-					acc_y += y;
-					
-					// increment accumulated pixels count
-					acc_count += 1;
-					s.val[0] = s.val[1] = s.val[2] = 0;
-					cvSet2D(image,y,x,s);
-				} // if
-			} // for
-		} //for
-		
-		// check the count accumulator is greater than zero, to avoid dividing by zero
-		if (acc_count > 0)
-		{
-			// calculate the mean x and y positions
-			int mean_x = acc_x / acc_count;
-			int mean_y = acc_y / acc_count;
-
-			// draw a small cross in red at the mean position
-			CvScalar s = cvGet2D(image, mean_y, mean_x);
-			
-			s.val[2] = 255;
-			
-			cvSet2D(image,mean_y,mean_x,s);				
-		} // if
-
-		// display the image on the screen
-		cvShowImage("Webcam feed", image);
-		cvWaitKey(1);
+		IplImage* img = cvDecodeImage(buf, CV_LOAD_IMAGE_COLOR);
+   
+		cvNamedWindow("Camera feed", CV_WINDOW_AUTOSIZE);
+		cvShowImage("Camera feed", img);
+		cvWaitKey(1); 
    
 		executed = 1;
 	} // if
@@ -781,7 +725,7 @@ int main(int argc, const char **argv)
 
    signal(SIGINT, signal_handler);
 
-   default_status(&state);  
+   default_status(&state);     
    
    if (state.verbose)
    {
@@ -814,7 +758,7 @@ int main(int argc, const char **argv)
 
       if (state.verbose)
          fprintf(stderr, "Starting component connection stage\n");
-               
+         
       camera_preview_port = state.camera_component->output[MMAL_CAMERA_PREVIEW_PORT];
       camera_video_port   = state.camera_component->output[MMAL_CAMERA_VIDEO_PORT];
       camera_still_port   = state.camera_component->output[MMAL_CAMERA_CAPTURE_PORT];
@@ -884,13 +828,13 @@ int main(int argc, const char **argv)
          }         
          else
          {			 
-			 FILE *output_file = NULL;            
+			 FILE *output_file = NULL;
             
-            int frame = 0; 
+            int frame = 1; 
             
-            while(1==1)           
+            while(1==1)//*/ for (frame=1;frame<=num_iterations; frame++)           
             {
-				// Initialize variable
+				// Initialise variable
                 executed = 0;
                 
 				if (state.timelapse)

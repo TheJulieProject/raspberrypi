@@ -59,7 +59,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "bcm_host.h"
 #include "interface/vcos/vcos.h"
 
-//*** PR : ADDED for OpenCV
+// *** MODIFICATION: ADDED for OpenCV
 #include <cv.h>
 #include <highgui.h>
 
@@ -101,8 +101,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 int mmal_status_to_int(MMAL_STATUS_T status);
 
-// REDEFINE
-int potato;
+// Variable to prevent the OpenCV code to be executed twice.
+int executed;
 
 // Points of the octagon
 struct Point point1, point2, point3, point4, point5, point6, point7, point8;
@@ -210,6 +210,7 @@ static int encoding_xref_size = sizeof(encoding_xref) / sizeof(encoding_xref[0])
 // Initialise the octagon.
 static void octagon(IplImage* image)
 {
+	// Keep the measure of the smallest side of the image
 	int smallest; 
 	
 	// Calculate the smallest of the image parameters
@@ -227,7 +228,7 @@ static void octagon(IplImage* image)
 	// Calculate distance d from a corner to the centre of the square.
 	int d = (smallest / 2 - t) * sqrt(2);
 
-	// Set points as tuples and draw them as green circles.
+	// Set points coordinates and draw them as green circles.
 	point1.height = smallest-t-d + c;
 	point1.width = t;
 	point1.isActive = 0;	
@@ -297,21 +298,21 @@ static void active(int x, int y)
 static void bluePoint(IplImage* image)
 {
 	if (point1.isActive == 1)
-		cvCircle(image,cvPoint(point1.height, point1.width),radius,CV_RGB(255,0,0),1,8,0);
+		cvCircle(image,cvPoint(point1.height, point1.width),radius,CV_RGB(0,0,255),1,8,0);
 	if (point2.isActive == 1)
-		cvCircle(image,cvPoint(point2.height, point2.width),radius,CV_RGB(255,0,0),1,8,0);
+		cvCircle(image,cvPoint(point2.height, point2.width),radius,CV_RGB(0,0,255),1,8,0);
 	if (point3.isActive == 1)
-		cvCircle(image,cvPoint(point3.height, point3.width),radius,CV_RGB(255,0,0),1,8,0);
+		cvCircle(image,cvPoint(point3.height, point3.width),radius,CV_RGB(0,0,255),1,8,0);
 	if (point4.isActive == 1)
-		cvCircle(image,cvPoint(point4.height, point4.width),radius,CV_RGB(255,0,0),1,8,0);
+		cvCircle(image,cvPoint(point4.height, point4.width),radius,CV_RGB(0,0,255),1,8,0);
 	if (point5.isActive == 1)
-		cvCircle(image,cvPoint(point5.height, point5.width),radius,CV_RGB(255,0,0),1,8,0);
+		cvCircle(image,cvPoint(point5.height, point5.width),radius,CV_RGB(0,0,255),1,8,0);
 	if (point6.isActive == 1)
-		cvCircle(image,cvPoint(point6.height, point6.width),radius,CV_RGB(255,0,0),1,8,0);
+		cvCircle(image,cvPoint(point6.height, point6.width),radius,CV_RGB(0,0,255),1,8,0);
 	if (point7.isActive == 1)
-		cvCircle(image,cvPoint(point7.height, point7.width),radius,CV_RGB(255,0,0),1,8,0);
+		cvCircle(image,cvPoint(point7.height, point7.width),radius,CV_RGB(0,0,255),1,8,0);
 	if (point8.isActive == 1)
-		cvCircle(image,cvPoint(point8.height, point8.width),radius,CV_RGB(255,0,0),1,8,0);
+		cvCircle(image,cvPoint(point8.height, point8.width),radius,CV_RGB(0,0,255),1,8,0);
 } // bluePoint
 
 // Check which points are not activated and return the resulting direction
@@ -379,12 +380,13 @@ static void default_status(RASPISTILL_STATE *state)
       return;
    }
    
-   // *** PR: modified for demo purpose -> smaller image	
+   // *** MODIFICATION: modified for demo purpose -> smaller image	
    state->timeout = 1000;// 1s delay before take image
    state->width = 324;//2592;
    state->height = 243;//1944;
    state->quality = 25;
    state->wantRAW = 0;
+   // *** USER: change name of file
    state->filename = "cam_image.jpg";
    state->verbose = 0;
    state->thumbnailConfig.enable = 1;
@@ -440,10 +442,12 @@ static void camera_control_callback(MMAL_PORT_T *port, MMAL_BUFFER_HEADER_T *buf
  */
 static void encoder_buffer_callback(MMAL_PORT_T *port, MMAL_BUFFER_HEADER_T *buffer)
 {   
-	if(!potato)
-	{
+	// *** MODIFICATION: OpenCV modifications
+	if(!executed)
+	{		
+		// Indexs to iterate in the loop.
 		int x, y;
-		// MOD: OpenCV modifications
+		
 		// Create an empty matrix with the size of the buffer.
 		CvMat* buf = cvCreateMat(1,buffer->length,CV_8UC1);
    
@@ -465,14 +469,16 @@ static void encoder_buffer_callback(MMAL_PORT_T *port, MMAL_BUFFER_HEADER_T *buf
 		cvNamedWindow("Green channel", CV_WINDOW_AUTOSIZE);
 		cvNamedWindow("Blue channel", CV_WINDOW_AUTOSIZE);
 		
-		// Split image into channels and show them.
+		// Get size and depth of original image.
 		CvSize size = cvSize(image->width, image->height);
 		int depth = image -> depth;
 		
+		// Keep the 3 channels individually.
 		IplImage* red = cvCreateImage(size, depth, 1);
 		IplImage* green = cvCreateImage(size, depth, 1);
 		IplImage* blue = cvCreateImage(size, depth, 1);
 		
+		// Split image into channels and show them.
 		cvSplit(image,blue, green, red, NULL);
 		
 		cvShowImage("Red channel", red);
@@ -524,14 +530,14 @@ static void encoder_buffer_callback(MMAL_PORT_T *port, MMAL_BUFFER_HEADER_T *buf
 			} // for
 		} //for	
 
-		// Save image if you want
+		// *** USER: Save image if you want
 		//cvSaveImage("image_without_background.jpg", my_image)
 
 		// display the image on the screen
 		cvShowImage("Final output", image);
 		cvWaitKey(1);
    
-		potato = 1;
+		executed = 1;
 	} // if
 	
    int complete = 0;
@@ -973,15 +979,7 @@ int main(int argc, const char **argv)
 
    signal(SIGINT, signal_handler);
 
-   default_status(&state);   
-
-   // Do we have any parameters
-   /*if (argc == 1)
-   {
-      fprintf(stderr, "\%s Camera App %s\n\n", basename(argv[0]), VERSION_STRING);
-      
-      exit(0);
-   }*/
+   default_status(&state);  
    
    if (state.verbose)
    {
@@ -1013,10 +1011,9 @@ int main(int argc, const char **argv)
       PORT_USERDATA callback_data;
 
       if (state.verbose)
-         fprintf(stderr, "Starting component connection stage\n");
-         
-      //*** PR : remove preview
-      camera_preview_port = NULL;//state.camera_component->output[MMAL_CAMERA_PREVIEW_PORT];
+         fprintf(stderr, "Starting component connection stage\n");         
+      
+      camera_preview_port = state.camera_component->output[MMAL_CAMERA_PREVIEW_PORT];
       camera_video_port   = state.camera_component->output[MMAL_CAMERA_VIDEO_PORT];
       camera_still_port   = state.camera_component->output[MMAL_CAMERA_CAPTURE_PORT];
       preview_input_port  = state.preview_parameters.preview_component->input[0];
@@ -1031,7 +1028,7 @@ int main(int argc, const char **argv)
             fprintf(stderr, "Starting video preview\n");
          }
 
-         // *** PR: remove preview
+         // *** USER: remove preview
          // Connect camera to preview
          //status = connect_ports(camera_preview_port, preview_input_port, &state.preview_connection);
 
@@ -1085,16 +1082,14 @@ int main(int argc, const char **argv)
          }         
          else
          {			 
-			 FILE *output_file = NULL;
-            /*int num_iterations =  2;//state.timelapse ? state.timeout / state.timelapse : 1;
-            int frame; */
+			 FILE *output_file = NULL;            
             
             int frame = 0; 
             
-            while(1==1)//*/ for (frame=1;frame<=num_iterations; frame++)           
+            while(1==1)           
             {
-				// REDEFINE
-                potato = 0;
+				// Initialize
+                executed = 0;
                 
 				if (state.timelapse)
                   vcos_sleep(state.timelapse);
