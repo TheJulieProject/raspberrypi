@@ -1,3 +1,4 @@
+# Code from opencvpython.blogspot.co.uk/2012/07/background-extraction-using-running.html
 import cv2
 import numpy as np
 
@@ -20,7 +21,7 @@ while True:
 	res1 = cv2.convertScaleAbs(avg1)
 	res2 = cv2.convertScaleAbs(avg2)
 	
-	# Save the images
+	# *** USER: Save the images
 	cv2.imwrite("Phantom1.jpg", f)
 	cv2.imwrite("Phantom2.jpg", res1)
 	cv2.imwrite("Phantom3.jpg", res2)

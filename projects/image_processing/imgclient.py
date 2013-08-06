@@ -32,24 +32,20 @@ class MyClient(Client):
 
 def setRunning(value):
   global running
-  #print("Running changed to " + str(value))
   running = value
-  #print(str(running))
 
 client = MyClient()
 client.start(ip, port)
 
 while(True):
- if running:
-        #print "In the loop"
+ if running:        
  	try:
-		#Get all the image processing information
-		#print("Getting image stuff")
+		#Get all the image processing information		
   		command = moveRobot.move()
-		#print(command)
+  		
+  		# Split the command into right and left motors.
   		commandRight, commandLeft = command.split("_")
-		#print("Splitted")
-		#print commandRight, commandLeft
+		
   		if commandLeft == "1":
 			print "LEFT_UP"
 			client.send(LEFT_UP)
@@ -58,11 +54,7 @@ while(True):
 			client.send(LEFT_DOWN)
   		elif commandLeft == "0":
 			print "LEFT_OFF"
-			client.send(LEFT_OFF)
-  		"""elif commandLeft == "Do nothing":
-			#				
-  		else:
-			print "ERROR: Invalid image processing output to server" """
+			client.send(LEFT_OFF)  		
 
   		if commandRight == "1":
 			print "RIGHT_UP"
@@ -72,12 +64,7 @@ while(True):
 			client.send(RIGHT_DOWN)
   		elif commandRight == "0":
 			print "RIGHT_OFF"
-			client.send(RIGHT_OFF)
-  		"""elif commandRight == "Do nothing":
-		 #
-  		else:
-			print "ERROR: Invalid image processing output to server" """
-  
+			client.send(RIGHT_OFF)	  
     
   	except:
     	 print("Error")

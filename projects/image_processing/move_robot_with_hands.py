@@ -27,13 +27,14 @@ def move():
  # Take an image and save it
  s, image = cam.read()
  if s:
-  imwrite('cam_image.jpg', image)
+	# *** USER: change name of file
+	imwrite('cam_image.jpg', image)
 
  # Initialise hand points
  leftHand.isActive = False
  rightHand.isActive = False
 
- # Code from stack overflow
+ # Code from stack overflow (# TODO: find link)
  # Open the image
  image = cv.LoadImage('cam_image.jpg') 
 
@@ -140,5 +141,6 @@ def move():
  # Return the command
  return commandRight + "_" + commandLeft
 	
+# TEST: code for testing this program without the client.	
 #while True:
  #move()

@@ -33,7 +33,6 @@ cam= VideoCapture(0)
 namedWindow("Move robot with blob", cv.CV_WINDOW_AUTOSIZE)
 
 while True:
-
 	# x and y position accumulators
 	acc_x = 0
 	acc_y = 0
@@ -48,14 +47,15 @@ while True:
 	# grab an image from the camera
 	s, image = cam.read()
 	if s:
-	 imwrite('cam_image.jpg', image)
+		# *** USER: change the name of the file
+		imwrite('cam_image.jpg', image)
 
 	image = cv.LoadImage('cam_image.jpg')	
 	
 	for x in range(0, image.height):
 	 for y in range(0, image.width):
-    		# get the value of the current pixel
-    		blue, green, red = image[x, y]
+    	# get the value of the current pixel
+    	blue, green, red = image[x, y]
 
    		# check if the blue intensity is greater than the green
    		if blue > green and blue > red and blue > 180 and green > 60:

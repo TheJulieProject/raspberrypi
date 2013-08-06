@@ -1,7 +1,6 @@
 #!/usr/bin/env python
 import cv
 from cv2 import *
-import numpy as np
 
 class Point:
  def __init__(self, requiredheight, requiredwidth, requiredactive):
@@ -19,13 +18,14 @@ rightHand = Point(0,0,False)
 while True:
  s, image = cam.read()
  if s:
-  imwrite('cam_image.jpg', image)
+	# *** USER: change filename
+	imwrite('cam_image.jpg', image)
 
  # Initialise
  leftHand.isActive = False
  rightHand.isActive = False
 
- # Code from stack overflow
+ # Code from stack overflow (# TODO: find link)
  # Open the image
  image = cv.LoadImage('cam_image.jpg') 
 
