@@ -37,7 +37,7 @@ class MyPhone(Phone):
 
 	def changeLed(self, pfd, led):
 		''' Turn LED's on and off '''
-		for i in range(0, 7):
+		for i in range(0, 8):
 			if i == led:
 				pfd.leds[i].turn_on()
 			else:
