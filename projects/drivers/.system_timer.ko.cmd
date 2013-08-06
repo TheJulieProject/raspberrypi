@@ -1,0 +1,1 @@
+cmd_/home/radu/Repos/raspberrypi/projects/drivers/system_timer.ko := ld -EL -r  -T /usr/src/linux-headers-3.6-trunk-common/scripts/module-common.lds --build-id  -o /home/radu/Repos/raspberrypi/projects/drivers/system_timer.ko /home/radu/Repos/raspberrypi/projects/drivers/system_timer.o /home/radu/Repos/raspberrypi/projects/drivers/system_timer.mod.o
