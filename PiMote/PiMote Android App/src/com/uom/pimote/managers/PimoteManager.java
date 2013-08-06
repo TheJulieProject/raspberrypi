@@ -1,6 +1,7 @@
 package com.uom.pimote.managers;
 
 import android.content.Context;
+import android.content.pm.ActivityInfo;
 import android.util.Log;
 
 import com.uom.pimote.Communicator;
@@ -25,11 +26,13 @@ public class PimoteManager {
 
 
     // Constructor (takes tcp client)
-    public PimoteManager(TCPClient tcp, Context c) {
+    public PimoteManager(TCPClient tcp, Context c, int orientation) {
         this.tcp = tcp;
         threads = new ArrayList<RecurringInfo>();
         streams = new ArrayList<MjpegStreamManager>();
         this.c = c;
+        int orient = orientation == 0 ? ActivityInfo.SCREEN_ORIENTATION_PORTRAIT : ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE;
+        ((Communicator) c).setRequestedOrientation(orient);
     }
 
     // Called when a message is received. Overridden by manager

@@ -58,11 +58,17 @@ class Phone():
 
   controltype = 0                                         #Type of phone
 
-  sensorvalue = 0                                         #Accellerometer. 0 = off, 1 = normal, 2 = game
+  orientation = 0
+  ORIENTATION_PORTRAIT = 0
+  ORIENTATION_LANDSCAPE = 1
+
+  sensorvalue = 0                                         #Accellerometer. 0 = off, 1 = normal, 2 = game, 3 = slow
   SENSOR_NORMAL = 1
   SENSOR_GAME = 2
+  SENSOR_SLOW = 3
   sensorX = 0
   sensorY = 0
+  sensorZ = 0
 
   #More protocol variables for component setup
   CLEAR_ALL = 0
@@ -97,7 +103,7 @@ class Phone():
     ''' Sends all setup information to the phone '''
     self.socket = socket
     self.server = server
-    socket.send(str(Phone.SET_CONTROL_TYPE)+","+str(self.controltype)+","+self.name+","+str(socket.id)+","+str(self.sensorvalue))
+    socket.send(str(Phone.SET_CONTROL_TYPE)+","+str(self.controltype)+","+self.name+","+str(socket.id)+","+str(self.sensorvalue)+","+str(self.orientation))
     for c in self.components:
       c.setup(socket, server) #setup each component
 
@@ -106,6 +112,9 @@ class Phone():
 
   def getSensorValues(self):
     return [self.sensorX, self.sensorY]
+
+  def setOrientation(self, value):
+    self.orientation = value
 
   def updateButtons(self, id, message, server):
     ''' Update button state if necessary '''
@@ -118,12 +127,14 @@ class Phone():
           c.value = False
 
   def updateSensors(self, message):
-    (x, sep, y) = message.strip().partition(",")
+    (x, sep, yz) = message.strip().partition(",")
     self.sensorX = x
+    (y, sep, z) = yz.strip().partition(",")
     self.sensorY = y
-    self.sensorUpdate(self.sensorX, self.sensorY)
+    self.sensorZ = z
+    self.sensorUpdate(float(self.sensorX), float(self.sensorY), float(self.sensorZ))
 
-  def sensorUpdate(self, x, y):
+  def sensorUpdate(self, x, y, z):
     pass
 
   def clearComponents(self):

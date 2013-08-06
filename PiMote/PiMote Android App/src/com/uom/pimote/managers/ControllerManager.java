@@ -24,8 +24,8 @@ public class ControllerManager extends PimoteManager {
     final TextView ultrasonic;
     final TextView battery;
 
-    public ControllerManager(final Context c, final TCPClient tcp, String ip, int videoV, int voiceV, int recurringV, int sleepTime) {
-        super(tcp, c);
+    public ControllerManager(final Context c, final TCPClient tcp, String ip, int videoV, int voiceV, int recurringV, int sleepTime, int orientation) {
+        super(tcp, c, orientation);
         ((Communicator)c).getActionBar().hide();
         ((Communicator)c).setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         ((Communicator)c).setContentView(R.layout.controllayout);

@@ -1,7 +1,6 @@
 package com.uom.pimote.managers;
 
 import android.content.Context;
-import android.content.pm.ActivityInfo;
 import android.text.Html;
 import android.util.Log;
 import android.view.View;
@@ -41,15 +40,15 @@ public class RegularButtonManager extends PimoteManager {
     int viewPosition; // Current position
 
     // Constructor. Sets up variables and action bar
-    public RegularButtonManager(Context c, TCPClient tcp, String ip, String name, int id, int sensors) {
-        super(tcp, c);
+    public RegularButtonManager(Context c, TCPClient tcp, String ip, String name, int id, int sensors, int orientation) {
+        super(tcp, c, orientation);
         this.c = c;
         this.tcp = tcp;
         this.ip = ip;
         this.viewPosition = 0;
+
         ((Communicator) c).getActionBar().show();
         ((Communicator) c).getActionBar().setTitle(name + "(" + id + ")");
-        ((Communicator) c).setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         ((Communicator) c).setContentView(R.layout.activity_main);
         this.layout = (LinearLayout) ((Communicator) c).findViewById(R.id.mainlayout);
         threads = new ArrayList<RecurringInfo>();

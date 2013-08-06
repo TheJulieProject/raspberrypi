@@ -12,6 +12,7 @@ import android.hardware.SensorManager;
 public class SensorManagement implements SensorEventListener {
     float sensorX;
     float sensorY;
+    float sensorZ;
     SensorManager mSensorManager;
     Sensor mAccelerometer;
     int speed;
@@ -21,7 +22,11 @@ public class SensorManagement implements SensorEventListener {
         this.tcp = tcp;
         mSensorManager = (SensorManager) c.getSystemService(c.SENSOR_SERVICE);
         mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        speed = speedValue == 1 ? SensorManager.SENSOR_DELAY_NORMAL : SensorManager.SENSOR_DELAY_GAME;
+        switch(speedValue){
+            case 1: speed = SensorManager.SENSOR_DELAY_NORMAL; break;
+            case 2: speed = SensorManager.SENSOR_DELAY_GAME; break;
+            case 3: speed = SensorManager.SENSOR_DELAY_UI; break;
+        }
         mSensorManager.registerListener(this, mAccelerometer, speed);
     }
 
@@ -41,12 +46,13 @@ public class SensorManagement implements SensorEventListener {
             return;
         sensorX = event.values[0];
         sensorY = event.values[1];
-        tcp.sendMessage(Communicator.SEND_DATA + "," + "8827," + sensorX + "," + sensorY);
+        sensorZ = event.values[2];
+        tcp.sendMessage(Communicator.SEND_DATA + "," + "8827," + sensorX + "," + sensorY+","+sensorZ);
 
     }
 
     public float[] getValues() {
-        float[] values = {sensorX, sensorY};
+        float[] values = {sensorX, sensorY, sensorZ};
         return values;
     }
 }

@@ -36,8 +36,8 @@ class MyPhone(Phone):
 			o4.setText("<font color=#CC0000><b>Progress Bar</b></font>: <b>"+str(i)+"</b>%")
 		elif id == vi.getId():
 			o5.setText("<font color=#CC0000><b>Voice Input</b></font>: '" + message + "'")
-	def sensorUpdate(self, x, y):
-		print("X: "+str(x)+", Y: "+str(y))
+	def sensorUpdate(self, x, y, z):
+		print("X: " + str(x)+", Y: " + str(y) + ", Z: " + str(z))
 
 # Create the phone object
 thisphone = MyPhone()
@@ -86,7 +86,8 @@ thisphone.add(vi)
 #thisphone.add(o7)
 #thisphone.add(v)
 
-thisphone.setSensor(Phone.SENSOR_NORMAL)
+thisphone.setSensor(Phone.SENSOR_SLOW)
+thisphone.setOrientation(Phone.ORIENTATION_LANDSCAPE)
 
 #Create the server
 myserver = PhoneServer()
