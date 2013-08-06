@@ -59,7 +59,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "bcm_host.h"
 #include "interface/vcos/vcos.h"
 
-//*** PR : ADDED for OpenCV
+// *** MODIFICATION: ADDED for OpenCV
 #include <cv.h>
 #include <highgui.h>
 
@@ -99,8 +99,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 int mmal_status_to_int(MMAL_STATUS_T status);
 
-// REDEFINE
-int potato;
+// *** MODIFCATION: got from python version
+// Variable to prevent the OpenCV code to be executed twice.
+int executed;
 
 // Global Variables and Settings
 CvHaarClassifierCascade* cascade = NULL;
@@ -155,17 +156,13 @@ static void detect_and_draw(IplImage* img )
     // draw a box with opencv on the image around the detected faces.
     CvSeq* faces = detectObject(img);
     if (faces != NULL)
-    {
-        //for (x,y,w,h),n in faces
+    {       
         int index;
         CvRect* face;
         int x, y, w,h;
         for(index = 0; index < faces-> total; index++)
         {
 			face = (CvRect*)cvGetSeqElem((CvSeq*)faces, index);
-			
-			// TEST
-			//fprintf(stdout, "Face %s \n", face);
 			
 			// Get values from sequence.
 			x = face->x;//(int)cvGetSeqElem((CvSeq*)face, 0);
@@ -285,12 +282,13 @@ static void default_status(RASPISTILL_STATE *state)
       return;
    }
    
-   // *** PR: modified for demo purpose -> smaller image	
+   // *** MODIFICATION: modified for demo purpose -> smaller image	
    state->timeout = 1000;// 1s delay before take image
    state->width = 324;//2592;
    state->height = 243;//1944;
    state->quality = 25;
    state->wantRAW = 0;
+   // *** USER: change the name of the file.
    state->filename = "cam_image.jpg";
    state->verbose = 0;
    state->thumbnailConfig.enable = 1;
@@ -346,9 +344,9 @@ static void camera_control_callback(MMAL_PORT_T *port, MMAL_BUFFER_HEADER_T *buf
  */
 static void encoder_buffer_callback(MMAL_PORT_T *port, MMAL_BUFFER_HEADER_T *buffer)
 {   
-	if(!potato)
-	{
-		// MOD: OpenCV modifications
+	// *** MODIFICATION: OpenCV modifications
+	if(!executed)
+	{		
 		// Create an empty matrix with the size of the buffer.
 		CvMat* buf = cvCreateMat(1,buffer->length,CV_8UC1);
    
@@ -360,6 +358,7 @@ static void encoder_buffer_callback(MMAL_PORT_T *port, MMAL_BUFFER_HEADER_T *buf
 
 		cvNamedWindow( "result", 1 );
 		
+		// Initialize variables
 		storage = cvCreateMemStorage(0);
 		mat = cvCreateMat(20,20, CV_32FC1);
 		min_size = cvGetSize(mat);
@@ -371,7 +370,6 @@ static void encoder_buffer_callback(MMAL_PORT_T *port, MMAL_BUFFER_HEADER_T *buf
 		
 		IplImage* frame_copy = NULL;
 			
-		//IplImage* frame = cvQueryFrame( image );		
 		if(frame_copy == NULL )
 			frame_copy = cvCreateImage( cvGetSize(frame),
 										IPL_DEPTH_8U, frame->nChannels);
@@ -386,7 +384,7 @@ static void encoder_buffer_callback(MMAL_PORT_T *port, MMAL_BUFFER_HEADER_T *buf
 
 		cvWaitKey(1);
 		 
-		potato = 1;
+		executed = 1;
 	} // if
 	
    int complete = 0;
@@ -828,15 +826,7 @@ int main(int argc, const char **argv)
 
    signal(SIGINT, signal_handler);
 
-   default_status(&state);   
-
-   // Do we have any parameters
-   /*if (argc == 1)
-   {
-      fprintf(stderr, "\%s Camera App %s\n\n", basename(argv[0]), VERSION_STRING);
-      
-      exit(0);
-   }*/
+   default_status(&state);  
    
    if (state.verbose)
    {
@@ -870,8 +860,7 @@ int main(int argc, const char **argv)
       if (state.verbose)
          fprintf(stderr, "Starting component connection stage\n");
          
-      //*** PR : remove preview
-      camera_preview_port = NULL;//state.camera_component->output[MMAL_CAMERA_PREVIEW_PORT];
+      camera_preview_port = state.camera_component->output[MMAL_CAMERA_PREVIEW_PORT];
       camera_video_port   = state.camera_component->output[MMAL_CAMERA_VIDEO_PORT];
       camera_still_port   = state.camera_component->output[MMAL_CAMERA_CAPTURE_PORT];
       preview_input_port  = state.preview_parameters.preview_component->input[0];
@@ -886,7 +875,7 @@ int main(int argc, const char **argv)
             fprintf(stderr, "Starting video preview\n");
          }
 
-         // *** PR: remove preview
+         // *** USER: remove preview
          // Connect camera to preview
          //status = connect_ports(camera_preview_port, preview_input_port, &state.preview_connection);
 
@@ -941,15 +930,13 @@ int main(int argc, const char **argv)
          else
          {			 
 			 FILE *output_file = NULL;
-            /*int num_iterations =  2;//state.timelapse ? state.timeout / state.timelapse : 1;
-            int frame; */
-            
+			 
             int frame = 0; 
             
-            while(1==1)//*/ for (frame=1;frame<=num_iterations; frame++)           
+            while(1==1)           
             {
-				// REDEFINE
-                potato = 0;
+				// *** MODIFICATION: Set OpenCV code as not executed.
+                executed = 0;
                 
 				if (state.timelapse)
                   vcos_sleep(state.timelapse);

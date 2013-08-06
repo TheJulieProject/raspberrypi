@@ -59,7 +59,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "bcm_host.h"
 #include "interface/vcos/vcos.h"
 
-//*** PR : ADDED for OpenCV
+// *** MODIFICATION: ADDED for OpenCV
 #include <cv.h>
 #include <highgui.h>
 
@@ -99,8 +99,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 int mmal_status_to_int(MMAL_STATUS_T status);
 
-// REDEFINE
-int potato;
+// *** MODIFICATION: Variable to prevent the OpenCV code to be executed twice.
+int executed;
 
 /** Structure containing all state information for the current run
  */
@@ -204,13 +204,14 @@ static void default_status(RASPISTILL_STATE *state)
       vcos_assert(0);
       return;
    }
-   
-   // *** PR: modified for demo purpose -> smaller image	
+   	
    state->timeout = 1000;// 1s delay before take image
+   // *** MODIFICATION: modified for demo purpose -> smaller image
    state->width = 324;//2592;
    state->height = 243;//1944;
    state->quality = 25;
    state->wantRAW = 0;
+   // *** USER: change the name of the file.
    state->filename = "cam_image.jpg";
    state->verbose = 0;
    state->thumbnailConfig.enable = 1;
@@ -266,10 +267,12 @@ static void camera_control_callback(MMAL_PORT_T *port, MMAL_BUFFER_HEADER_T *buf
  */
 static void encoder_buffer_callback(MMAL_PORT_T *port, MMAL_BUFFER_HEADER_T *buffer)
 {   
-	if(!potato)
+	// *** MODIFICATION: OpenCV modifications
+	if(!executed)
 	{
+		// Keep indexs for loops.
 		int x, y;
-		// MOD: OpenCV modifications
+		
 		// Create an empty matrix with the size of the buffer.
 		CvMat* buf = cvCreateMat(1,buffer->length,CV_8UC1);
    
@@ -298,10 +301,12 @@ static void encoder_buffer_callback(MMAL_PORT_T *port, MMAL_BUFFER_HEADER_T *buf
 				CvScalar s = cvGet2D(image, y, x);
 				CvScalar t = cvGet2D(prevImage, y,x);
 				
+				// Color channels of the current image.
 				int blue = s.val[0];
 				int green = s.val[1];
 				int red = s.val[2];
 				
+				// Color channels of the previously taken image
 				int prevBlue = t.val[0];
 				int prevGreen = t.val[1];
 				int prevRed = t.val[2];
@@ -329,7 +334,7 @@ static void encoder_buffer_callback(MMAL_PORT_T *port, MMAL_BUFFER_HEADER_T *buf
 		// Update previous image
 		cvSaveImage("motion1.jpg",image,0);
    
-		potato = 1;
+		executed = 1;
 	} // if
 	
    int complete = 0;
@@ -771,16 +776,8 @@ int main(int argc, const char **argv)
 
    signal(SIGINT, signal_handler);
 
-   default_status(&state);   
-
-   // Do we have any parameters
-   /*if (argc == 1)
-   {
-      fprintf(stderr, "\%s Camera App %s\n\n", basename(argv[0]), VERSION_STRING);
+   default_status(&state); 
       
-      exit(0);
-   }*/
-   
    if (state.verbose)
    {
       fprintf(stderr, "\n%s Camera App %s\n\n", basename(argv[0]), VERSION_STRING);      
@@ -813,8 +810,7 @@ int main(int argc, const char **argv)
       if (state.verbose)
          fprintf(stderr, "Starting component connection stage\n");
          
-      //*** PR : remove preview
-      camera_preview_port = NULL;//state.camera_component->output[MMAL_CAMERA_PREVIEW_PORT];
+      camera_preview_port = state.camera_component->output[MMAL_CAMERA_PREVIEW_PORT];
       camera_video_port   = state.camera_component->output[MMAL_CAMERA_VIDEO_PORT];
       camera_still_port   = state.camera_component->output[MMAL_CAMERA_CAPTURE_PORT];
       preview_input_port  = state.preview_parameters.preview_component->input[0];
@@ -829,7 +825,7 @@ int main(int argc, const char **argv)
             fprintf(stderr, "Starting video preview\n");
          }
 
-         // *** PR: remove preview
+         // *** USER: remove preview
          // Connect camera to preview
          //status = connect_ports(camera_preview_port, preview_input_port, &state.preview_connection);
 
@@ -884,15 +880,13 @@ int main(int argc, const char **argv)
          else
          {			 
 			 FILE *output_file = NULL;
-            /*int num_iterations =  2;//state.timelapse ? state.timeout / state.timelapse : 1;
-            int frame; */
             
             int frame = 0; 
             
-            while(1==1)//*/ for (frame=1;frame<=num_iterations; frame++)           
+            while(1==1)           
             {
-				// REDEFINE
-                potato = 0;
+				// *** MODIFICATION: Set OpenCV code as not executed.
+                executed = 0;
                 
 				if (state.timelapse)
                   vcos_sleep(state.timelapse);

@@ -59,7 +59,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "bcm_host.h"
 #include "interface/vcos/vcos.h"
 
-// MOD: ADDED for OpenCV
+// *** MODIFICATION: ADDED for OpenCV
 #include <cv.h>
 #include <highgui.h>
 
@@ -99,9 +99,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 int mmal_status_to_int(MMAL_STATUS_T status);
 
-// REDEFINE
-int potato;
+// *** MODIFICATION: OpenCV variables and structures
+// Variable to prevent the OpenCV code to be executed twice.
+int executed;
 
+// Keep indexes for loops.
 int x,y;
 
 // Structure to represent a point.
@@ -129,6 +131,7 @@ struct Point rightHand = {
 	.currentState = 0, 
 	.previousState = 0
 };
+// *** MODIFICATION ENDS
 
 /** Structure containing all state information for the current run
  */
@@ -233,12 +236,13 @@ static void default_status(RASPISTILL_STATE *state)
       return;
    }
    
-   // *** PR: modified for demo purpose -> smaller image	
    state->timeout = 1000;// 1s delay before take image
+   // *** MODIFICATION: modified for demo purpose -> smaller image	
    state->width = 324;//2592;
    state->height = 243;//1944;
    state->quality = 25;
    state->wantRAW = 0;
+   // *** USER: change name of file.
    state->filename = "cam_image.jpg";
    state->verbose = 0;
    state->thumbnailConfig.enable = 1;
@@ -294,9 +298,9 @@ static void camera_control_callback(MMAL_PORT_T *port, MMAL_BUFFER_HEADER_T *buf
  */
 static void encoder_buffer_callback(MMAL_PORT_T *port, MMAL_BUFFER_HEADER_T *buffer)
 {   
-	if(!potato)
-	{
-		// MOD: OpenCV modifications
+	// *** MODIFICATION: OpenCV modifications
+	if(!executed)
+	{		
 		// Create an empty matrix with the size of the buffer.
 		CvMat* buf = cvCreateMat(1,buffer->length,CV_8UC1);
    
@@ -306,12 +310,9 @@ static void encoder_buffer_callback(MMAL_PORT_T *port, MMAL_BUFFER_HEADER_T *buf
 		// Decode the image and display it.
 		IplImage* image = cvDecodeImage(buf, CV_LOAD_IMAGE_COLOR);
 		
-		IplImage* yuv = cvCreateImage(cvGetSize(image),8,3);
-	
-		// convert to grey
-		IplImage* gray = cvCreateImage(cvGetSize(image),8,1);
-		cvCvtColor(image,yuv, CV_BGR2YCrCb);
-		cvSplit(yuv,gray, NULL,NULL,NULL);
+		// Load image in graysclae
+		
+		IplImage* gray = cvDecodeImage(buf, CV_LOAD_IMAGE_GRAYSCALE);
 
 		// Use canny algorithm for edge detection
 		IplImage* canny = cvCreateImage(cvGetSize(image),8,1);
@@ -447,14 +448,18 @@ static void encoder_buffer_callback(MMAL_PORT_T *port, MMAL_BUFFER_HEADER_T *buf
 		cvShowImage("Robot movement", canny);
 		cvWaitKey(1);
 		
+		// *** TODO: Implement with client
 		// Return the command
 		//return commandRight + "_" + commandLeft;
 		
-		// TEST
+		// *** TEST: while client is not working, so it is possible to check
+		// if the program works.
 		fprintf(stdout, "%s %s \n", commandRight, commandLeft);
 		fflush(stdout);
    
-		potato = 1;
+		// Set this code as already executed so it is not runned again until
+		// another iteration in the main method has started.
+		executed = 1;
 	} // if
 	
    int complete = 0;
@@ -896,15 +901,7 @@ int main(int argc, const char **argv)
 
    signal(SIGINT, signal_handler);
 
-   default_status(&state);   
-
-   // Do we have any parameters
-   /*if (argc == 1)
-   {
-      fprintf(stderr, "\%s Camera App %s\n\n", basename(argv[0]), VERSION_STRING);
-      
-      exit(0);
-   }*/
+   default_status(&state); 
    
    if (state.verbose)
    {
@@ -938,8 +935,7 @@ int main(int argc, const char **argv)
       if (state.verbose)
          fprintf(stderr, "Starting component connection stage\n");
          
-      // MOD: remove preview
-      camera_preview_port = NULL;//state.camera_component->output[MMAL_CAMERA_PREVIEW_PORT];
+      camera_preview_port = state.camera_component->output[MMAL_CAMERA_PREVIEW_PORT];
       camera_video_port   = state.camera_component->output[MMAL_CAMERA_VIDEO_PORT];
       camera_still_port   = state.camera_component->output[MMAL_CAMERA_CAPTURE_PORT];
       preview_input_port  = state.preview_parameters.preview_component->input[0];
@@ -954,7 +950,7 @@ int main(int argc, const char **argv)
             fprintf(stderr, "Starting video preview\n");
          }
 
-         // *** PR: remove preview
+         // *** USER: remove preview
          // Connect camera to preview
          //status = connect_ports(camera_preview_port, preview_input_port, &state.preview_connection);
 
@@ -1009,15 +1005,13 @@ int main(int argc, const char **argv)
          else
          {			 
 			 FILE *output_file = NULL;
-            /*int num_iterations =  2;//state.timelapse ? state.timeout / state.timelapse : 1;
-            int frame; */
             
             int frame = 0; 
             
-            while(1==1)//*/ for (frame=1;frame<=num_iterations; frame++)           
+            while(1==1)
             {
-				// REDEFINE
-                potato = 0;
+				// *** MODIFICATION: Initialize variable.
+                executed = 0;
                 
 				if (state.timelapse)
                   vcos_sleep(state.timelapse);
