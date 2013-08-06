@@ -1,6 +1,6 @@
 """
 An example application using pimote
-To run: python testprogram.py
+To run: python lights.py
   this will run it on ip=0.0.0.0 port=8090
 
 """
@@ -15,6 +15,9 @@ pfd = p.PiFaceDigital()
 class MyPhone(Phone):
 	global pfd
 	def sensorUpdate(self, x, y, z):
+		''' Called whenever there is a change in the accelerometer data
+			Accelerometer values are between -10 and 10 (ish. They pick up the acceleration due to gravity 9.81ms)
+		'''
 		if y < -8:
 			self.changeLed(pfd, 7)
 		elif y > -8 and y < -6:
@@ -33,6 +36,7 @@ class MyPhone(Phone):
 			self.changeLed(pfd, 0)
 
 	def changeLed(self, pfd, led):
+		''' Turn LED's on and off '''
 		for i in range(0, 7):
 			if i == led:
 				pfd.leds[i].turn_on()
@@ -46,7 +50,7 @@ title = OutputText("<b>Tilt the phone to make different lights glow!</b>")
 
 #Add the buttons to the phone
 thisphone.add(title)
-
+# Tell the phone to take sensor readings, slow
 thisphone.setSensor(Phone.SENSOR_SLOW)
 thisphone.setOrientation(Phone.ORIENTATION_LANDSCAPE)
 
