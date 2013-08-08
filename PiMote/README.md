@@ -4,6 +4,12 @@ Raspberry Pi projects
 PiMote (Work in progress)
 Still to come: Grid Layout, More sensor readings, Images, Landscape/Portrait option
 
+
+NOTE:
+ACCELEROMETER IS STILL EXPERIMENTAL
+NOT MUCH VALIDATION ADDED YET SO THERE ARE LOTS OF POTENTIAL ERRORS
+
+
 How to install
 
     git clone https://www.github.com/radujipa/raspberrypi

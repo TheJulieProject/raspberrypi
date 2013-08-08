@@ -186,7 +186,6 @@ public class Communicator extends Activity {
         protected void onProgressUpdate(String... values) {
             super.onProgressUpdate(values);
             final String[] info = values[0].split(",");
-            Log.d("pi", info[0]);
 
             switch (Integer.parseInt(info[0])) {
                 case REQUEST_PASSWORD: { // Server asking for password

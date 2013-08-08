@@ -23,8 +23,9 @@ class MyPhone(Phone):
 		#########----------------------------------------------###########
 		if id == b1.getId():
 			self.buttonPress+=1
-			values = self.getSensorValues()
-			o1.setText("X:"+str(values[0])+", Y:"+values[1])
+			self.clearComponents()
+			self.add(b4)
+			self.updateDisplay()
 			#o1.setText("<font color=#CC0000><b>Regular Button</b></font>: you have pressed it " + str(self.buttonPress) + " times")
 		elif id == b2.getId():
 			o2.setText("<font color=#CC0000><b>Toggle Button</b></font>: " + message)
@@ -36,12 +37,16 @@ class MyPhone(Phone):
 			o4.setText("<font color=#CC0000><b>Progress Bar</b></font>: <b>"+str(i)+"</b>%")
 		elif id == vi.getId():
 			o5.setText("<font color=#CC0000><b>Voice Input</b></font>: '" + message + "'")
-	def sensorUpdate(self, x, y, z):
-		print("X: " + str(x)+", Y: " + str(y) + ", Z: " + str(z))
+		elif id == b4.getId():
+			print "pressed"
+			self.clearComponents()
+			setup()
+			self.updateDisplay()
 
 # Create the phone object
 thisphone = MyPhone()
 thisphone.setTitle("Example PiMote App")
+
 p = ProgressBar(100)
 b1 = Button("Get Readings") #Regular button
 b2 = ToggleButton("This is a toggle button", True) #Toggle
@@ -62,31 +67,36 @@ vi = VoiceInput() #Voice input
 s = Spacer(100)
 r = RecurringInfo(2000)
 
-#Add the buttons to the phone
-thisphone.add(title)
-thisphone.add(o)
-thisphone.add(s)
-thisphone.add(o1)
-thisphone.add(b1)
-thisphone.add(s)
-thisphone.add(o2)
-thisphone.add(b2)
-thisphone.add(s)
-thisphone.add(o3)
-thisphone.add(b3)
-thisphone.add(s)
-thisphone.add(o4)
-thisphone.add(p)
-thisphone.add(r)
-thisphone.add(o6)
-thisphone.add(s)
-thisphone.add(o5)
-thisphone.add(vi)
-#thisphone.add(s)
-#thisphone.add(o7)
-#thisphone.add(v)
+b4 = Button("RePopulate")
 
-thisphone.setSensor(Phone.SENSOR_SLOW)
+def setup():
+	#Add the buttons to the phone
+	thisphone.add(title)
+	thisphone.add(o)
+	thisphone.add(s)
+	thisphone.add(o1)
+	thisphone.add(b1)
+	thisphone.add(s)
+	thisphone.add(o2)
+	thisphone.add(b2)
+	thisphone.add(s)
+	thisphone.add(o3)
+	thisphone.add(b3)
+	thisphone.add(s)
+	thisphone.add(o4)
+	thisphone.add(p)
+	thisphone.add(r)
+	thisphone.add(o6)
+	thisphone.add(s)
+	thisphone.add(o5)
+	thisphone.add(vi)
+	#thisphone.add(s)
+	#thisphone.add(o7)
+	#thisphone.add(v)
+
+setup()
+
+#thisphone.setSensor(Phone.SENSOR_SLOW)
 thisphone.setOrientation(Phone.ORIENTATION_LANDSCAPE)
 
 #Create the server

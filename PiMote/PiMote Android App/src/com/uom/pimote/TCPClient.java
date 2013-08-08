@@ -79,7 +79,6 @@ public class TCPClient {
                 // server
                 while (mRun) {
                     try {
-                        Log.d("pi", "Run");
                         if (!mRun) throw new Exception();
                         serverMessage = in.readLine();
                         if (serverMessage == null)

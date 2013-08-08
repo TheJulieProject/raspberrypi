@@ -71,8 +71,7 @@ public class RegularButtonManager extends PimoteManager {
             case REQUEST_OUTPUT_CHANGE:
                 if (Integer.parseInt(message[1]) == TEXT_OUTPUT) {
                     TextView output = getTextView(Integer.parseInt(message[2]));
-                    Log.d("SETUP", message[3]);
-                    String out = message[3].replace("%/", ",");
+                    String out = addIllegalChars(message[3]);
                     output.setText(Html.fromHtml(out));
                 } else if (Integer.parseInt(message[1]) == PROGRESS_BAR) {
                     ProgressBar bar = getProgressBar(Integer.parseInt(message[2]));
@@ -91,7 +90,9 @@ public class RegularButtonManager extends PimoteManager {
             case CLEAR_ALL:
                 Log.e("SETUP", "Clearing");
                 layout.removeAllViews();
+                viewPosition = 0;
                 stopAllThreads();
+                deleteThreads();
                 break;
             case BUTTON:
                 addNewButton(setup);
@@ -127,10 +128,14 @@ public class RegularButtonManager extends PimoteManager {
         }
     }
 
+    public String addIllegalChars(String string){
+        return string.replace("%/", ",");
+    }
+
     // Adds a new button to the screen
     public void addNewButton(final String[] setup) {
         Button button = new Button(c);
-        button.setText(setup[2]);
+        button.setText(addIllegalChars(setup[2]));
         button.setOnClickListener(new OnClickListener() {
             public void onClick(View v) {
                 if (tcp != null)
@@ -151,7 +156,7 @@ public class RegularButtonManager extends PimoteManager {
         params.setMargins(0, 10, 0, 10);
         textButtonLayout.setLayoutParams(params);
         final EditText addText = new EditText(c);
-        addText.setHint(setup[2]);
+        addText.setHint(addIllegalChars(setup[2]));
         LayoutParams params2 = new TableRow.LayoutParams(0,
                 LayoutParams.WRAP_CONTENT, 1f);
         addText.setLayoutParams(params2);
@@ -182,7 +187,7 @@ public class RegularButtonManager extends PimoteManager {
         textButtonLayout.setLayoutParams(params);
         TextView text = new TextView(c);
         text.setTextSize(16);
-        text.setText(setup[2]);
+        text.setText(addIllegalChars(setup[2]));
         LayoutParams params2 = new TableRow.LayoutParams(0,
                 LayoutParams.WRAP_CONTENT, 1f);
         text.setLayoutParams(params2);
@@ -211,7 +216,7 @@ public class RegularButtonManager extends PimoteManager {
         text.setTextSize(18);
         text.setLayoutParams(params);
         if (setup.length >= 3) {
-            String out = setup[2].replace("%/", ",");
+            String out = addIllegalChars(setup[2]);
             text.setText(Html.fromHtml(out));
         }
         text.setTextSize(Integer.parseInt(setup[3]));

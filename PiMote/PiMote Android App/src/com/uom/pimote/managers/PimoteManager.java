@@ -86,6 +86,11 @@ public class PimoteManager {
         if(sensors!= null)sensors.pause();
     }
 
+    public void deleteThreads(){
+        threads.clear();
+        streams.clear();
+    }
+
 
     // Send a message back to the pi
     public void send(String message){
