@@ -1,4 +1,15 @@
 #!/usr/bin/env python
+'''
+This programs let's you detect an arrow with 6 corners using an octagon
+and then it prints the correspondant command based on where the arrow is 
+pointing to. It shows in a window the image taken as well as the corners of
+the octagon. When they change from green to blue it means a detected corner 
+is inside of it. When 6 corners are succesfully detected, then the command 
+is printed. It also shows windows with the intermediate steps of the process.
+
+The *** USER tag in the comments is to point good places where the user 
+can modify it for his own purpouses.
+'''
 import cv
 from cv2 import *
 import math
@@ -33,6 +44,7 @@ def octagon(img):
 
   # Set points as tuples and draw them as green circles.
   point1 = Point(smallest-t-d + c,t, False)
+  # *** USER: change the colour of the undetected corners of the octagon.
   cv.Circle(imcolor,(point1.height, point1.width),radius,cv.RGB(0, 255, 0))
 
   point2 = Point(t+d+ c, t, False)
@@ -79,6 +91,7 @@ def active(x,y):
   point8.isActive = True
 
 # Change from green to blue the points that are active.
+# *** USER: change the color of the detected corner of the octagon.
 def bluePoint():
  if point1.isActive:
     cv.Circle(imcolor,(point1.height, point1.width),radius,cv.RGB(0, 0, 255))
@@ -131,6 +144,7 @@ global radius
 radius = 7
 
 # Create the windows to show the final result and the intermediate steps.
+# *** USER: change the name of the windows.
 namedWindow("Normal feed", cv.CV_WINDOW_AUTOSIZE)
 namedWindow("Black and white", cv.CV_WINDOW_AUTOSIZE)
 namedWindow("Octagon", cv.CV_WINDOW_AUTOSIZE)
@@ -190,7 +204,8 @@ while True:
 	  if harris[0] > 10e-06:
  	  
 	   # *** GP: draw a small circle on the original image to represent the corner
-           cv.Circle(imcolor,(x,y),2,cv.RGB(155, 0, 25))
+	   # *** USER: change the colour of the detected corner.
+	   cv.Circle(imcolor,(x,y),2,cv.RGB(155, 0, 25))
 
 	   # Check if it is in one of the 8 points.
 	   active(x,y)
