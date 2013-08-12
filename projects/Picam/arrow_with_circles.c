@@ -27,12 +27,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 /**
- * \file RaspiStill.c
+ * \file arrow_with_circles.c
  * Command line program to capture a still frame and encode it to file.
  * Also optionally display a preview/viewfinder of current camera input.
  *
- * \date 31 Jan 2013
- * \Author: James Hughes
+ * \date 31 Jan 2013 (original code)
+ * \Author: James Hughes (orginal code)
  *
  * Description
  *
@@ -44,6 +44,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * are simply written straight to the file in the requisite buffer callback.
  *
  * We use the RaspiCamControl code to handle the specific camera settings.
+ * 
+ * *** MODIFICATION: when the encoder_buffer_callback is executed, the image is 
+ * decodified from the buffer and then it is processed in orfer to find
+ * corners. If a corner is insiide one of the 8 corners of the octagon, this
+ * one is activated. When 6 are succesfully active, a command is printed
+ * in the terminal. A windoe shows the image with the detected corners
+ * and the circles representing the octagon.
  */
 
 // We use some GNU extensions (asprintf, basename)
@@ -59,12 +66,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "bcm_host.h"
 #include "interface/vcos/vcos.h"
 
-// *** MODIFICATION: ADDED for OpenCV
-#include <cv.h>
-#include <highgui.h>
-
-#include <math.h>
-
 #include "interface/mmal/mmal.h"
 #include "interface/mmal/mmal_logging.h"
 #include "interface/mmal/mmal_buffer.h"
@@ -79,6 +80,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "RaspiCLI.h"
 
 #include <semaphore.h>
+
+// *** MODIFICATION: ADDED for OpenCV
+#include <cv.h>
+#include <highgui.h>
+#include <math.h>
 
 /// Camera number to use - we only have one camera, indexed from 0.
 #define CAMERA_NUMBER 0
@@ -101,16 +107,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 int mmal_status_to_int(MMAL_STATUS_T status);
 
-// Variable to prevent the OpenCV code to be executed twice.
+// *** MODIFICATION: Variable to prevent the OpenCV code to be executed twice.
 int executed;
 
-// Points of the octagon
+// *** MODIFICATION: Keep points of the octagon
 struct Point point1, point2, point3, point4, point5, point6, point7, point8;
 
-// Radius for the circles
+// *** MODIFICATION: Radius for the circles
 int radius = 7;
 
-// Structure to represent a point.
+/** *** MODIFICATION: Structure to represent a point.
+ */
 struct Point
 {
 	int height;
@@ -207,7 +214,11 @@ static struct
 
 static int encoding_xref_size = sizeof(encoding_xref) / sizeof(encoding_xref[0]);
 
-// Initialise the octagon.
+/**
+ * *** MODIFICATION: Initialize the octagon.
+ * 
+ * @param image Pointer to image that will be displayed.
+ */ 
 static void octagon(IplImage* image)
 {
 	// Keep the measure of the smallest side of the image
@@ -270,7 +281,13 @@ static void octagon(IplImage* image)
 	cvCircle(image,cvPoint(point8.height, point8.width),radius,CV_RGB(0, 255, 0),1,8,0);
 } // octagon
 
-// Check if a corner is in one of the 8 regions and, in that case, activate it.
+/** 
+ * *** MODIFICATION: Check if a corner is in one of the 8 regions and, 
+ * in that case, activate it.
+ * 
+ * @param x Coordinate x of the point. 
+ * @param y Coordinate y of the point.
+ */ 
 static void active(int x, int y)
 {
 	if (point1.isActive == 0 && abs(x-point1.height) < radius && abs(y - point1.width) < radius)
@@ -291,7 +308,11 @@ static void active(int x, int y)
 		point8.isActive = 1;
 } // active
 
-// Change from green to blue the points that are active.
+/**
+ * *** MODIFICATION: Change from green to blue the points that are active.
+ * 
+ * @param image Pointer to image that will be displayed.
+ */ 
 static void bluePoint(IplImage* image)
 {
 	if (point1.isActive == 1)
@@ -312,7 +333,9 @@ static void bluePoint(IplImage* image)
 		cvCircle(image,cvPoint(point8.height, point8.width),radius,CV_RGB(0,0,255),1,8,0);
 } // bluePoint
 
-// Check which points are not activated and return the resulting direction
+/** 
+ * *** MODIFICATION: Check which points are not activated and return the resulting direction.
+ */ 
 static char* direction()
 {
 	if (point1.isActive == 0)
@@ -376,11 +399,11 @@ static void default_status(RASPISTILL_STATE *state)
       vcos_assert(0);
       return;
    }
-   
-   // *** MODIFICATION: modified for demo purpose -> smaller image	
+   	
    state->timeout = 1000;// 1s delay before take image
-   state->width = 324;//2592;
-   state->height = 243;//1944;
+   // *** MODIFICATION: modified for demo purpose -> smaller image
+   state->width = 324;
+   state->height = 243;
    state->quality = 25;
    state->wantRAW = 0;
    // *** USER: change name of file
@@ -454,20 +477,20 @@ static void encoder_buffer_callback(MMAL_PORT_T *port, MMAL_BUFFER_HEADER_T *buf
 		// Decode the image and display it.
 		IplImage* image = cvDecodeImage(buf, CV_LOAD_IMAGE_COLOR);
 		
-		// Load the image in grey.
-		IplImage* grey = cvDecodeImage(buf, CV_LOAD_IMAGE_GRAYSCALE);	
+		// Load the image in gray.
+		IplImage* gray = cvDecodeImage(buf, CV_LOAD_IMAGE_GRAYSCALE);	
 		
 		// View for the final image
 		cvNamedWindow("Corner detection", CV_WINDOW_AUTOSIZE);	
 		
-		// Initialise the octagon
+		// Initialize the octagon
 		octagon(image);	
 	
 		// Destination of the harris algorithm
 		CvMat* cornerMap = cvCreateMat(image->height, image->width, CV_32FC1);
 	
 		// OpenCV corner detection
-		cvCornerHarris(grey,cornerMap,3, 3, 0.04);	
+		cvCornerHarris(gray,cornerMap,3, 3, 0.04);	
 
 		// iterate over ever pixel in the image by iterating 
 		// over each row and column
@@ -1059,7 +1082,7 @@ int main(int argc, const char **argv)
             
             while(1==1)          
             {
-				// Initialise variable
+				// *** MODIFICATION: Initialize variable
                 executed = 0;
                                 
 				if (state.timelapse)

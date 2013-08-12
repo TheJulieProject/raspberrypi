@@ -27,12 +27,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 /**
- * \file RaspiStill.c
+ * \file background_change.c
  * Command line program to capture a still frame and encode it to file.
  * Also optionally display a preview/viewfinder of current camera input.
  *
- * \date 31 Jan 2013
- * \Author: James Hughes
+ * \date 31 Jan 2013 (original code)
+ * \Author: James Hughes (original code)
  *
  * Description
  *
@@ -44,6 +44,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * are simply written straight to the file in the requisite buffer callback.
  *
  * We use the RaspiCamControl code to handle the specific camera settings.
+ * 
+ * *** MODIFICATION: This program takes an image and changes the background 
+ * for a given one. It shows in two windows the original with the background 
+ * detected and colored as black and the image with the background changed. 
  */
 
 // We use some GNU extensions (asprintf, basename)
@@ -59,10 +63,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "bcm_host.h"
 #include "interface/vcos/vcos.h"
 
-// *** MODIFICATION: ADDED for OpenCV
-#include <cv.h>
-#include <highgui.h>
-
 #include "interface/mmal/mmal.h"
 #include "interface/mmal/mmal_logging.h"
 #include "interface/mmal/mmal_buffer.h"
@@ -77,6 +77,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "RaspiCLI.h"
 
 #include <semaphore.h>
+
+// *** MODIFICATION: ADDED for OpenCV
+#include <cv.h>
+#include <highgui.h>
 
 /// Camera number to use - we only have one camera, indexed from 0.
 #define CAMERA_NUMBER 0
@@ -99,7 +103,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 int mmal_status_to_int(MMAL_STATUS_T status);
 
-// Variable to prevent the OpenCV code to be executed twice.
+// *** MODIFICATION: Variable to prevent the OpenCV code to be executed twice.
 int executed;
 
 /** Structure containing all state information for the current run
@@ -207,8 +211,8 @@ static void default_status(RASPISTILL_STATE *state)
    
    state->timeout = 1000;// 1s delay before take image
    // *** MODIFICATION: modified for demo purpose -> smaller image	
-   state->width = 324;//2592;
-   state->height = 243;//1944;
+   state->width = 324;
+   state->height = 243;
    state->quality = 25;
    state->wantRAW = 0;
    // *** USER: change name of file.
@@ -879,7 +883,7 @@ int main(int argc, const char **argv)
             
             while(1==1)          
             {
-				// Initialize variable
+				// *** MODIFICATION: Initialize variable
                 executed = 0;
                 
 				if (state.timelapse)
