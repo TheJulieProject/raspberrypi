@@ -1,9 +1,16 @@
 #!/usr/bin/env python
+'''
+This program takes an image and resizes it by a factor of 2. Both odf them
+are showed on the screen.
+
+The *** USER tag in the comments is to point good places where the user 
+can modify it for his own purpouses.
+'''
 import cv
 from cv2 import *
 
-# Create windows to display the original image and the one with
-# double size
+# Create windows to display the original image and the one with double size.
+# *** USER: change the name of the windows that show the video.
 namedWindow("Doubled")
 namedWindow("Normal", cv.CV_WINDOW_AUTOSIZE)
 
@@ -21,6 +28,7 @@ while True:
 	image = cv.LoadImageM('cam_image.jpg')
 
 	# Create a matrix with double the size of the original image and 8-bits
+	# *** USER: change the factor which resizes de image.
 	doubleimg = cv.CreateMat(image.rows * 2, image.cols * 2, cv.CV_8UC3)
 
 	# Change the size of the image
