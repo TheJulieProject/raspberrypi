@@ -1,4 +1,14 @@
 #!/usr/bin/env python
+'''
+This program takes an image from two separated cameras located one next 
+to each other and finds the image that represents the stereo correspondence
+of both. This one will be showed in the screen and will only show the objects located
+below the threshold, that means, the objects that are not further from the camera
+than the given distance limit.
+
+The *** USER tag in the comments is to point good places where the user 
+can modify it for his own purpouses.
+'''
 import cv
 from cv2 import *
 
@@ -34,6 +44,7 @@ if s:
 left = cv.LoadImage('scene_l.bmp',cv.CV_LOAD_IMAGE_GRAYSCALE)
 right = cv.LoadImage('scene_r.bmp',cv.CV_LOAD_IMAGE_GRAYSCALE)
 
+# Initialize matrices which will store the result of the stereo correspondence.
 disparity_left = cv.CreateMat(left.height, left.width, cv.CV_16S)
 disparity_right = cv.CreateMat(left.height, left.width, cv.CV_16S)
 
@@ -52,6 +63,7 @@ cut(disp_left_visual,left,80)
 cv.SaveImage("Binocular_vision.jpg", disp_left_visual)
 
 # Show result
+# *** USER: change the name of the window that will show the result.
 cv.NamedWindow('Disparity map',cv.CV_WINDOW_AUTOSIZE)
 cv.ShowImage('Disparity map',disp_left_visual)
 cv.WaitKey()

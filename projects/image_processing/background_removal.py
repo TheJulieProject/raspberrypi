@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 '''
-This programs takes an image and sets to black all the background detected as
+This program takes an image and sets to black all the background detected as
 white. It shows in two windows the original and modified image.
 
 The *** USER tag in the comments is to point good places where the user 

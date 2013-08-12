@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 '''
-This programs let's you detect an arrow with 6 corners using an octagon
+This program let's you detect an arrow with 6 corners using an octagon
 and then it prints the correspondant command based on where the arrow is 
 pointing to. It shows in a window the image taken as well as the corners of
 the octagon. When they change from green to blue it means a detected corner 

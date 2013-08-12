@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 '''
-This programs takes an image and changes the background for a given one. 
+This program takes an image and changes the background for a given one. 
 It shows in two windows the original with the background detected and colore
 d as black and the image with the background changed.
 
