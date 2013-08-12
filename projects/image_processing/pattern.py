@@ -1,6 +1,17 @@
 #!/usr/bin/env python
-# Original code from stackoverflow.com/a/14477677
-# Modifications include make code work, add comments and make it more efficient.
+'''
+This program takes an image and detects the color of the rectangles in there.
+If it is blue, green, red or yellow, it will be counted as valid. At the end, the 
+pattern is printed in order.
+
+Program was taken from stackoverflow.com/a/14477677 and then modified in order
+to make it more efficient, add coments and fix some parts. All code was made by
+ the author in that link with the exception of the lines marked with the tag
+*** MODIFICATION.
+
+The *** USER tag in the comments is to point good places where the user 
+can modify it for his own purpouses.
+'''
 import cv2
 
 # *** MODIFICATION: grab an image from the camera
