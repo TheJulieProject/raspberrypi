@@ -1,4 +1,12 @@
 #!/usr/bin/env python
+'''
+This program detects the location of a blob of color on the screen and
+prints in the terminal the command to move the robot asociated with it.
+On the screen there is also a window that shows the detected video feed.
+
+The *** USER tag in the comments is to point good places where the user 
+can modify it for his own purpouses.
+'''
 import cv
 from cv2 import *
 import time
@@ -30,6 +38,7 @@ def calc_command(number):
 cam= VideoCapture(0)
 
 # View for the final image
+# *** USER: change name of the window.
 namedWindow("Move robot with blob", cv.CV_WINDOW_AUTOSIZE)
 
 while True:
@@ -54,16 +63,16 @@ while True:
 	
 	for x in range(0, image.height):
 	 for y in range(0, image.width):
-    	# get the value of the current pixel
-    	blue, green, red = image[x, y]
-
-   		# check if the blue intensity is greater than the green
-   		if blue > green and blue > red and blue > 180 and green > 60:
-		 # add x and y to accumulators
-		 acc_x += x
-		 acc_y += y
-		 # increment accumulated pixels count
-		 acc_count += 1		
+		 # get the value of the current pixel
+		 blue, green, red = image[x, y]
+		 
+		 # check if the blue intensity is greater than the green
+		 if blue > green and blue > red and blue > 180 and green > 60:
+			 # add x and y to accumulators
+			 acc_x += x
+			 acc_y += y
+			 # increment accumulated pixels count
+			 acc_count += 1		
 
 	# check the count accumulator is greater than zero, to avoid dividing by zero
 	if acc_count > 0:

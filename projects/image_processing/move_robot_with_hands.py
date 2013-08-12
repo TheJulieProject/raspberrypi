@@ -1,4 +1,14 @@
 #!/usr/bin/env python
+'''
+This program uses the canny algorithm for edge detection to detect the hands
+and then, depending on where the image is located, the command is returned.
+Both hands are read individually.
+
+The *** USER tag in the comments is to point good places where the user 
+can modify it for his own purpouses.
+
+The *** TEST tag points existing code for testing purpouses.
+'''
 import cv
 from cv2 import *
 
@@ -13,6 +23,7 @@ class Point:
 	self.previousState = 0
 
 # Window for the final image and the normal one
+# *** USER: change the name of the window.
 namedWindow("Normal feed", cv.CV_WINDOW_AUTOSIZE)
 namedWindow("Robot movement", cv.CV_WINDOW_AUTOSIZE)
 
@@ -38,9 +49,10 @@ def move():
  # Open the image
  image = cv.LoadImage('cam_image.jpg') 
 
+ # Keep image yuv color model version
  yuv = cv.CreateImage(cv.GetSize(image),8,3)
 	
- # convert image to grey
+ # Convert image to gray
  gray = cv.CreateImage(cv.GetSize(image),8,1)
  cv.CvtColor(image,yuv, cv.CV_BGR2YCrCb)
  cv.Split(yuv,gray, None,None,None)
@@ -50,6 +62,7 @@ def move():
  cv.Canny(gray,canny,50,200)
  
  # Draw guide lines in the image.
+ # *** USER: change the color of the line.
  cv.Line(image, (image.width/4, 0), (image.width/4, image.height/3), cv.RGB(255,0, 0)) 
  cv.Line(image, (0, image.height/3), (image.width/4, image.height/3), cv.RGB(255,0, 0))
  
@@ -141,6 +154,6 @@ def move():
  # Return the command
  return commandRight + "_" + commandLeft
 	
-# TEST: code for testing this program without the client.	
-#while True:
- #move()
+# *** TEST: code for testing this program without the client.	
+"""while True:
+ move()"""
