@@ -27,12 +27,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 /**
- * \file RaspiStill.c
+ * \file pattern.c
  * Command line program to capture a still frame and encode it to file.
  * Also optionally display a preview/viewfinder of current camera input.
  *
- * \date 31 Jan 2013
- * \Author: James Hughes
+ * \date 31 Jan 2013 (original file)
+ * \Author: James Hughes (original file)
  *
  * Description
  *
@@ -44,6 +44,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * are simply written straight to the file in the requisite buffer callback.
  *
  * We use the RaspiCamControl code to handle the specific camera settings.
+ * 
+ * *** MODIFICATION: This program takes an image and detects the color of
+ * the rectangles in there. If it is blue, green, red or yellow, it will be
+ * counted as valid. At the end, the pattern is printed in order.
+ * 
+ * The *** USER tag in the comments is to point good places where the user 
+ * can modify it for his own purpouses.
  */
 
 // We use some GNU extensions (asprintf, basename)
@@ -59,11 +66,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "bcm_host.h"
 #include "interface/vcos/vcos.h"
 
-
-// *** MODIFICATION: ADDED for OpenCV
-#include <cv.h>
-#include <highgui.h>
-
 #include "interface/mmal/mmal.h"
 #include "interface/mmal/mmal_logging.h"
 #include "interface/mmal/mmal_buffer.h"
@@ -78,6 +80,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "RaspiCLI.h"
 
 #include <semaphore.h>
+
+// *** MODIFICATION: ADDED for OpenCV
+#include <cv.h>
+#include <highgui.h>
 
 /// Camera number to use - we only have one camera, indexed from 0.
 #define CAMERA_NUMBER 0
@@ -103,7 +109,8 @@ int mmal_status_to_int(MMAL_STATUS_T status);
 // *** MODIFICATION: Variable to prevent the OpenCV code to be executed twice.
 int executed;
 
-// *** MODIFICATION: structure to keep the rectanglrs found in the image.
+/** *** MODIFICATION: structure to keep the rectanglrs found in the image.
+ */
 typedef struct Rectangles
 {
 	int xCoordinate[15];
@@ -203,8 +210,12 @@ static struct
 
 static int encoding_xref_size = sizeof(encoding_xref) / sizeof(encoding_xref[0]);
 
-// *** MODIFICATION: function to execute bubblesort algorithm over given
-// two-dimensional array.
+/** *** MODIFICATION: function to execute bubblesort algorithm over given
+ * two-dimensional array.
+ * 
+ * @param rectangle Structure containing all the rectangles detected in the picture.
+ * @param size Number of rectangles in the structure.
+ */ 
 static void* bubbleSort(Rectangles* rectangle, int size)
 {
 	int index;
@@ -1370,7 +1381,7 @@ int main(int argc, const char **argv)
 
             for(frame = 1; frame <= num_iterations; frame++)
             {
-				// *** MODIFICATION: Initialise variable
+				// *** MODIFICATION: Initialize variable
                 executed = 0;
                 
                if (state.timelapse)

@@ -27,12 +27,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 /**
- * \file RaspiStill.c
+ * \file running_average.c
  * Command line program to capture a still frame and encode it to file.
  * Also optionally display a preview/viewfinder of current camera input.
  *
- * \date 31 Jan 2013
- * \Author: James Hughes
+ * \date 31 Jan 2013 (original file)
+ * \Author: James Hughes (original file)
  *
  * Description
  *
@@ -44,6 +44,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * are simply written straight to the file in the requisite buffer callback.
  *
  * We use the RaspiCamControl code to handle the specific camera settings.
+ * 
+ * *** MODIFICATION: this program creates a running average in the taken image
+ * and then keeps updating it. Three windows appear on the screen: one that 
+ * shows the current video and then other two two show two running averages 
+ * with different weights.
  */
 
 // We use some GNU extensions (asprintf, basename)
@@ -59,10 +64,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "bcm_host.h"
 #include "interface/vcos/vcos.h"
 
-// *** MODIFICATION: ADDED for OpenCV
-#include <cv.h>
-#include <highgui.h>
-
 #include "interface/mmal/mmal.h"
 #include "interface/mmal/mmal_logging.h"
 #include "interface/mmal/mmal_buffer.h"
@@ -77,6 +78,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "RaspiCLI.h"
 
 #include <semaphore.h>
+
+// *** MODIFICATION: ADDED for OpenCV
+#include <cv.h>
+#include <highgui.h>
 
 /// Camera number to use - we only have one camera, indexed from 0.
 #define CAMERA_NUMBER 0
@@ -102,7 +107,7 @@ int mmal_status_to_int(MMAL_STATUS_T status);
 // *** MODIFICATION: Variable to prevent the OpenCV code to be executed twice.
 int executed;
 
-// Keep running averages.
+// *** MODIFICATION: Keep running averages.
 CvMat* avg1;
 CvMat* avg2;
 
@@ -211,8 +216,8 @@ static void default_status(RASPISTILL_STATE *state)
    	
    state->timeout = 1000;// 1s delay before take image   
    // MODIFICATION: modified for demo purpose -> smaller image
-   state->width = 324;//2592;
-   state->height = 243;//1944;
+   state->width = 324;
+   state->height = 243;
    state->quality = 25;
    state->wantRAW = 0;
    // *** USER: change the name of the file.
@@ -745,6 +750,7 @@ int main(int argc, const char **argv)
 	// Set data from previous image into arrays.
 	cvSetData(avg1,image32->imageData,image32->widthStep);
 	cvSetData(avg2,image32->imageData,image32->widthStep);
+	// *** MODIFICATION end
 		
    // Our main data storage vessel..
    RASPISTILL_STATE state;
