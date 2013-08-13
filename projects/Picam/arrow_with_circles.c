@@ -51,6 +51,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * one is activated. When 6 are succesfully active, a command is printed
  * in the terminal. A windoe shows the image with the detected corners
  * and the circles representing the octagon.
+ * 
+ * The *** USER tag  in comments points good places where the user can modify 
+ * it for his own purpouses.
+ * 
+ * The *** MODIFICATION tag marks the code added to the original file in order
+ * to get the extra function work.
  */
 
 // We use some GNU extensions (asprintf, basename)
@@ -481,6 +487,7 @@ static void encoder_buffer_callback(MMAL_PORT_T *port, MMAL_BUFFER_HEADER_T *buf
 		IplImage* gray = cvDecodeImage(buf, CV_LOAD_IMAGE_GRAYSCALE);	
 		
 		// View for the final image
+		// *** USER: change name of the window.
 		cvNamedWindow("Corner detection", CV_WINDOW_AUTOSIZE);	
 		
 		// Initialize the octagon
@@ -504,6 +511,7 @@ static void encoder_buffer_callback(MMAL_PORT_T *port, MMAL_BUFFER_HEADER_T *buf
 				if (harris.val[0] > 10e-06)
 				{
 					// draw a small circle on the original image to represent the corner
+					// *** USER: change the color of the circle.
 					cvCircle(image,cvPoint(x,y),2,CV_RGB(155, 0, 25),1,8,0);
 
 					// Check if that corner is in one of the 8 points.
@@ -524,7 +532,7 @@ static void encoder_buffer_callback(MMAL_PORT_T *port, MMAL_BUFFER_HEADER_T *buf
 			} // for
 		} //for	
 
-		// Save image if you want
+		// *** USER: Save image if you want
 		//cvSaveImage("image_without_background.jpg", my_image)
 
 		// display the image on the screen

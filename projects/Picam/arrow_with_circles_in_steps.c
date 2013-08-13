@@ -51,6 +51,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * one is activated. When 6 are succesfully active, a command is printed
  * in the terminal. Windows show the final result and some intermediate
  * states, like separate RGB channels.
+ * 
+ * The *** USER tag  in comments points good places where the user can modify 
+ * it for his own purpouses.
+ * 
+ * The *** MODIFICATION tag marks the code added to the original file in order
+ * to get the extra function work.
  */
 
 // We use some GNU extensions (asprintf, basename)
@@ -115,6 +121,7 @@ int executed;
 struct Point point1, point2, point3, point4, point5, point6, point7, point8;
 
 // *** MODIFICATION: Radius for the circles
+// *** USER: change the value of the radius.
 int radius = 7;
 
 /** *** MODIFICATION: Structure to represent a point.
@@ -485,6 +492,7 @@ static void encoder_buffer_callback(MMAL_PORT_T *port, MMAL_BUFFER_HEADER_T *buf
 		IplImage* grey = cvDecodeImage(buf, CV_LOAD_IMAGE_GRAYSCALE);	
 		
 		// Create the windows to show the final result and the intermediate steps.
+		// *** USER: change name of the windows.
 		cvNamedWindow("Normal feed", CV_WINDOW_AUTOSIZE);
 		cvNamedWindow("Black and white", CV_WINDOW_AUTOSIZE);
 		cvNamedWindow("Octagon", CV_WINDOW_AUTOSIZE);
@@ -509,7 +517,7 @@ static void encoder_buffer_callback(MMAL_PORT_T *port, MMAL_BUFFER_HEADER_T *buf
 		cvShowImage("Green channel", green);
 		cvShowImage("Blue channel", blue);
 		
-		// Show image in black and white and in colour.
+		// Show image in black and white and in color.
 		cvShowImage("Normal feed", image);
 		cvShowImage("Black and white", grey);
 		
@@ -534,6 +542,7 @@ static void encoder_buffer_callback(MMAL_PORT_T *port, MMAL_BUFFER_HEADER_T *buf
 				if (harris.val[0] > 10e-06)
 				{
 					// draw a small circle on the original image to represent the corner
+					// *** USER: change the color of the circle.
 					cvCircle(image,cvPoint(x,y),2,CV_RGB(155, 0, 25),1,8,0);
 
 					// Check if that corner is in one of the 8 points.

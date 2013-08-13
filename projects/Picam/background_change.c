@@ -48,6 +48,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * *** MODIFICATION: This program takes an image and changes the background 
  * for a given one. It shows in two windows the original with the background 
  * detected and colored as black and the image with the background changed. 
+ * 
+ * The *** USER tag  in comments points good places where the user can modify 
+ * it for his own purpouses.
+ * 
+ * The *** MODIFICATION tag marks the code added to the original file in order
+ * to get the extra function work.
  */
 
 // We use some GNU extensions (asprintf, basename)
@@ -287,10 +293,12 @@ static void encoder_buffer_callback(MMAL_PORT_T *port, MMAL_BUFFER_HEADER_T *buf
 		IplImage* image = cvDecodeImage(buf, CV_LOAD_IMAGE_COLOR);		
 		
 		// View for the final images
+		// *** USER: change name of the windows
 		cvNamedWindow("Without background", CV_WINDOW_AUTOSIZE);
 		cvNamedWindow("Another background", CV_WINDOW_AUTOSIZE);
 		
 		// Load destiny image.
+		// *** USER: change the image.
 		IplImage* destiny = cvLoadImage("background.jpg", CV_LOAD_IMAGE_COLOR);		
 
 		// iterate over ever pixel in the image by iterating 
@@ -306,13 +314,17 @@ static void encoder_buffer_callback(MMAL_PORT_T *port, MMAL_BUFFER_HEADER_T *buf
 				int Green = s.val[1];
 				int Red = s.val[2];
 				
-				// check if the intensities are near to white colour
+				// check if the intensities are near to white color
+				// *** USER: change the color that will be deleted.
 				if (Blue > 120 && Green > 180 && Red > 180)      		 
 				{
 					// this pixel is predominantly white let's set it to black
+					// *** USER: change black for another color.
 					s.val[0] = s.val[1] = s.val[2] = 0;
 					cvSet2D(image,y,x,s);
 				} // if
+				// If it is not background. then let's output the pixel
+				// to the other image.
 				else
 				{
 					CvScalar t = cvGet2D(destiny, y, x);
