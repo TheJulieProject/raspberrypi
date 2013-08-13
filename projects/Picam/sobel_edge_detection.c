@@ -48,10 +48,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * *** MODIFICATION: This program executes the sobel edge detection algorithm 
  * in the taken image and saves the result in a file, so you can see it later.
  * 
+ * The *** USER tag  in comments points good places where the user can modify 
+ * it for his own purpouses.
  * 
- * The *** USER tag in the comments is to point good places where the user 
- * can modify it for his own purpouses followed by a recomendation of what
- * can you do.
+ * The *** MODIFICATION tag marks the code added to the original file in order
+ * to get the extra function work.
  */
 
 // We use some GNU extensions (asprintf, basename)
@@ -294,6 +295,7 @@ static void encoder_buffer_callback(MMAL_PORT_T *port, MMAL_BUFFER_HEADER_T *buf
 		cvSobel(image, dstSobel, 1, 1, 3);
 	
 		// Save the image
+		// *** USER: set the name of the saved file.
 		cvSaveImage("sobel.jpg", dstSobel, 0);
    
 		// Set as executed so we don't run it again until another image has been taken.

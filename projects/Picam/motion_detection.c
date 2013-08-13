@@ -49,8 +49,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * the pixels of the previous frame and the current one, printing the information
  * on the terminal. A window shows the video feed.
  * 
- * The *** USER tag in the comments is to point good places where the user 
- * can modify it for his own purpouses.
+ * The *** USER tag  in comments points good places where the user can modify 
+ * it for his own purpouses.
+ * 
+ * The *** MODIFICATION tag marks the code added to the original file in order
+ * to get the extra function work.
  */
 
 // We use some GNU extensions (asprintf, basename)
@@ -290,6 +293,7 @@ static void encoder_buffer_callback(MMAL_PORT_T *port, MMAL_BUFFER_HEADER_T *buf
 		IplImage* image = cvDecodeImage(buf, CV_LOAD_IMAGE_COLOR);		
 		
 		// View for the final image
+		// *** USER: set the name of the window.
 		cvNamedWindow("Motion detection", CV_WINDOW_AUTOSIZE);
 		
 		// Keep number of different pixels
@@ -318,7 +322,8 @@ static void encoder_buffer_callback(MMAL_PORT_T *port, MMAL_BUFFER_HEADER_T *buf
 				int prevGreen = t.val[1];
 				int prevRed = t.val[2];
 
-				// Take luminosity into account by assuming that a change of 10 is permited. If more, then motion was detected.
+				// Take luminosity into account by assuming that a change of 20 is permited. If more, then motion was detected.
+				// *** USER: modify the value of the threshold.
 				if (abs(prevBlue - blue) > 20 || abs(prevGreen - green) > 20 || abs(prevRed - red) > 20)
 				{
 					// Update pixel count and, if greater than threshold, say that motion was detected.

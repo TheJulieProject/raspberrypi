@@ -49,8 +49,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * the rectangles in there. If it is blue, green, red or yellow, it will be
  * counted as valid. At the end, the pattern is printed in order.
  * 
- * The *** USER tag in the comments is to point good places where the user 
- * can modify it for his own purpouses.
+ * The *** USER tag  in comments points good places where the user can modify 
+ * it for his own purpouses.
+ * 
+ * The *** MODIFICATION tag marks the code added to the original file in order
+ * to get the extra function work.
  */
 
 // We use some GNU extensions (asprintf, basename)
@@ -218,16 +221,13 @@ static int encoding_xref_size = sizeof(encoding_xref) / sizeof(encoding_xref[0])
  */ 
 static void* bubbleSort(Rectangles* rectangle, int size)
 {
-	int index;
-	//int prevCoordinate, currentCoordinate;
+	int index;	
 	int tempX, tempY;
 	char tempColor;
 	while(size != 0)
-	{
-		//prevCoordinate = rectangle.xCoordinate[0];
+	{		
 		for(index = 1; index < size; index++)
 		{
-			//currentCoordinate = rectangle.xCoordinate[index];
 			if(rectangle->xCoordinate[index] < rectangle->xCoordinate[index-1])
 			{
 				// Keep values of previous array.
@@ -267,8 +267,8 @@ static void default_status(RASPISTILL_STATE *state)
 
    state->timeout = 5000; // 5s delay before take image
    // *** MODIFICATION: modified for demo purpose -> smaller image	
-   state->width = 324;//2592;
-   state->height = 243;//1944;
+   state->width = 324;
+   state->height = 243;
    state->quality = 85;
    state->wantRAW = 0;
    state->filename = NULL;
@@ -618,7 +618,6 @@ static void encoder_buffer_callback(MMAL_PORT_T *port, MMAL_BUFFER_HEADER_T *buf
 		cvCvtColor(img, hsv, CV_BGR2HSV); 
 				
 		// Storage for the contours.
-		//CvSeq* contours;
 		CvMemStorage* storage = cvCreateMemStorage(0);
 		
 		// Void sequence keeping first contour.
@@ -668,6 +667,7 @@ static void encoder_buffer_callback(MMAL_PORT_T *port, MMAL_BUFFER_HEADER_T *buf
 			int color = channels.val[0] * 2;	
 		
 			// If the color is red, green, yellow or blue put into the list of rectangles.
+			// *** USER: change the colors that are detected.
 			if (color < 30 || color > 330)
 			{
 				res.xCoordinate[rectanglesSoFar] = cx;
@@ -704,6 +704,7 @@ static void encoder_buffer_callback(MMAL_PORT_T *port, MMAL_BUFFER_HEADER_T *buf
 		} // for
 			
 		// Sort the list by x coordinate.
+		// *** USER: implement a faster algorithm.
 		bubbleSort(&res, rectanglesSoFar);
 
 		// Print the letters representing the colors of the rectangles

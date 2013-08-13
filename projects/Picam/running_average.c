@@ -49,6 +49,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * and then keeps updating it. Three windows appear on the screen: one that 
  * shows the current video and then other two two show two running averages 
  * with different weights.
+ * 
+ * The *** USER tag  in comments points good places where the user can modify 
+ * it for his own purpouses.
+ * 
+ * The *** MODIFICATION tag marks the code added to the original file in order
+ * to get the extra function work.
  */
 
 // We use some GNU extensions (asprintf, basename)
@@ -294,6 +300,7 @@ static void encoder_buffer_callback(MMAL_PORT_T *port, MMAL_BUFFER_HEADER_T *buf
 		
 		// Update running averages and then scale, calculate absolute values
 		// and convert the result 8-bit.
+		// *** USER:change the value of the weight.
 		cvRunningAvg(image,avg2,0.0001, NULL);		
 		cvConvertScaleAbs(avg2, res2, 1,0);
 		

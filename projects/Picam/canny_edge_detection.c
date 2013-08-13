@@ -48,6 +48,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * *** MODIFICATION: This program detects the edges in the given image using 
  * the canny algorithm. The result is showed in white for the edges and 
  * black for the background.
+ * 
+ * The *** USER tag  in comments points good places where the user can modify 
+ * it for his own purpouses.
+ * 
+ * The *** MODIFICATION tag marks the code added to the original file in order
+ * to get the extra function work.
  */
 
 // We use some GNU extensions (asprintf, basename)
@@ -286,14 +292,15 @@ static void encoder_buffer_callback(MMAL_PORT_T *port, MMAL_BUFFER_HEADER_T *buf
 		// Load the same image in gray.
 		IplImage* gray = cvDecodeImage(buf, CV_LOAD_IMAGE_GRAYSCALE);
 		
-		// Use canny algorithm for edge detection
+		// Use canny algorithm for edge detection.
 		IplImage* canny = cvCreateImage(cvGetSize(image),8,1);
 		cvCanny(gray,canny,50,200, 3);
  
-		// *** PR: Save the image
+		// *** USER: Save the image
 		//cv.SaveImage("Canny.jpg", canny);
 		
-		// Create windows
+		// Create windows		
+		// *** USER: change the name of the window.
 		cvNamedWindow("Normal feed", CV_WINDOW_AUTOSIZE);
 		cvNamedWindow("Edge detection", CV_WINDOW_AUTOSIZE);
 

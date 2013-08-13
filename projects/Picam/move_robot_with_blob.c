@@ -50,8 +50,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * asociated with it. On the screen there is also a window that shows the 
  * detected video feed.
  * 
- * The *** USER tag in the comments is to point good places where the user 
- * can modify it for his own purpouses.
+ * The *** USER tag  in comments points good places where the user can modify 
+ * it for his own purpouses.
+ * 
+ * The *** MODIFICATION tag marks the code added to the original file in order
+ * to get the extra function work.
  */
 
 // We use some GNU extensions (asprintf, basename)
@@ -323,6 +326,7 @@ static void encoder_buffer_callback(MMAL_PORT_T *port, MMAL_BUFFER_HEADER_T *buf
 		IplImage* image = cvDecodeImage(buf, CV_LOAD_IMAGE_COLOR);		
 		
 		// View for the final image
+		// *** USER: set the name of the window.
 		cvNamedWindow("Move robot with blob", CV_WINDOW_AUTOSIZE);
 		
 		// x and y position accumulators
@@ -349,7 +353,8 @@ static void encoder_buffer_callback(MMAL_PORT_T *port, MMAL_BUFFER_HEADER_T *buf
 				int green = s.val[1];
 				int red = s.val[2];
 				
-				// check if the intensities are near to white colour
+				// check if the intensities are near to white color
+				// *** USER: vary the intensities in order to look for another color.
 				if (blue > green && blue > red && blue > 180 && green > 60)      		 
 				{
 					// add x and y to accumulators
@@ -402,7 +407,7 @@ static void encoder_buffer_callback(MMAL_PORT_T *port, MMAL_BUFFER_HEADER_T *buf
 			} // else
 		} // if
 		
-		// Calculate the command corresponding to the coordinate and print it
+		// Calculate the command corresponding to the coordinate and print it.
 		fprintf(stdout, "%s\n", calc_command(coordinate));
    
 		executed = 1;

@@ -49,8 +49,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * to detect the hands and then, depending on where the image is located, 
  * the command is returned. Both hands are read individually.
  * 
- * The *** USER tag in the comments is to point good places where the user 
- * can modify it for his own purpouses.
+ * The *** USER tag  in comments points good places where the user can modify 
+ * it for his own purpouses.
+ * 
+ * The *** MODIFICATION tag marks the code added to the original file in order
+ * to get the extra function work.
  */
 
 // We use some GNU extensions (asprintf, basename)
@@ -322,8 +325,7 @@ static void encoder_buffer_callback(MMAL_PORT_T *port, MMAL_BUFFER_HEADER_T *buf
 		// Decode the image and display it.
 		IplImage* image = cvDecodeImage(buf, CV_LOAD_IMAGE_COLOR);
 		
-		// Load image in graysclae
-		
+		// Load image in gray scale		
 		IplImage* gray = cvDecodeImage(buf, CV_LOAD_IMAGE_GRAYSCALE);
 
 		// Use canny algorithm for edge detection
@@ -335,6 +337,7 @@ static void encoder_buffer_callback(MMAL_PORT_T *port, MMAL_BUFFER_HEADER_T *buf
 		rightHand.isActive = 0;
  
 		// Draw guide lines in the image.
+		// *** USER: change the color of the lines.
 		cvLine(image, cvPoint(image->width/4, 0), cvPoint(image->width/4, image->height/3), 
 			   CV_RGB(255,0, 0),1,8,0); 
 		cvLine(image, cvPoint(0, image->height/3), cvPoint(image->width/4, image->height/3), 
@@ -452,6 +455,7 @@ static void encoder_buffer_callback(MMAL_PORT_T *port, MMAL_BUFFER_HEADER_T *buf
 			commandLeft = "Do nothing";	   
 		
 		// Create windows
+		// *** USER: set the name of the windows that show the video feed.
 		cvNamedWindow("Normal feed", CV_WINDOW_AUTOSIZE);
 		cvNamedWindow("Robot movement", CV_WINDOW_AUTOSIZE);
 

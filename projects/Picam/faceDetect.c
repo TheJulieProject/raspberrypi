@@ -45,7 +45,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  * We use the RaspiCamControl code to handle the specific camera settings.
  * 
- * *** MODIFICATION:
+ * *** MODIFICATION: this program detects faces or eyes in the taken image
+ * and draws a rectangle to delimit them, as well as printing the coordinates
+ * in the terminal.
+ * 
+ * The *** USER tag  in comments points good places where the user can modify 
+ * it for his own purpouses.
+ * 
+ * The *** MODIFICATION tag marks the code added to the original file in order
+ * to get the extra function work.
  */
 
 // We use some GNU extensions (asprintf, basename)
@@ -101,7 +109,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 int mmal_status_to_int(MMAL_STATUS_T status);
 
-// *** MODIFICATION: got from python version
+// *** MODIFICATION: got from python version of the program.
 // Variable to prevent the OpenCV code to be executed twice.
 int executed;
 
@@ -109,6 +117,7 @@ int executed;
 CvHaarClassifierCascade* cascade = NULL;
 CvMemStorage* storage;
 
+// *** USER: change the feature that will be detected.
 //char* cascade_name = "haarcascade_frontalface_alt.xml";
 char* cascade_name = "haarcascade_eye.xml";
 //char* cascade_name =  "haarcascade_frontalface_default.xml";
@@ -125,7 +134,8 @@ CvSize min_size;
 double image_scale = 1.3;
 double haar_scale = 1.1;
 int min_neighbors = 3;
-int haar_flags = 0;
+int haar_flags = 0
+// *** MODIFICATION ends.
   
 
 /** Structure containing all state information for the current run
@@ -368,6 +378,7 @@ static void encoder_buffer_callback(MMAL_PORT_T *port, MMAL_BUFFER_HEADER_T *buf
 		// Decode the image and display it.
 		IplImage* frame = cvDecodeImage(buf, CV_LOAD_IMAGE_COLOR);		
 
+		// *** USER: set the name of the window.
 		cvNamedWindow( "result", 1 );
 		
 		// Initialize variables
