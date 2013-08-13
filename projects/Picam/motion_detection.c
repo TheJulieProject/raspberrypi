@@ -27,12 +27,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 /**
- * \file RaspiStill.c
+ * \file motion_detection.c
  * Command line program to capture a still frame and encode it to file.
  * Also optionally display a preview/viewfinder of current camera input.
  *
- * \date 31 Jan 2013
- * \Author: James Hughes
+ * \date 31 Jan 2013 (original file)
+ * \Author: James Hughes (original file)
  *
  * Description
  *
@@ -44,6 +44,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * are simply written straight to the file in the requisite buffer callback.
  *
  * We use the RaspiCamControl code to handle the specific camera settings.
+ * 
+ * *** MODIFICATION: This program detects motion in a video by comparing 
+ * the pixels of the previous frame and the current one, printing the information
+ * on the terminal. A window shows the video feed.
+ * 
+ * The *** USER tag in the comments is to point good places where the user 
+ * can modify it for his own purpouses.
  */
 
 // We use some GNU extensions (asprintf, basename)
@@ -59,10 +66,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "bcm_host.h"
 #include "interface/vcos/vcos.h"
 
-// *** MODIFICATION: ADDED for OpenCV
-#include <cv.h>
-#include <highgui.h>
-
 #include "interface/mmal/mmal.h"
 #include "interface/mmal/mmal_logging.h"
 #include "interface/mmal/mmal_buffer.h"
@@ -77,6 +80,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "RaspiCLI.h"
 
 #include <semaphore.h>
+
+// *** MODIFICATION: ADDED for OpenCV
+#include <cv.h>
+#include <highgui.h>
 
 /// Camera number to use - we only have one camera, indexed from 0.
 #define CAMERA_NUMBER 0
@@ -207,8 +214,8 @@ static void default_status(RASPISTILL_STATE *state)
    	
    state->timeout = 1000;// 1s delay before take image
    // *** MODIFICATION: modified for demo purpose -> smaller image
-   state->width = 324;//2592;
-   state->height = 243;//1944;
+   state->width = 324;
+   state->height = 243;
    state->quality = 25;
    state->wantRAW = 0;
    // *** USER: change the name of the file.
