@@ -27,12 +27,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 /**
- * \file RaspiStill.c
+ * \file faceDetect.c
  * Command line program to capture a still frame and encode it to file.
  * Also optionally display a preview/viewfinder of current camera input.
  *
- * \date 31 Jan 2013
- * \Author: James Hughes
+ * \date 31 Jan 2013 (original file)
+ * \Author: James Hughes (original file)
  *
  * Description
  *
@@ -44,6 +44,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * are simply written straight to the file in the requisite buffer callback.
  *
  * We use the RaspiCamControl code to handle the specific camera settings.
+ * 
+ * *** MODIFICATION:
  */
 
 // We use some GNU extensions (asprintf, basename)
@@ -59,10 +61,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "bcm_host.h"
 #include "interface/vcos/vcos.h"
 
-// *** MODIFICATION: ADDED for OpenCV
-#include <cv.h>
-#include <highgui.h>
-
 #include "interface/mmal/mmal.h"
 #include "interface/mmal/mmal_logging.h"
 #include "interface/mmal/mmal_buffer.h"
@@ -77,6 +75,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "RaspiCLI.h"
 
 #include <semaphore.h>
+
+// *** MODIFICATION: ADDED for OpenCV
+#include <cv.h>
+#include <highgui.h>
 
 /// Camera number to use - we only have one camera, indexed from 0.
 #define CAMERA_NUMBER 0
@@ -99,7 +101,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 int mmal_status_to_int(MMAL_STATUS_T status);
 
-// *** MODIFCATION: got from python version
+// *** MODIFICATION: got from python version
 // Variable to prevent the OpenCV code to be executed twice.
 int executed;
 
@@ -124,60 +126,7 @@ double image_scale = 1.3;
 double haar_scale = 1.1;
 int min_neighbors = 3;
 int haar_flags = 0;
-
-static CvSeq* detectObject(IplImage* img)
-{
-    IplImage* gray = cvCreateImage( cvGetSize(img), 8, 1 );
-    IplImage* small_img = cvCreateImage(cvGetSize(img),8, 1 );
-    cvCvtColor(img, gray, CV_BGR2GRAY);
-    cvResize( gray, small_img, CV_INTER_LINEAR );
-
-    cvEqualizeHist( small_img, small_img );
-    
-    //ClearMemStorage( storage )
-
-    if( cascade != NULL)
-    {
-        CvSeq* faces = cvHaarDetectObjects(small_img, cascade, storage,
-										   haar_scale, min_neighbors, haar_flags, 
-										   min_size, cvSize(10,10) );        
-        fprintf(stdout, "%i objects found\n" , faces->total);
-        return faces;
-	} // if
-    else
-    {
-        fprintf (stdout,"no cascade\n");
-        fflush(stdout);
-	} // else
-} // detectObject
-    
-static void detect_and_draw(IplImage* img )
-{
-    // draw a box with opencv on the image around the detected faces.
-    CvSeq* faces = detectObject(img);
-    if (faces != NULL)
-    {       
-        int index;
-        CvRect* face;
-        int x, y, w,h;
-        for(index = 0; index < faces-> total; index++)
-        {
-			face = (CvRect*)cvGetSeqElem((CvSeq*)faces, index);
-			
-			// Get values from sequence.
-			x = face->x;//(int)cvGetSeqElem((CvSeq*)face, 0);
-			y = face->y;//(int)cvGetSeqElem((CvSeq*)face, 1);
-			w = face->width;//(int)cvGetSeqElem((CvSeq*)face, 2);
-			h = face->height;//(int)cvGetSeqElem((CvSeq*)face, 3);
-			
-			fprintf(stdout,"Face found at (x,y) = (%i,%i)\n" ,x,y); 
-			cvRectangle( img, cvPoint(x,y), cvPoint(x+w,y+h), CV_RGB(255,0,0),1,8,0);
-		} // for		
-	} // if
-	
-    cvShowImage( "result", img );
-    //return img;
-} // detect_and_draw    
+  
 
 /** Structure containing all state information for the current run
  */
@@ -268,6 +217,69 @@ static struct
 
 static int encoding_xref_size = sizeof(encoding_xref) / sizeof(encoding_xref[0]);
 
+/**
+ * Detect a feature in the image.
+ * 
+ * @param img Image that will be processed.
+ */
+static CvSeq* detectObject(IplImage* img)
+{
+    IplImage* gray = cvCreateImage( cvGetSize(img), 8, 1 );
+    IplImage* small_img = cvCreateImage(cvGetSize(img),8, 1 );
+    cvCvtColor(img, gray, CV_BGR2GRAY);
+    cvResize( gray, small_img, CV_INTER_LINEAR );
+
+    cvEqualizeHist( small_img, small_img );
+    
+    //ClearMemStorage( storage )
+
+    if( cascade != NULL)
+    {
+        CvSeq* faces = cvHaarDetectObjects(small_img, cascade, storage,
+										   haar_scale, min_neighbors, haar_flags, 
+										   min_size, cvSize(10,10) );        
+        fprintf(stdout, "%i objects found\n" , faces->total);
+        return faces;
+	} // if
+    else
+    {
+        fprintf (stdout,"no cascade\n");
+        fflush(stdout);
+	} // else
+} // detectObject
+
+/**
+ * Detect a object in the image and draw a rectangle to mark its limits.
+ * 
+ * @param img Image that will be processed.
+ */     
+static void detect_and_draw(IplImage* img )
+{
+    // draw a box with opencv on the image around the detected faces.
+    CvSeq* faces = detectObject(img);
+    if (faces != NULL)
+    {       
+        int index;
+        CvRect* face;
+        int x, y, w,h;
+        for(index = 0; index < faces-> total; index++)
+        {
+			face = (CvRect*)cvGetSeqElem((CvSeq*)faces, index);
+			
+			// Get values from sequence.
+			x = face->x;
+			y = face->y;
+			w = face->width;
+			h = face->height;
+			
+			fprintf(stdout,"Face found at (x,y) = (%i,%i)\n" ,x,y); 
+			cvRectangle( img, cvPoint(x,y), cvPoint(x+w,y+h), CV_RGB(255,0,0),1,8,0);
+		} // for		
+	} // if
+	
+    cvShowImage( "result", img );
+    //return img;
+} // detect_and_draw  
 
 /**
  * Assign a default set of parameters to the state passed in
@@ -282,10 +294,10 @@ static void default_status(RASPISTILL_STATE *state)
       return;
    }
    
-   // *** MODIFICATION: modified for demo purpose -> smaller image	
    state->timeout = 1000;// 1s delay before take image
-   state->width = 324;//2592;
-   state->height = 243;//1944;
+   // *** MODIFICATION: modified for demo purpose -> smaller image	
+   state->width = 324;
+   state->height = 243;
    state->quality = 25;
    state->wantRAW = 0;
    // *** USER: change the name of the file.
