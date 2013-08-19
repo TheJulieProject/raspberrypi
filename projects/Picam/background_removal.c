@@ -108,9 +108,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 int mmal_status_to_int(MMAL_STATUS_T status);
 
-// *** MODIFICATION: Variable to prevent the OpenCV code to be executed twice.
-int executed;
-
 /** Structure containing all state information for the current run
  */
 typedef struct
@@ -276,60 +273,6 @@ static void camera_control_callback(MMAL_PORT_T *port, MMAL_BUFFER_HEADER_T *buf
  */
 static void encoder_buffer_callback(MMAL_PORT_T *port, MMAL_BUFFER_HEADER_T *buffer)
 { 
-	// *** MODIFICATION: OpenCV modifications  
-	if(!executed)
-	{
-		// Keep indexs for loop.
-		int x, y;
-		
-		// Create an empty matrix with the size of the buffer.
-		CvMat* buf = cvCreateMat(1,buffer->length,CV_8UC1);
-   
-		// Copy buffer from camera to matrix.
-		buf->data.ptr = buffer->data;
-   
-		// Decode the image and display it.
-		IplImage* image = cvDecodeImage(buf, CV_LOAD_IMAGE_COLOR);		
-		
-		// View for the final image
-		// *** USER: modify the name of the window.
-		cvNamedWindow("Without background", CV_WINDOW_AUTOSIZE);		
-
-		// iterate over ever pixel in the image by iterating 
-		// over each row and column
-		for (y = 0; y < image->height; ++y)
-		{		
-			for(x = 0; x < image->width; ++x)
-			{
-				CvScalar s = cvGet2D(image, y, x);
-				
-				// Get values of the 3 color channels.
-				int Blue = s.val[0];
-				int Green = s.val[1];
-				int Red = s.val[2];
-				
-				// check if the intensities are near to white color
-				// *** USER: remove backgrounf with another color.
-				if (Blue > 120 && Green > 180 && Red > 180)      		 
-				{
-					// this pixel is predominantly white let's set it to black
-					// *** USER: set deleted background to another color.
-					s.val[0] = s.val[1] = s.val[2] = 0;
-					cvSet2D(image,y,x,s);
-				} // if
-			} // for
-		} //for	
-
-		// *** USER: Save image if you want
-		//cvSaveImage("image_without_background.jpg", image)
-
-		// display the image on the screen
-		cvShowImage("Without background", image);
-		cvWaitKey(1);
-   
-		executed = 1;
-	} // if
-	
    int complete = 0;
 
    // We pass our file handle and other stuff in via the userdata field.
@@ -765,11 +708,11 @@ int main(int argc, const char **argv)
    bcm_host_init();
 
    // Register our application with the logging system
-   vcos_log_register("camcv", VCOS_LOG_CATEGORY);
+   vcos_log_register("fast", VCOS_LOG_CATEGORY);
 
    signal(SIGINT, signal_handler);
 
-   default_status(&state);   
+   default_status(&state);     
    
    if (state.verbose)
    {
@@ -858,141 +801,120 @@ int main(int argc, const char **argv)
             vcos_log_error("Failed to setup encoder output");
             goto error;
          }
+         
+         FILE *output_file = NULL;
+         
+         int frame = 1;
+         
+         // Enable the encoder output port
+         encoder_output_port->userdata = (struct MMAL_PORT_USERDATA_T *)&callback_data;
+         
+         if (state.verbose)
+			fprintf(stderr, "Enabling encoder output port\n");
+			
+		// Enable the encoder output port and tell it its callback function
+		status = mmal_port_enable(encoder_output_port, encoder_buffer_callback);
+		
+		// Create an empty matrix with the size of the buffer.
+		CvMat* buf = cvCreateMat(1,60000,CV_8UC1);
+		
+		// Keep buffer that gets frames from queue.
+		MMAL_BUFFER_HEADER_T *buffer;
+		
+		// Image to be displayed.
+		IplImage* image;
+		
+		// Keep number of buffers and index for the loop.
+		int num, q; 
+			
+		// Keep index for loops.
+		int x, y;		
+		
+		// View for the final image
+		// *** USER: modify the name of the window.
+		cvNamedWindow("Without background", CV_WINDOW_AUTOSIZE);
+		
+		// Store the values of a particular pixel for both destiny and
+		// origin image.
+		CvScalar s,t;
+		
+		// Keep values of each color channel.
+		int Blue, Green, Red;
+		
+		while(1) 
+		{
+			// Send all the buffers to the encoder output port
+			num = mmal_queue_length(state.encoder_pool->queue);
+			
+			for (q=0;q<num;q++)
+			{
+				buffer = mmal_queue_get(state.encoder_pool->queue);
+				
+				if (!buffer)
+					vcos_log_error("Unable to get a required buffer %d from pool queue", q);
+					
+				if (mmal_port_send_buffer(encoder_output_port, buffer)!= MMAL_SUCCESS)
+					vcos_log_error("Unable to send a buffer to encoder output port (%d)", q);
+			} // for
+			
+			if (mmal_port_parameter_set_boolean(camera_still_port, MMAL_PARAMETER_CAPTURE, 1) != MMAL_SUCCESS)
+				vcos_log_error("%s: Failed to start capture", __func__);
+			
+			else
+			{
+				// Wait for capture to complete
+				// For some reason using vcos_semaphore_wait_timeout sometimes returns immediately with bad parameter error
+				// even though it appears to be all correct, so reverting to untimed one until figure out why its erratic
+				vcos_semaphore_wait(&callback_data.complete_semaphore);
+				if (state.verbose)
+					fprintf(stderr, "Finished capture %d\n", frame);
+			} // else
+			
+			// Copy buffer from camera to matrix.
+			buf->data.ptr = buffer->data;
+			
+			// This workaround is needed for the code to work
+			// *** TODO: investigate why.
+			printf("Until here works\n");
+			
+			// Decode the image and display it.
+			image = cvDecodeImage(buf, CV_LOAD_IMAGE_COLOR);	
 
-         if (state.demoMode)
-         {
-            // Run for the user specific time..
-            int num_iterations = state.timeout / state.demoInterval;
-            int i;
-            for (i=0;i<num_iterations;i++)
-            {
-               raspicamcontrol_cycle_test(state.camera_component);
-               vcos_sleep(state.demoInterval);
-            }
-         }         
-         else
-         {			 
-			 FILE *output_file = NULL;
-                        
-            int frame = 0; 
-            
-            while(1==1)          
-            {
-				// *** MODIFICATION: Initialize each time we restart the loop.
-                executed = 0;
-                
-				if (state.timelapse)
-                  vcos_sleep(state.timelapse);
-                else
-                  vcos_sleep(state.timeout);
+			// iterate over ever pixel in the image by iterating 
+			// over each row and column
+			for (y = 0; y < image->height; ++y)
+			{		
+				for(x = 0; x < image->width; ++x)
+				{
+					s = cvGet2D(image, y, x);
+				
+					// Get channel values
+					Blue = s.val[0];
+					Green = s.val[1];
+					Red = s.val[2];
+				
+					// check if the intensities are near to white color
+					// *** USER: change the color that will be deleted.
+					if (Blue > 120 && Green > 180 && Red > 180)      		 
+					{
+						// this pixel is predominantly white let's set it to black
+						// *** USER: change black for another color.
+						s.val[0] = s.val[1] = s.val[2] = 0;
+						cvSet2D(image,y,x,s);
+					} // if
+				} // for
+			} //for	
 
-               // Open the file
-               if (state.filename)
-               {
-		            if (state.filename[0] == '-')
-    		         {
-		               output_file = stdout;
+			// *** USER: Save image if you want
+			//cvSaveImage("image_without_background.jpg", my_image)
 
-		               // Ensure we don't upset the output stream with diagnostics/info
-		               state.verbose = 0;
-    		         }
-                  else
-                  {
-                     char *use_filename = state.filename;
-	
-	                  if (state.timelapse)
-	                     asprintf(&use_filename, state.filename, frame);
-	
-	                  if (state.verbose)
-	                     fprintf(stderr, "Opening output file %s\n", use_filename);
-	
-	                  output_file = fopen(use_filename, "wb");
-	
-	                  if (!output_file)
-	                  {
-	                     // Notify user, carry on but discarding encoded output buffers
-	                     vcos_log_error("%s: Error opening output file: %s\nNo output file will be generated\n", __func__, use_filename);
-	                  }
-
-	                  // asprintf used in timelapse mode allocates its own memory which we need to free
-	                  if (state.timelapse)
-	                     free(use_filename);
-                  }
-									
-                  callback_data.file_handle = output_file;
-               }
-
-               // We only capture if a filename was specified and it opened
-               if (output_file)
-               {
-                  int num, q;                  
-
-                  // Same with raw, apparently need to set it for each capture, whilst port
-                  // is not enabled
-                  if (state.wantRAW)
-                  {
-                     if (mmal_port_parameter_set_boolean(camera_still_port, MMAL_PARAMETER_ENABLE_RAW_CAPTURE, 1) != MMAL_SUCCESS)
-                     {
-                        vcos_log_error("RAW was requested, but failed to enable");
-                     }
-                  }
-                  
-                  // Enable the encoder output port
-                  encoder_output_port->userdata = (struct MMAL_PORT_USERDATA_T *)&callback_data;
-
-                  if (state.verbose)
-                     fprintf(stderr, "Enabling encoder output port\n");
-                  
-                  // Enable the encoder output port and tell it its callback function
-                  status = mmal_port_enable(encoder_output_port, encoder_buffer_callback);
-
-                  // Send all the buffers to the encoder output port
-                  num = mmal_queue_length(state.encoder_pool->queue);
-                  
-                  for (q=0;q<num;q++)
-                  {
-                     MMAL_BUFFER_HEADER_T *buffer = mmal_queue_get(state.encoder_pool->queue);
-
-                     if (!buffer)
-                        vcos_log_error("Unable to get a required buffer %d from pool queue", q);
-
-                     if (mmal_port_send_buffer(encoder_output_port, buffer)!= MMAL_SUCCESS)
-                        vcos_log_error("Unable to send a buffer to encoder output port (%d)", q);
-                  }
-
-                  if (state.verbose)
-                     fprintf(stderr, "Starting capture %d\n", frame);
-
-                  if (mmal_port_parameter_set_boolean(camera_still_port, MMAL_PARAMETER_CAPTURE, 1) != MMAL_SUCCESS)
-                  {
-                     vcos_log_error("%s: Failed to start capture", __func__);
-                  }
-                  else
-                  {
-                     // Wait for capture to complete
-                     // For some reason using vcos_semaphore_wait_timeout sometimes 
-                     // returns immediately with bad parameter error
-                     // even though it appears to be all correct, so reverting to untimed 
-                     // one until figure out why its erratic
-                     vcos_semaphore_wait(&callback_data.complete_semaphore);
-                     if (state.verbose)
-                        fprintf(stderr, "Finished capture %d\n", frame);
-                  }
-
-                  // Ensure we don't die if get callback with no open file
-                  callback_data.file_handle = NULL;
-
-                  if (output_file != stdout)
-                     fclose(output_file);
-
-                  // Disable encoder output port
-                  status = mmal_port_disable(encoder_output_port);
-               } 
-               
-            } // end while (frame)            
-               
-            vcos_semaphore_delete(&callback_data.complete_semaphore);
-         }
+			// display the image on the screen
+			cvShowImage("Without background", image);
+			cvWaitKey(1);
+		} // end while 
+		
+		vcos_semaphore_delete(&callback_data.complete_semaphore);
+         
       }
       else
       {

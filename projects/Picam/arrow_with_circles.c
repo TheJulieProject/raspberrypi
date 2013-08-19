@@ -113,9 +113,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 int mmal_status_to_int(MMAL_STATUS_T status);
 
-// *** MODIFICATION: Variable to prevent the OpenCV code to be executed twice.
-int executed;
-
 // *** MODIFICATION: Keep points of the octagon
 struct Point point1, point2, point3, point4, point5, point6, point7, point8;
 
@@ -467,81 +464,7 @@ static void camera_control_callback(MMAL_PORT_T *port, MMAL_BUFFER_HEADER_T *buf
  * @param buffer mmal buffer header pointer
  */
 static void encoder_buffer_callback(MMAL_PORT_T *port, MMAL_BUFFER_HEADER_T *buffer)
-{   
-	// *** MODIFICATION: OpenCV modifications
-	if(!executed)
-	{
-		// Indices for the loops.
-		int x, y;
-		
-		// Create an empty matrix with the size of the buffer.
-		CvMat* buf = cvCreateMat(1,buffer->length,CV_8UC1);
-   
-		// Copy buffer from camera to matrix.
-		buf->data.ptr = buffer->data;
-   
-		// Decode the image and display it.
-		IplImage* image = cvDecodeImage(buf, CV_LOAD_IMAGE_COLOR);
-		
-		// Load the image in gray.
-		IplImage* gray = cvDecodeImage(buf, CV_LOAD_IMAGE_GRAYSCALE);	
-		
-		// View for the final image
-		// *** USER: change name of the window.
-		cvNamedWindow("Corner detection", CV_WINDOW_AUTOSIZE);	
-		
-		// Initialize the octagon
-		octagon(image);	
-	
-		// Destination of the harris algorithm
-		CvMat* cornerMap = cvCreateMat(image->height, image->width, CV_32FC1);
-	
-		// OpenCV corner detection
-		cvCornerHarris(gray,cornerMap,3, 3, 0.04);	
-
-		// iterate over ever pixel in the image by iterating 
-		// over each row and column
-		for (y = 0; y < image->height; ++y)
-		{		
-			for(x = 0; x < image->width; ++x)
-			{
-				CvScalar harris = cvGet2D(cornerMap, y, x); // get the x,y value
- 	  
-				// check the corner detector response
-				if (harris.val[0] > 10e-06)
-				{
-					// draw a small circle on the original image to represent the corner
-					// *** USER: change the color of the circle.
-					cvCircle(image,cvPoint(x,y),2,CV_RGB(155, 0, 25),1,8,0);
-
-					// Check if that corner is in one of the 8 points.
-					active(x,y);
-
-					// Change to red the activated corners of the octagon.
-					bluePoint(image);
-
-					// Print the resulting direction
-					char *direct = direction();
-					
-					if (direct != NULL)
-					{
-						printf("%s \n", direct);
-						//fflush(stdout);
-					} // if
-				} // if
-			} // for
-		} //for	
-
-		// *** USER: Save image if you want
-		//cvSaveImage("image_without_background.jpg", my_image)
-
-		// display the image on the screen
-		cvShowImage("Corner detection", image);
-		cvWaitKey(1);
-   
-		executed = 1;
-	} // if
-	
+{  
    int complete = 0;
 
    // We pass our file handle and other stuff in via the userdata field.
@@ -977,11 +900,11 @@ int main(int argc, const char **argv)
    bcm_host_init();
 
    // Register our application with the logging system
-   vcos_log_register("camcv", VCOS_LOG_CATEGORY);
+   vcos_log_register("fast", VCOS_LOG_CATEGORY);
 
    signal(SIGINT, signal_handler);
 
-   default_status(&state);   
+   default_status(&state);     
    
    if (state.verbose)
    {
@@ -1013,8 +936,8 @@ int main(int argc, const char **argv)
       PORT_USERDATA callback_data;
 
       if (state.verbose)
-         fprintf(stderr, "Starting component connection stage\n");         
-      
+         fprintf(stderr, "Starting component connection stage\n");
+         
       camera_preview_port = state.camera_component->output[MMAL_CAMERA_PREVIEW_PORT];
       camera_video_port   = state.camera_component->output[MMAL_CAMERA_VIDEO_PORT];
       camera_still_port   = state.camera_component->output[MMAL_CAMERA_CAPTURE_PORT];
@@ -1070,141 +993,132 @@ int main(int argc, const char **argv)
             vcos_log_error("Failed to setup encoder output");
             goto error;
          }
-
-         if (state.demoMode)
-         {
-            // Run for the user specific time..
-            int num_iterations = state.timeout / state.demoInterval;
-            int i;
-            for (i=0;i<num_iterations;i++)
-            {
-               raspicamcontrol_cycle_test(state.camera_component);
-               vcos_sleep(state.demoInterval);
-            }
-         }         
-         else
-         {			 
-			 FILE *output_file = NULL;
-            
-            int frame = 0; 
-            
-            while(1==1)          
-            {
-				// *** MODIFICATION: Initialize variable
-                executed = 0;
-                                
-				if (state.timelapse)
-                  vcos_sleep(state.timelapse);
-                else
-                  vcos_sleep(state.timeout);
-
-               // Open the file
-               if (state.filename)
-               {
-		            if (state.filename[0] == '-')
-    		         {
-		               output_file = stdout;
-
-		               // Ensure we don't upset the output stream with diagnostics/info
-		               state.verbose = 0;
-    		         }
-                  else
-                  {
-                     char *use_filename = state.filename;
+         
+         FILE *output_file = NULL;
+         
+         int frame = 1;
+         
+         // Enable the encoder output port
+         encoder_output_port->userdata = (struct MMAL_PORT_USERDATA_T *)&callback_data;
+         
+         if (state.verbose)
+			fprintf(stderr, "Enabling encoder output port\n");
+			
+		// Enable the encoder output port and tell it its callback function
+		status = mmal_port_enable(encoder_output_port, encoder_buffer_callback);
+		
+		// Create an empty matrix with the size of the buffer.
+		CvMat* buf = cvCreateMat(1,60000,CV_8UC1);
+		
+		// Keep buffer that gets frames from queue.
+		MMAL_BUFFER_HEADER_T *buffer;
+		
+		// Image to be displayed.
+		IplImage* image;
+		
+		// Keep number of buffers and index for the loop.
+		int num, q; 
+			
+		// Indices for the loops.
+		int x, y;	
+		
+		// View for the final image
+		// *** USER: change name of the window.
+		cvNamedWindow("Corner detection", CV_WINDOW_AUTOSIZE);
+		
+		while(1) 
+		{
+			// Send all the buffers to the encoder output port
+			num = mmal_queue_length(state.encoder_pool->queue);
+			
+			for (q=0;q<num;q++)
+			{
+				buffer = mmal_queue_get(state.encoder_pool->queue);
+				
+				if (!buffer)
+					vcos_log_error("Unable to get a required buffer %d from pool queue", q);
+					
+				if (mmal_port_send_buffer(encoder_output_port, buffer)!= MMAL_SUCCESS)
+					vcos_log_error("Unable to send a buffer to encoder output port (%d)", q);
+			} // for
+			
+			if (mmal_port_parameter_set_boolean(camera_still_port, MMAL_PARAMETER_CAPTURE, 1) != MMAL_SUCCESS)
+				vcos_log_error("%s: Failed to start capture", __func__);
+			
+			else
+			{
+				// Wait for capture to complete
+				// For some reason using vcos_semaphore_wait_timeout sometimes returns immediately with bad parameter error
+				// even though it appears to be all correct, so reverting to untimed one until figure out why its erratic
+				vcos_semaphore_wait(&callback_data.complete_semaphore);
+				if (state.verbose)
+					fprintf(stderr, "Finished capture %d\n", frame);
+			} // else
+			
+			// Copy buffer from camera to matrix.
+			buf->data.ptr = buffer->data;
+			
+			// This workaround is needed for the code to work
+			// *** TODO: investigate why.
+			printf("Until here works\n");
+			
+			// Decode the image and display it.
+			image = cvDecodeImage(buf, CV_LOAD_IMAGE_COLOR);
+		
+			// Load the image in gray.
+			IplImage* gray = cvDecodeImage(buf, CV_LOAD_IMAGE_GRAYSCALE);	
+		
+			// Initialize the octagon
+			octagon(image);	
 	
-	                  if (state.timelapse)
-	                     asprintf(&use_filename, state.filename, frame);
+			// Destination of the harris algorithm
+			CvMat* cornerMap = cvCreateMat(image->height, image->width, CV_32FC1);
 	
-	                  if (state.verbose)
-	                     fprintf(stderr, "Opening output file %s\n", use_filename);
-	
-	                  output_file = fopen(use_filename, "wb");
-	
-	                  if (!output_file)
-	                  {
-	                     // Notify user, carry on but discarding encoded output buffers
-	                     vcos_log_error("%s: Error opening output file: %s\nNo output file will be generated\n", __func__, use_filename);
-	                  }
+			// OpenCV corner detection
+			cvCornerHarris(gray,cornerMap,3, 3, 0.04);	
 
-	                  // asprintf used in timelapse mode allocates its own memory which we need to free
-	                  if (state.timelapse)
-	                     free(use_filename);
-                  }
-									
-                  callback_data.file_handle = output_file;
-               }
+			// iterate over ever pixel in the image by iterating 
+			// over each row and column
+			for (y = 0; y < image->height; ++y)
+			{		
+				for(x = 0; x < image->width; ++x)
+				{
+					CvScalar harris = cvGet2D(cornerMap, y, x); // get the x,y value
+ 	  
+					// check the corner detector response
+					if (harris.val[0] > 10e-06)
+					{
+						// draw a small circle on the original image to represent the corner
+						// *** USER: change the color of the circle.
+						cvCircle(image,cvPoint(x,y),2,CV_RGB(155, 0, 25),1,8,0);
 
-               // We only capture if a filename was specified and it opened
-               if (output_file)
-               {
-                  int num, q;                  
+						// Check if that corner is in one of the 8 points.
+						active(x,y);
 
-                  // Same with raw, apparently need to set it for each capture, whilst port
-                  // is not enabled
-                  if (state.wantRAW)
-                  {
-                     if (mmal_port_parameter_set_boolean(camera_still_port, MMAL_PARAMETER_ENABLE_RAW_CAPTURE, 1) != MMAL_SUCCESS)
-                     {
-                        vcos_log_error("RAW was requested, but failed to enable");
-                     }
-                  }
-                  
-                  // Enable the encoder output port
-                  encoder_output_port->userdata = (struct MMAL_PORT_USERDATA_T *)&callback_data;
+						// Change to red the activated corners of the octagon.
+						bluePoint(image);
 
-                  if (state.verbose)
-                     fprintf(stderr, "Enabling encoder output port\n");
-                  
-                  // Enable the encoder output port and tell it its callback function
-                  status = mmal_port_enable(encoder_output_port, encoder_buffer_callback);
+						// Print the resulting direction
+						char *direct = direction();
+					
+						if (direct != NULL)
+						{
+							printf("%s \n", direct);
+						} // if
+					} // if
+				} // for
+			} //for	
 
-                  // Send all the buffers to the encoder output port
-                  num = mmal_queue_length(state.encoder_pool->queue);
-                  
-                  for (q=0;q<num;q++)
-                  {
-                     MMAL_BUFFER_HEADER_T *buffer = mmal_queue_get(state.encoder_pool->queue);
+			// *** USER: Save image if you want
+			//cvSaveImage("image_without_background.jpg", my_image)
 
-                     if (!buffer)
-                        vcos_log_error("Unable to get a required buffer %d from pool queue", q);
-
-                     if (mmal_port_send_buffer(encoder_output_port, buffer)!= MMAL_SUCCESS)
-                        vcos_log_error("Unable to send a buffer to encoder output port (%d)", q);
-                  }
-
-                  if (state.verbose)
-                     fprintf(stderr, "Starting capture %d\n", frame);
-
-                  if (mmal_port_parameter_set_boolean(camera_still_port, MMAL_PARAMETER_CAPTURE, 1) != MMAL_SUCCESS)
-                  {
-                     vcos_log_error("%s: Failed to start capture", __func__);
-                  }
-                  else
-                  {
-                     // Wait for capture to complete
-                     // For some reason using vcos_semaphore_wait_timeout sometimes 
-                     // returns immediately with bad parameter error
-                     // even though it appears to be all correct, so reverting to untimed 
-                     // one until figure out why its erratic
-                     vcos_semaphore_wait(&callback_data.complete_semaphore);
-                     if (state.verbose)
-                        fprintf(stderr, "Finished capture %d\n", frame);
-                  }
-
-                  // Ensure we don't die if get callback with no open file
-                  callback_data.file_handle = NULL;
-
-                  if (output_file != stdout)
-                     fclose(output_file);
-
-                  // Disable encoder output port
-                  status = mmal_port_disable(encoder_output_port);
-               } 
-               
-            } // end while (frame)            
-               
-            vcos_semaphore_delete(&callback_data.complete_semaphore);
-         }
+			// display the image on the screen
+			cvShowImage("Corner detection", image);
+			cvWaitKey(1);
+		} // end while 
+		
+		vcos_semaphore_delete(&callback_data.complete_semaphore);
+         
       }
       else
       {
