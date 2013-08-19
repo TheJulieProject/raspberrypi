@@ -868,7 +868,7 @@ int main(int argc, const char **argv)
 			// Decode the image and display it.
 			image = cvDecodeImage(buf, CV_LOAD_IMAGE_COLOR);
 			
-			cvShowImage("Camera feed", img);			
+			cvShowImage("Camera feed", image);			
 			cvWaitKey(1);
 		} // end while 
 		
