@@ -824,7 +824,7 @@ int main(int argc, const char **argv)
 		cvNamedWindow("Camera feed", CV_WINDOW_AUTOSIZE);
 		
 		// Image to be displayed.
-		IplImage* img;
+		IplImage* image;
 		
 		// Keep number of buffers and index for the loop.
 		int num, q; 
@@ -866,7 +866,7 @@ int main(int argc, const char **argv)
 			printf("Until here works\n");
 			
 			// Decode the image and display it.
-			img = cvDecodeImage(buf, CV_LOAD_IMAGE_COLOR);
+			image = cvDecodeImage(buf, CV_LOAD_IMAGE_COLOR);
 			
 			cvShowImage("Camera feed", img);			
 			cvWaitKey(1);
