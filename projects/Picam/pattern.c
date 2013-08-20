@@ -54,6 +54,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  * 
  * The *** MODIFICATION tag marks the code added to the original file in order
  * to get the extra function work.
+ * 
+ * *** TODO: investigate why a Segmentation fault error is raised at the end.
  */
 
 // We use some GNU extensions (asprintf, basename)
@@ -109,9 +111,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 int mmal_status_to_int(MMAL_STATUS_T status);
 
-// *** MODIFICATION: Variable to prevent the OpenCV code to be executed twice.
-int executed;
-
 /** *** MODIFICATION: structure to keep the rectanglrs found in the image.
  */
 typedef struct Rectangles
@@ -160,9 +159,6 @@ typedef struct
    VCOS_SEMAPHORE_T complete_semaphore; /// semaphore which is posted when we reach end of frame (indicates end of capture or fault)
    RASPISTILL_STATE *pstate;            /// pointer to our state in case required in callback
 } PORT_USERDATA;
-
-static void display_valid_parameters(char *app_name);
-static void store_exif_tag(RASPISTILL_STATE *state, const char *exif_tag);
 
 /// Comamnd ID's and Structure defining our command line options
 #define CommandHelp         0
@@ -295,275 +291,6 @@ static void default_status(RASPISTILL_STATE *state)
    raspicamcontrol_set_defaults(&state->camera_parameters);
 }
 
-/**
- * Dump image state parameters to stderr. Used for debugging
- *
- * @param state Pointer to state structure to assign defaults to
- */
-static void dump_status(RASPISTILL_STATE *state)
-{
-   int i;
-
-   if (!state)
-   {
-      vcos_assert(0);
-      return;
-   }
-
-   fprintf(stderr, "Width %d, Height %d, quality %d, filename %s\n", state->width,
-         state->height, state->quality, state->filename);
-   fprintf(stderr, "Time delay %d, Raw %s\n", state->timeout,
-         state->wantRAW ? "yes" : "no");
-   fprintf(stderr, "Thumbnail enabled %s, width %d, height %d, quality %d\n\n",
-         state->thumbnailConfig.enable ? "Yes":"No", state->thumbnailConfig.width,
-         state->thumbnailConfig.height, state->thumbnailConfig.quality);
-
-   if (state->numExifTags)
-   {
-      fprintf(stderr, "User supplied EXIF tags :\n");
-
-      for (i=0;i<state->numExifTags;i++)
-      {
-         fprintf(stderr, "%s", state->exifTags[i]);
-         if (i != state->numExifTags-1)
-            fprintf(stderr, ",");
-      }
-      fprintf(stderr, "\n\n");
-   }
-
-   raspipreview_dump_parameters(&state->preview_parameters);
-   raspicamcontrol_dump_parameters(&state->camera_parameters);
-}
-
-/**
- * Parse the incoming command line and put resulting parameters in to the state
- *
- * @param argc Number of arguments in command line
- * @param argv Array of pointers to strings from command line
- * @param state Pointer to state structure to assign any discovered parameters to
- * @return non-0 if failed for some reason, 0 otherwise
- */
-static int parse_cmdline(int argc, const char **argv, RASPISTILL_STATE *state)
-{
-   // Parse the command line arguments.
-   // We are looking for --<something> or -<abreviation of something>
-
-   int valid = 1;
-   int i;
-
-   for (i = 1; i < argc && valid; i++)
-   {
-      int command_id, num_parameters;
-
-      if (!argv[i])
-         continue;
-
-      if (argv[i][0] != '-')
-      {
-         valid = 0;
-         continue;
-      }
-
-      // Assume parameter is valid until proven otherwise
-      valid = 1;
-
-      command_id = raspicli_get_command_id(cmdline_commands, cmdline_commands_size, &argv[i][1], &num_parameters);
-
-      // If we found a command but are missing a parameter, continue (and we will drop out of the loop)
-      if (command_id != -1 && num_parameters > 0 && (i + 1 >= argc) )
-         continue;
-
-      //  We are now dealing with a command line option
-      switch (command_id)
-      {
-      case CommandHelp:
-         display_valid_parameters(basename(argv[0]));
-         // exit straight away if help requested
-         return -1;
-
-      case CommandWidth: // Width > 0
-         if (sscanf(argv[i + 1], "%u", &state->width) != 1)
-            valid = 0;
-         else
-            i++;
-         break;
-
-      case CommandHeight: // Height > 0
-         if (sscanf(argv[i + 1], "%u", &state->height) != 1)
-            valid = 0;
-         else
-            i++;
-         break;
-
-      case CommandQuality: // Quality = 1-100
-         if (sscanf(argv[i + 1], "%u", &state->quality) == 1)
-         {
-            if (state->quality > 100)
-            {
-               fprintf(stderr, "Setting max quality = 100\n");
-               state->quality = 100;
-            }
-            i++;
-         }
-         else
-            valid = 0;
-
-         break;
-
-      case CommandRaw: // Add raw bayer data in metadata
-         state->wantRAW = 1;
-         break;
-
-      case CommandOutput:  // output filename
-      {
-         int len = strlen(argv[i + 1]);
-         if (len)
-         {
-            state->filename = malloc(len + 10); // leave enough space for any timelapse generated changes to filename
-            vcos_assert(state->filename);
-            if (state->filename)
-               strncpy(state->filename, argv[i + 1], len);
-            i++;
-         }
-         else
-            valid = 0;
-         break;
-      }
-
-      case CommandVerbose: // display lots of data during run
-         state->verbose = 1;
-         break;
-
-      case CommandTimeout: // Time to run viewfinder for before taking picture, in seconds
-      {
-         if (sscanf(argv[i + 1], "%u", &state->timeout) == 1)
-         {
-            // TODO : What limits do we need for timeout?
-            i++;
-         }
-         else
-            valid = 0;
-         break;
-      }
-      case CommandThumbnail : // thumbnail parameters - needs string "x:y:quality"
-         sscanf(argv[i + 1], "%d:%d:%d", &state->thumbnailConfig.width,&state->thumbnailConfig.height,
-                  &state->thumbnailConfig.quality);
-         i++;
-         break;
-
-      case CommandDemoMode: // Run in demo mode - no capture
-      {
-         // Demo mode might have a timing parameter
-         // so check if a) we have another parameter, b) its not the start of the next option
-         if (i + 1 < argc  && argv[i+1][0] != '-')
-         {
-            if (sscanf(argv[i + 1], "%u", &state->demoInterval) == 1)
-            {
-               // TODO : What limits do we need for timeout?
-               state->demoMode = 1;
-               i++;
-            }
-            else
-               valid = 0;
-         }
-         else
-         {
-            state->demoMode = 1;
-         }
-
-         break;
-      }
-
-      case CommandEncoding :
-      {
-         int len = strlen(argv[i + 1]);
-         valid = 0;
-
-         if (len)
-         {
-            int j;
-            for (j=0;j<encoding_xref_size;j++)
-            {
-               if (strcmp(encoding_xref[j].format, argv[i+1]) == 0)
-               {
-                  state->encoding = encoding_xref[j].encoding;
-                  valid = 1;
-                  i++;
-                  break;
-               }
-            }
-         }
-         break;
-      }
-
-      case CommandExifTag:
-         store_exif_tag(state, argv[i+1]);
-         i++;
-         break;
-
-      case CommandTimelapse:
-         if (sscanf(argv[i + 1], "%u", &state->timelapse) != 1)
-            valid = 0;
-         else
-            i++;
-         break;
-
-      default:
-      {
-         // Try parsing for any image specific parameters
-         // result indicates how many parameters were used up, 0,1,2
-         // but we adjust by -1 as we have used one already
-         const char *second_arg = (i + 1 < argc) ? argv[i + 1] : NULL;
-         int parms_used = raspicamcontrol_parse_cmdline(&state->camera_parameters, &argv[i][1], second_arg);
-
-         // Still unused, try preview options
-         if (!parms_used)
-            parms_used = raspipreview_parse_cmdline(&state->preview_parameters, &argv[i][1], second_arg);
-
-         // If no parms were used, this must be a bad parameters
-         if (!parms_used)
-            valid = 0;
-         else
-            i += parms_used - 1;
-
-         break;
-      }
-      }
-   }
-
-   if (!valid)
-   {
-      fprintf(stderr, "Invalid command line option (%s)\n", argv[i]);
-      return 1;
-   }
-
-   return 0;
-}
-
-/**
- * Display usage information for the application to stdout
- *
- * @param app_name String to display as the application name
- */
-static void display_valid_parameters(char *app_name)
-{
-   fprintf(stderr, "Runs camera for specific time, and take JPG capture at end if requested\n\n");
-   fprintf(stderr, "usage: %s [options]\n\n", app_name);
-
-   fprintf(stderr, "Image parameter commands\n\n");
-
-   raspicli_display_help(cmdline_commands, cmdline_commands_size);
-
-   // Help for preview options
-   raspipreview_display_help();
-
-   // Now display any help information from the camcontrol code
-   raspicamcontrol_display_help();
-
-   fprintf(stderr, "\n");
-
-   return;
-}
 
 /**
  *  buffer header callback function for camera control
@@ -596,127 +323,6 @@ static void camera_control_callback(MMAL_PORT_T *port, MMAL_BUFFER_HEADER_T *buf
  */
 static void encoder_buffer_callback(MMAL_PORT_T *port, MMAL_BUFFER_HEADER_T *buffer)
 {
-	// *** MODIFICATION: OpenCV modifications
-	if(!executed)
-	{		
-		// Create an empty matrix with the size of the buffer.
-		CvMat* buf = cvCreateMat(1,buffer->length,CV_8UC1);
-   
-		// Copy buffer from camera to matrix.
-		buf->data.ptr = buffer->data;
-   
-		// Decode the image.
-		IplImage* img = cvDecodeImage(buf, CV_LOAD_IMAGE_COLOR);
-		// *** TEST:IplImage* img = cvLoadImage("rectangles.jpg", CV_LOAD_IMAGE_COLOR);
-		
-		// Get gray version.
-		IplImage* gray = cvDecodeImage(buf, CV_LOAD_IMAGE_GRAYSCALE);
-		// *** TEST: IplImage* gray = cvLoadImage("rectangles.jpg", CV_LOAD_IMAGE_GRAYSCALE);
-		
-		// Convert image to hsv plane.
-		IplImage* hsv = cvCreateImage(cvSize(img->width,img->height),img->depth, 3);
-		cvCvtColor(img, hsv, CV_BGR2HSV); 
-				
-		// Storage for the contours.
-		CvMemStorage* storage = cvCreateMemStorage(0);
-		
-		// Void sequence keeping first contour.
-		CvSeq* contours;
-
-		// Binarize the image and detect contours.
-		IplImage* edges = cvCreateImage(cvGetSize(img),8,1);
-		cvCanny(gray,edges,50,150,3);
-		
-		cvFindContours(edges,storage,&contours,sizeof(CvContour),
-					   CV_RETR_EXTERNAL,CV_CHAIN_APPROX_SIMPLE, cvPoint(0,0));
-
-		// Keep rectanles
-		Rectangles res;
-		
-		// Keep number of rectangles found.
-		int rectanglesSoFar = 0;
-		
-		// Index for the loop
-		int index;
-
-		// Go through all contours and find their area. Only continue if it isn't too small (noise).
-		for(index = 0; contours->total; index++)
-		{	
-			
-			if (cvContourArea(contours, CV_WHOLE_SEQ,0) <= 100)
-			{
-				contours = contours->h_next;
-				continue;
-			} // if
-			
-			// Find a rectangle for it
-			CvRect rectangle = cvBoundingRect(contours,0);
-						
-			// Get values from sequence.
-			int x = rectangle.x;
-			int y = rectangle.y;
-			int w = rectangle.width;
-			int h = rectangle.height;
-						
-			// Find the center of the rectangle
-			int cx = x+w/2;
-			int cy = y+h/2;
-		
-			// Check its color
-			CvScalar channels = cvGet2D(hsv,cy,cx);
-			int color = channels.val[0] * 2;	
-		
-			// If the color is red, green, yellow or blue put into the list of rectangles.
-			// *** USER: change the colors that are detected.
-			if (color < 30 || color > 330)
-			{
-				res.xCoordinate[rectanglesSoFar] = cx;
-				res.yCoordinate[rectanglesSoFar] = cy;
-				res.color[rectanglesSoFar] = 'R';
-				rectanglesSoFar++;	
-			} // if
-			else if(90 <= color && color < 150)
-			{
-				res.xCoordinate[rectanglesSoFar] = cx;
-				res.yCoordinate[rectanglesSoFar] = cy;
-				res.color[rectanglesSoFar] = 'G';
-				rectanglesSoFar++;
-			} // else if
-			else if(30 <= color && color < 90)
-			{
-				res.xCoordinate[rectanglesSoFar] = cx;
-				res.yCoordinate[rectanglesSoFar] = cy;
-				res.color[rectanglesSoFar] = 'Y';
-				rectanglesSoFar++;
-			} // else if
-			else if(210 < color && color < 270)
-			{
-				res.xCoordinate[rectanglesSoFar] = cx;
-				res.yCoordinate[rectanglesSoFar] = cy;
-				res.color[rectanglesSoFar] = 'B';
-				rectanglesSoFar++;
-			} // else if	
-				
-			contours = contours->h_next;
-				
-			if(contours == NULL || contours->total == 0)
-				break;
-		} // for
-			
-		// Sort the list by x coordinate.
-		// *** USER: implement a faster algorithm.
-		bubbleSort(&res, rectanglesSoFar);
-
-		// Print the letters representing the colors of the rectangles
-		for(index = 0; index < rectanglesSoFar; index++)
-			printf("%c ", res.color[index]);
-			
-		printf("\n");
-   
-		// Set this part of the code as being performed.
-		executed = 1;
-	} // if
-	
    int complete = 0;
 
    // We pass our file handle and other stuff in via the userdata field.
@@ -1082,108 +688,6 @@ static void destroy_encoder_component(RASPISTILL_STATE *state)
 }
 
 /**
- * Add an exif tag to the capture
- *
- * @param state Pointer to state control struct
- * @param exif_tag String containing a "key=value" pair.
- * @return  Returns a MMAL_STATUS_T giving result of operation
- */
-static MMAL_STATUS_T add_exif_tag(RASPISTILL_STATE *state, const char *exif_tag)
-{
-   MMAL_STATUS_T status;
-   MMAL_PARAMETER_EXIF_T *exif_param = (MMAL_PARAMETER_EXIF_T*)calloc(sizeof(MMAL_PARAMETER_EXIF_T) + MAX_EXIF_PAYLOAD_LENGTH, 1);
-
-   vcos_assert(state);
-   vcos_assert(state->encoder_component);
-
-   // Check to see if the tag is present or is indeed a key=value pair.
-   if (!exif_tag || strchr(exif_tag, '=') == NULL || strlen(exif_tag) > MAX_EXIF_PAYLOAD_LENGTH-1)
-      return MMAL_EINVAL;
-
-   exif_param->hdr.id = MMAL_PARAMETER_EXIF;
-
-   strncpy((char*)exif_param->data, exif_tag, MAX_EXIF_PAYLOAD_LENGTH-1);
-
-   exif_param->hdr.size = sizeof(MMAL_PARAMETER_EXIF_T) + strlen((char*)exif_param->data);
-
-   status = mmal_port_parameter_set(state->encoder_component->output[0], &exif_param->hdr);
-
-   free(exif_param);
-
-   return status;
-}
-
-/**
- * Add a basic set of EXIF tags to the capture
- * Make, Time etc
- *
- * @param state Pointer to state control struct
- *
- */
-static void add_exif_tags(RASPISTILL_STATE *state)
-{
-   time_t rawtime;
-   struct tm *timeinfo;
-   char time_buf[32];
-   char exif_buf[128];
-   int i;
-
-   add_exif_tag(state, "IFD0.Model=RP_OV5647");
-   add_exif_tag(state, "IFD0.Make=RaspberryPi");
-
-   time(&rawtime);
-   timeinfo = localtime(&rawtime);
-
-   snprintf(time_buf, sizeof(time_buf),
-            "%04d:%02d:%02d:%02d:%02d:%02d",
-            timeinfo->tm_year+1900,
-            timeinfo->tm_mon+1,
-            timeinfo->tm_mday,
-            timeinfo->tm_hour,
-            timeinfo->tm_min,
-            timeinfo->tm_sec);
-
-   snprintf(exif_buf, sizeof(exif_buf), "EXIF.DateTimeDigitized=%s", time_buf);
-   add_exif_tag(state, exif_buf);
-
-   snprintf(exif_buf, sizeof(exif_buf), "EXIF.DateTimeOriginal=%s", time_buf);
-   add_exif_tag(state, exif_buf);
-
-   snprintf(exif_buf, sizeof(exif_buf), "IFD0.DateTime=%s", time_buf);
-   add_exif_tag(state, exif_buf);
-
-   // Now send any user supplied tags
-
-   for (i=0;i<state->numExifTags && i < MAX_USER_EXIF_TAGS;i++)
-   {
-      if (state->exifTags[i])
-      {
-         add_exif_tag(state, state->exifTags[i]);
-      }
-   }
-}
-
-/**
- * Stores an EXIF tag in the state, incrementing various pointers as necessary.
- * Any tags stored in this way will be added to the image file when add_exif_tags
- * is called
- *
- * Will not store if run out of storage space
- *
- * @param state Pointer to state control struct
- * @param exif_tag EXIF tag string
- *
- */
-static void store_exif_tag(RASPISTILL_STATE *state, const char *exif_tag)
-{
-   if (state->numExifTags < MAX_USER_EXIF_TAGS)
-   {
-      state->exifTags[state->numExifTags] = exif_tag;
-      state->numExifTags++;
-   }
-}
-
-/**
  * Connect two specific ports together
  *
  * @param output_port Pointer the output port
@@ -1255,32 +759,15 @@ int main(int argc, const char **argv)
    bcm_host_init();
 
    // Register our application with the logging system
-   vcos_log_register("RaspiStill", VCOS_LOG_CATEGORY);
+   vcos_log_register("fast", VCOS_LOG_CATEGORY);
 
    signal(SIGINT, signal_handler);
 
-   default_status(&state);
-
-   // Do we have any parameters
-   if (argc == 1)
-   {
-      fprintf(stderr, "\%s Camera App %s\n\n", basename(argv[0]), VERSION_STRING);
-
-      display_valid_parameters(basename(argv[0]));
-      exit(0);
-   }
-
-   // Parse the command line and put options in to our status structure
-   if (parse_cmdline(argc, argv, &state))
-   {
-      exit(0);
-   }
-
+   default_status(&state);     
+   
    if (state.verbose)
    {
-      fprintf(stderr, "\n%s Camera App %s\n\n", basename(argv[0]), VERSION_STRING);
-
-      dump_status(&state);
+      fprintf(stderr, "\n%s Camera App %s\n\n", basename(argv[0]), VERSION_STRING);      
    }
 
    // OK, we have a nice set of parameters. Now set up our components
@@ -1309,7 +796,7 @@ int main(int argc, const char **argv)
 
       if (state.verbose)
          fprintf(stderr, "Starting component connection stage\n");
-
+         
       camera_preview_port = state.camera_component->output[MMAL_CAMERA_PREVIEW_PORT];
       camera_video_port   = state.camera_component->output[MMAL_CAMERA_VIDEO_PORT];
       camera_still_port   = state.camera_component->output[MMAL_CAMERA_CAPTURE_PORT];
@@ -1324,9 +811,11 @@ int main(int argc, const char **argv)
             fprintf(stderr, "Connecting camera preview port to preview input port\n");
             fprintf(stderr, "Starting video preview\n");
          }
-         
+
+         // *** USER: remove preview
          // Connect camera to preview
-         status = connect_ports(camera_preview_port, preview_input_port, &state.preview_connection);
+         //status = connect_ports(camera_preview_port, preview_input_port, &state.preview_connection);
+
       }
       else
       {
@@ -1342,6 +831,7 @@ int main(int argc, const char **argv)
 
          // Now connect the camera to the encoder
          status = connect_ports(camera_still_port, encoder_input_port, &state.encoder_connection);
+         
 
          if (status != MMAL_SUCCESS)
          {
@@ -1362,143 +852,189 @@ int main(int argc, const char **argv)
             vcos_log_error("Failed to setup encoder output");
             goto error;
          }
+         
+         FILE *output_file = NULL;
+         
+         int frame = 1;
+         
+         vcos_sleep(state.timeout);
+         
+         // *** MODIFICATION: All the code from here untill the end of the
+         // while loop has been modified in order to get the faster version
+         // working.
+         
+         // Enable the encoder output port
+         encoder_output_port->userdata = (struct MMAL_PORT_USERDATA_T *)&callback_data;
+         
+         if (state.verbose)
+			fprintf(stderr, "Enabling encoder output port\n");
+			
+		// Enable the encoder output port and tell it its callback function
+		status = mmal_port_enable(encoder_output_port, encoder_buffer_callback);
+		
+		// Create an empty matrix with the size of the buffer.
+		CvMat* buf = cvCreateMat(1,60000,CV_8UC1);
+		
+		// Keep buffer that gets frames from queue.
+		MMAL_BUFFER_HEADER_T *buffer;
+		
+		// Keep number of buffers and index for the loop.
+		int num, q; 
+		
+		// Keep taken image.
+		IplImage* img;
+		
+		// Send all the buffers to the encoder output port
+		num = mmal_queue_length(state.encoder_pool->queue);
+			
+		for (q=0;q<num;q++)
+		{
+			buffer = mmal_queue_get(state.encoder_pool->queue);
+				
+			if (!buffer)
+				vcos_log_error("Unable to get a required buffer %d from pool queue", q);
+					
+			if (mmal_port_send_buffer(encoder_output_port, buffer)!= MMAL_SUCCESS)
+				vcos_log_error("Unable to send a buffer to encoder output port (%d)", q);
+		} // for
+			
+		if (mmal_port_parameter_set_boolean(camera_still_port, MMAL_PARAMETER_CAPTURE, 1) != MMAL_SUCCESS)
+			vcos_log_error("%s: Failed to start capture", __func__);
+			
+		else
+		{
+			// Wait for capture to complete
+			// For some reason using vcos_semaphore_wait_timeout sometimes returns immediately with bad parameter error
+			// even though it appears to be all correct, so reverting to untimed one until figure out why its erratic
+			vcos_semaphore_wait(&callback_data.complete_semaphore);
+			if (state.verbose)
+				fprintf(stderr, "Finished capture %d\n", frame);
+		} // else
+		
+		// Disable encoder output port.
+		//status = mmal_port_disable(encoder_output_port);
+			
+		// Copy buffer from camera to matrix.
+		buf->data.ptr = buffer->data;
+			
+		// This workaround is needed for the code to work
+		// *** TODO: investigate why.
+		//printf("Until here works\n");
+			
+		// Decode the image and display it.
+		// *** TEST:img = cvDecodeImage(buf, CV_LOAD_IMAGE_COLOR);
+		img = cvLoadImage("rectangles.jpg", CV_LOAD_IMAGE_COLOR);
+		
+		// Get gray version.
+		// *** TEST: IplImage* gray = cvDecodeImage(buf, CV_LOAD_IMAGE_GRAYSCALE);
+		IplImage* gray = cvLoadImage("rectangles.jpg", CV_LOAD_IMAGE_GRAYSCALE);
+		
+		// Convert image to hsv plane.
+		IplImage* hsv = cvCreateImage(cvSize(img->width,img->height),img->depth, 3);
+		cvCvtColor(img, hsv, CV_BGR2HSV); 
+				
+		// Storage for the contours.
+		CvMemStorage* storage = cvCreateMemStorage(0);
+		
+		// Void sequence keeping first contour.
+		CvSeq* contours;
 
-         if (state.demoMode)
-         {
-            // Run for the user specific time..
-            int num_iterations = state.timeout / state.demoInterval;
-            int i;
-            for (i=0;i<num_iterations;i++)
-            {
-               raspicamcontrol_cycle_test(state.camera_component);
-               vcos_sleep(state.demoInterval);
-            }
-         }
-         else
-         {
-            int num_iterations =  state.timelapse ? state.timeout / state.timelapse : 1;
-            int frame;
-            FILE *output_file = NULL;
+		// Binarize the image and detect contours.
+		IplImage* edges = cvCreateImage(cvGetSize(img),8,1);
+		cvCanny(gray,edges,50,150,3);
+		
+		cvFindContours(edges,storage,&contours,sizeof(CvContour),
+					   CV_RETR_EXTERNAL,CV_CHAIN_APPROX_SIMPLE, cvPoint(0,0));
 
-            for(frame = 1; frame <= num_iterations; frame++)
-            {
-				// *** MODIFICATION: Initialize variable
-                executed = 0;
-                
-               if (state.timelapse)
-                  vcos_sleep(state.timelapse);
-               else
-                  vcos_sleep(state.timeout);
+		// Keep rectanles
+		Rectangles res;
+		
+		// Keep number of rectangles found.
+		int rectanglesSoFar = 0;
+		
+		// Index for the loop
+		int index;
 
-               // Open the file
-               if (state.filename)
-               {
-		            if (state.filename[0] == '-')
-    		         {
-		               output_file = stdout;
+		// Go through all contours and find their area. Only continue if it isn't too small (noise).
+		for(index = 0; contours->total; index++)
+		{	
+			
+			if (cvContourArea(contours, CV_WHOLE_SEQ,0) <= 100)
+			{
+				contours = contours->h_next;
+				continue;
+			} // if
+			
+			// Find a rectangle for it
+			CvRect rectangle = cvBoundingRect(contours,0);
+						
+			// Get values from sequence.
+			int x = rectangle.x;
+			int y = rectangle.y;
+			int w = rectangle.width;
+			int h = rectangle.height;
+						
+			// Find the center of the rectangle
+			int cx = x+w/2;
+			int cy = y+h/2;
+		
+			// Check its color
+			CvScalar channels = cvGet2D(hsv,cy,cx);
+			int color = channels.val[0] * 2;	
+		
+			// If the color is red, green, yellow or blue put into the list of rectangles.
+			// *** USER: change the colors that are detected.
+			if (color < 30 || color > 330)
+			{
+				res.xCoordinate[rectanglesSoFar] = cx;
+				res.yCoordinate[rectanglesSoFar] = cy;
+				res.color[rectanglesSoFar] = 'R';
+				rectanglesSoFar++;	
+			} // if
+			else if(90 <= color && color < 150)
+			{
+				res.xCoordinate[rectanglesSoFar] = cx;
+				res.yCoordinate[rectanglesSoFar] = cy;
+				res.color[rectanglesSoFar] = 'G';
+				rectanglesSoFar++;
+			} // else if
+			else if(30 <= color && color < 90)
+			{
+				res.xCoordinate[rectanglesSoFar] = cx;
+				res.yCoordinate[rectanglesSoFar] = cy;
+				res.color[rectanglesSoFar] = 'Y';
+				rectanglesSoFar++;
+			} // else if
+			else if(210 < color && color < 270)
+			{
+				res.xCoordinate[rectanglesSoFar] = cx;
+				res.yCoordinate[rectanglesSoFar] = cy;
+				res.color[rectanglesSoFar] = 'B';
+				rectanglesSoFar++;
+			} // else if	
+				
+			contours = contours->h_next;
+				
+			if(contours == NULL || contours->total == 0)
+				break;
+		} // for
+			
+		// Sort the list by x coordinate.
+		// *** USER: implement a faster algorithm.
+		bubbleSort(&res, rectanglesSoFar);
 
-		               // Ensure we don't upset the output stream with diagnostics/info
-		               state.verbose = 0;
-    		         }
-                  else
-                  {
-                     char *use_filename = state.filename;
-	
-	                  if (state.timelapse)
-	                     asprintf(&use_filename, state.filename, frame);
-	
-	                  if (state.verbose)
-	                     fprintf(stderr, "Opening output file %s\n", use_filename);
-	
-	                  output_file = fopen(use_filename, "wb");
-	
-	                  if (!output_file)
-	                  {
-	                     // Notify user, carry on but discarding encoded output buffers
-	                     vcos_log_error("%s: Error opening output file: %s\nNo output file will be generated\n", __func__, use_filename);
-	                  }
-
-	                  // asprintf used in timelapse mode allocates its own memory which we need to free
-	                  if (state.timelapse)
-	                     free(use_filename);
-                  }
-									
-                  callback_data.file_handle = output_file;
-               }
-
-               // We only capture if a filename was specified and it opened
-               if (output_file)
-               {
-                  int num, q;
-
-                  // Must do this before the encoder output port is enabled since
-                  // once enabled no further exif data is accepted
-                  add_exif_tags(&state);
-
-                  // Same with raw, apparently need to set it for each capture, whilst port
-                  // is not enabled
-                  if (state.wantRAW)
-                  {
-                     if (mmal_port_parameter_set_boolean(camera_still_port, MMAL_PARAMETER_ENABLE_RAW_CAPTURE, 1) != MMAL_SUCCESS)
-                     {
-                        vcos_log_error("RAW was requested, but failed to enable");
-                     }
-                  }
-
-                  // Enable the encoder output port
-                  encoder_output_port->userdata = (struct MMAL_PORT_USERDATA_T *)&callback_data;
-
-                  if (state.verbose)
-                     fprintf(stderr, "Enabling encoder output port\n");
-
-                  // Enable the encoder output port and tell it its callback function
-                  status = mmal_port_enable(encoder_output_port, encoder_buffer_callback);
-
-                  // Send all the buffers to the encoder output port
-                  num = mmal_queue_length(state.encoder_pool->queue);
-
-                  for (q=0;q<num;q++)
-                  {
-                     MMAL_BUFFER_HEADER_T *buffer = mmal_queue_get(state.encoder_pool->queue);
-
-                     if (!buffer)
-                        vcos_log_error("Unable to get a required buffer %d from pool queue", q);
-
-                     if (mmal_port_send_buffer(encoder_output_port, buffer)!= MMAL_SUCCESS)
-                        vcos_log_error("Unable to send a buffer to encoder output port (%d)", q);
-                  }
-
-                  if (state.verbose)
-                     fprintf(stderr, "Starting capture %d\n", frame);
-
-                  if (mmal_port_parameter_set_boolean(camera_still_port, MMAL_PARAMETER_CAPTURE, 1) != MMAL_SUCCESS)
-                  {
-                     vcos_log_error("%s: Failed to start capture", __func__);
-                  }
-                  else
-                  {
-                     // Wait for capture to complete
-                     // For some reason using vcos_semaphore_wait_timeout sometimes returns immediately with bad parameter error
-                     // even though it appears to be all correct, so reverting to untimed one until figure out why its erratic
-                     vcos_semaphore_wait(&callback_data.complete_semaphore);
-                     if (state.verbose)
-                        fprintf(stderr, "Finished capture %d\n", frame);
-                  }
-
-                  // Ensure we don't die if get callback with no open file
-                  callback_data.file_handle = NULL;
-
-                  if (output_file != stdout)
-                     fclose(output_file);
-
-                  // Disable encoder output port
-                  status = mmal_port_disable(encoder_output_port);
-               }
-
-            } // end for (frame)
-
-            vcos_semaphore_delete(&callback_data.complete_semaphore);
-         }
+		// Print the letters representing the colors of the rectangles
+		for(index = 0; index < rectanglesSoFar; index++)
+			printf("%c ", res.color[index]);	
+			
+		printf("\n");
+		
+		//vcos_semaphore_delete(&callback_data.complete_semaphore);
+		
+		// TEST
+		//printf("Finished code\n");
+		//fflush(stdout);
+         
       }
       else
       {

@@ -110,10 +110,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 int mmal_status_to_int(MMAL_STATUS_T status);
 
 // *** MODIFICATION: OpenCV variables and structures
-// Variable to prevent the OpenCV code to be executed twice.
-int executed;
-
-// Keep indexes for loops.
+// Keep indices for loops.
 int x,y;
 
 /** Structure to represent a point.
@@ -127,25 +124,6 @@ typedef struct Point
 	int previousState;
 } Point; 
 
-/** Keep left hand hands coordinates and states.
- */ 
-struct Point leftHand = {
-	.height = 0, 
-	.width = 0, 
-	.isActive = 0, 
-	.currentState = 0, 
-	.previousState = 0
-};
-
-/** Keep right hand hands coordinates and states.
- */
-struct Point rightHand = {
-	.height = 0, 
-	.width = 0, 
-	.isActive = 0, 
-	.currentState = 0, 
-	.previousState = 0
-};
 // *** MODIFICATION ENDS
 
 /** Structure containing all state information for the current run
@@ -313,170 +291,6 @@ static void camera_control_callback(MMAL_PORT_T *port, MMAL_BUFFER_HEADER_T *buf
  */
 static void encoder_buffer_callback(MMAL_PORT_T *port, MMAL_BUFFER_HEADER_T *buffer)
 {   
-	// *** MODIFICATION: OpenCV modifications
-	if(!executed)
-	{		
-		// Create an empty matrix with the size of the buffer.
-		CvMat* buf = cvCreateMat(1,buffer->length,CV_8UC1);
-   
-		// Copy buffer from camera to matrix.
-		buf->data.ptr = buffer->data;
-   
-		// Decode the image and display it.
-		IplImage* image = cvDecodeImage(buf, CV_LOAD_IMAGE_COLOR);
-		
-		// Load image in gray scale		
-		IplImage* gray = cvDecodeImage(buf, CV_LOAD_IMAGE_GRAYSCALE);
-
-		// Use canny algorithm for edge detection
-		IplImage* canny = cvCreateImage(cvGetSize(image),8,1);
-		cvCanny(gray,canny,50,200, 3);
-		
-		// Initialise hands.
-		leftHand.isActive = 0;
-		rightHand.isActive = 0;
- 
-		// Draw guide lines in the image.
-		// *** USER: change the color of the lines.
-		cvLine(image, cvPoint(image->width/4, 0), cvPoint(image->width/4, image->height/3), 
-			   CV_RGB(255,0, 0),1,8,0); 
-		cvLine(image, cvPoint(0, image->height/3), cvPoint(image->width/4, image->height/3), 
-			   CV_RGB(255,0, 0),1,8,0);
- 
-		cvLine(image, cvPoint(image->width*3/4, 0), cvPoint(image->width*3/4, image->height/3), 
-			   CV_RGB(255,0, 0),1,8,0);
-		cvLine(image, cvPoint(image->width*3/4, image->height/3), 
-			   cvPoint(image->width, image->height/3), CV_RGB(255,0, 0),1,8,0);
-
-		cvLine(image, cvPoint(image->width/4, image->height*2/3), cvPoint(image->width/4, image->height), 
-			   CV_RGB(255,0, 0),1,8,0);
-		cvLine(image, cvPoint(0, image->height*2/3), cvPoint(image->width/4, image->height*2/3), 
-			   CV_RGB(255,0, 0),1,8,0);
-
-		cvLine(image, cvPoint(image->width*3/4, image->height*2/3), cvPoint(image->width*3/4, image->height), 
-			   CV_RGB(255,0, 0),1,8,0);
-		cvLine(image, cvPoint(image->width*3/4, image->height*2/3), cvPoint(image->width, image->height*2/3), 
-			   CV_RGB(255,0, 0),1,8,0);
-			   
-		// iterate over ever pixel in the image by iterating 
-		// over each row and column
-		for (y = 0; y < image->height; ++y)
-		{		
-			for(x = 0; x < image->width; ++x)
-			{
-				CvScalar pixel = cvGet2D(canny, y, x); // get the x,y value
-
-				// If white check in which quarter is located
-				if (pixel.val[0] == 255)
-				{
-					// If left quarter and not read yet, store state.
-					if (y < image->width/4 && rightHand.isActive == 0)
-					{
-						if (x < image->height/3)
-						{
-							rightHand.currentState = 1;
-							rightHand.isActive = 1;
-						} // if
-						else if (x > image->height*2/3)
-						{
-							rightHand.currentState = -1;
-							rightHand.isActive = 1;
-						} // else if
-						else
-						{
-							rightHand.currentState = 0;
-							rightHand.isActive = 1;
-						} // else
-					} // if
-					// If right quarter and not read yet, store state.
-					if (y > image->width*3/4 && leftHand.isActive == 0)
-					{
-						if (x < image->height/3)
-						{
-							leftHand.currentState = 1;
-							leftHand.isActive = 1;
-						} // if
-						else if (x > image->height*2/3)
-						{
-							leftHand.currentState = -1;
-							leftHand.isActive = 1;
-						} // else if
-						else
-						{
-							leftHand.currentState = 0;
-							leftHand.isActive = 1;
-						} // else
-					} // if
-					// If both hands have been read, stop the loops.
-					if (rightHand.isActive == 1 && leftHand.isActive == 1)
-						break ;
-				} // if
-			} // for
-		} //for
-		
-		// If at the end of the loop one of the hands hasnt been read, 
-		// it current coordinate will change to 0.
-		if (rightHand.isActive == 0)
-			rightHand.currentState = 0;
-		if (leftHand.isActive == 0)
-			leftHand.currentState = 0;
-
-		// Keep commands
-		char* commandLeft = "";
-		char* commandRight = "";
-
-		// Send a message if the current state is different to the previous state.
-		if (rightHand.currentState != rightHand.previousState)
-		{
-			if (rightHand.currentState == 1)
-				commandRight = "1";
-			else if (rightHand.currentState == -1)
-				commandRight = "-1";
-			else
-				commandRight = "0";
-
-			rightHand.previousState = rightHand.currentState;
-		} // if
-		else
-			commandRight = "Do nothing";
-
-		if (leftHand.currentState != leftHand.previousState)
-		{
-			if (leftHand.currentState == 1)
-				commandLeft = "1";
-			else if (leftHand.currentState == -1)
-				commandLeft = "-1";
-			else
-				commandLeft = "0";
-
-			leftHand.previousState = leftHand.currentState;
-		} // if
-		else
-			commandLeft = "Do nothing";	   
-		
-		// Create windows
-		// *** USER: set the name of the windows that show the video feed.
-		cvNamedWindow("Normal feed", CV_WINDOW_AUTOSIZE);
-		cvNamedWindow("Robot movement", CV_WINDOW_AUTOSIZE);
-
-		// Show the images
-		cvShowImage("Normal feed", image);
-		cvShowImage("Robot movement", canny);
-		cvWaitKey(1);
-		
-		// *** TODO: Implement with client
-		// Return the command
-		//return commandRight + "_" + commandLeft;
-		
-		// *** TEST: while client is not working, so it is possible to check
-		// if the program works.
-		fprintf(stdout, "%s %s \n", commandRight, commandLeft);
-		fflush(stdout);
-   
-		// Set this code as already executed so it is not runned again until
-		// another iteration in the main method has started.
-		executed = 1;
-	} // if
 	
    int complete = 0;
 
@@ -913,11 +727,11 @@ int main(int argc, const char **argv)
    bcm_host_init();
 
    // Register our application with the logging system
-   vcos_log_register("camcv", VCOS_LOG_CATEGORY);
+   vcos_log_register("fast", VCOS_LOG_CATEGORY);
 
    signal(SIGINT, signal_handler);
 
-   default_status(&state); 
+   default_status(&state);     
    
    if (state.verbose)
    {
@@ -1006,141 +820,254 @@ int main(int argc, const char **argv)
             vcos_log_error("Failed to setup encoder output");
             goto error;
          }
+         
+         FILE *output_file = NULL;
+         
+         int frame = 1;
+         
+         // Enable the encoder output port
+         encoder_output_port->userdata = (struct MMAL_PORT_USERDATA_T *)&callback_data;
+         
+         if (state.verbose)
+			fprintf(stderr, "Enabling encoder output port\n");
+			
+		// Enable the encoder output port and tell it its callback function
+		status = mmal_port_enable(encoder_output_port, encoder_buffer_callback);
+		
+		// Create an empty matrix with the size of the buffer.
+		CvMat* buf = cvCreateMat(1,60000,CV_8UC1);
+		
+		// Keep buffer that gets frames from queue.
+		MMAL_BUFFER_HEADER_T *buffer;
+		
+		// Image to be displayed.
+		IplImage* image;
+		
+		// Keep number of buffers and index for the loop.
+		int num, q; 
+		
+		// Keep image in gray scale.
+		IplImage* gray;
+		
+		// Keep image with canny algorithm applied.
+		IplImage* canny; 
+		
+		// Keep color value of the pixel.
+		CvScalar pixel;
 
-         if (state.demoMode)
-         {
-            // Run for the user specific time..
-            int num_iterations = state.timeout / state.demoInterval;
-            int i;
-            for (i=0;i<num_iterations;i++)
-            {
-               raspicamcontrol_cycle_test(state.camera_component);
-               vcos_sleep(state.demoInterval);
-            }
-         }         
-         else
-         {			 
-			 FILE *output_file = NULL;
-            
-            int frame = 0; 
-            
-            while(1==1)
-            {
-				// *** MODIFICATION: Initialize variable.
-                executed = 0;
-                
-				if (state.timelapse)
-                  vcos_sleep(state.timelapse);
-                else
-                  vcos_sleep(state.timeout);
+		// Keep commands
+		char* commandLeft = "";
+		char* commandRight = "";
+		
+		// Create windows
+		// *** USER: set the name of the windows that show the video feed.
+		cvNamedWindow("Normal feed", CV_WINDOW_AUTOSIZE);
+		cvNamedWindow("Robot movement", CV_WINDOW_AUTOSIZE);
+		
+		// Keep left hand hands coordinates and states.
+		struct Point leftHand = {
+			.height = 0, 
+			.width = 0, 
+			.isActive = 0, 
+			.currentState = 0, 
+			.previousState = 0
+		};
 
-               // Open the file
-               if (state.filename)
-               {
-		            if (state.filename[0] == '-')
-    		         {
-		               output_file = stdout;
+		// Keep right hand hands coordinates and states.
+		struct Point rightHand = {
+			.height = 0, 
+			.width = 0, 
+			.isActive = 0, 
+			.currentState = 0, 
+			.previousState = 0
+		};
+		
+		while(1) 
+		{
+			// Send all the buffers to the encoder output port
+			num = mmal_queue_length(state.encoder_pool->queue);
+			
+			for (q=0;q<num;q++)
+			{
+				buffer = mmal_queue_get(state.encoder_pool->queue);
+				
+				if (!buffer)
+					vcos_log_error("Unable to get a required buffer %d from pool queue", q);
+					
+				if (mmal_port_send_buffer(encoder_output_port, buffer)!= MMAL_SUCCESS)
+					vcos_log_error("Unable to send a buffer to encoder output port (%d)", q);
+			} // for
+			
+			if (mmal_port_parameter_set_boolean(camera_still_port, MMAL_PARAMETER_CAPTURE, 1) != MMAL_SUCCESS)
+				vcos_log_error("%s: Failed to start capture", __func__);
+			
+			else
+			{
+				// Wait for capture to complete
+				// For some reason using vcos_semaphore_wait_timeout sometimes returns immediately with bad parameter error
+				// even though it appears to be all correct, so reverting to untimed one until figure out why its erratic
+				vcos_semaphore_wait(&callback_data.complete_semaphore);
+				if (state.verbose)
+					fprintf(stderr, "Finished capture %d\n", frame);
+			} // else
+			
+			// Copy buffer from camera to matrix.
+			buf->data.ptr = buffer->data;
+			
+			// This workaround is needed for the code to work
+			// *** TODO: investigate why.
+			printf("Until here works\n");
+			
+			// Decode the image and display it.
+			image = cvDecodeImage(buf, CV_LOAD_IMAGE_COLOR);
+			
+			// Load image in gray scale		
+			gray = cvDecodeImage(buf, CV_LOAD_IMAGE_GRAYSCALE);
+			
+			// Ensure we continue if an image has been taken. Otherwise
+			// the progrm will crash.
+			if(image != NULL)
+			{
+				// Use canny algorithm for edge detection.
+				canny = cvCreateImage(cvGetSize(image),8,1);
+				cvCanny(gray,canny,50,200, 3);
+		
+				// Initialise hands.
+				leftHand.isActive = 0;
+				rightHand.isActive = 0;
+ 
+				// Draw guide lines in the image.
+				// *** USER: change the color of the lines.
+				cvLine(image, cvPoint(image->width/4, 0), cvPoint(image->width/4, image->height/3), 
+						CV_RGB(255,0, 0),1,8,0); 
+				cvLine(image, cvPoint(0, image->height/3), cvPoint(image->width/4, image->height/3), 
+						CV_RGB(255,0, 0),1,8,0);
+ 
+				cvLine(image, cvPoint(image->width*3/4, 0), cvPoint(image->width*3/4, image->height/3), 
+						CV_RGB(255,0, 0),1,8,0);
+				cvLine(image, cvPoint(image->width*3/4, image->height/3), 
+						cvPoint(image->width, image->height/3), CV_RGB(255,0, 0),1,8,0);
 
-		               // Ensure we don't upset the output stream with diagnostics/info
-		               state.verbose = 0;
-    		         }
-                  else
-                  {
-                     char *use_filename = state.filename;
-	
-	                  if (state.timelapse)
-	                     asprintf(&use_filename, state.filename, frame);
-	
-	                  if (state.verbose)
-	                     fprintf(stderr, "Opening output file %s\n", use_filename);
-	
-	                  output_file = fopen(use_filename, "wb");
-	
-	                  if (!output_file)
-	                  {
-	                     // Notify user, carry on but discarding encoded output buffers
-	                     vcos_log_error("%s: Error opening output file: %s\nNo output file will be generated\n", __func__, use_filename);
-	                  }
+				cvLine(image, cvPoint(image->width/4, image->height*2/3), 
+						cvPoint(image->width/4, image->height), CV_RGB(255,0, 0),1,8,0);
+				cvLine(image, cvPoint(0, image->height*2/3), cvPoint(image->width/4, image->height*2/3), 
+						CV_RGB(255,0, 0),1,8,0);
 
-	                  // asprintf used in timelapse mode allocates its own memory which we need to free
-	                  if (state.timelapse)
-	                     free(use_filename);
-                  }
-									
-                  callback_data.file_handle = output_file;
-               }
+				cvLine(image, cvPoint(image->width*3/4, image->height*2/3), 
+						cvPoint(image->width*3/4, image->height), CV_RGB(255,0, 0),1,8,0);
+				cvLine(image, cvPoint(image->width*3/4, image->height*2/3), 
+						cvPoint(image->width, image->height*2/3), CV_RGB(255,0, 0),1,8,0);
+			   
+				// iterate over ever pixel in the image by iterating 
+				// over each row and column
+				for (y = 0; y < image->height; ++y)
+				{		
+					for(x = 0; x < image->width; ++x)
+					{
+						pixel = cvGet2D(canny, y, x); // get the x,y value
 
-               // We only capture if a filename was specified and it opened
-               if (output_file)
-               {
-                  int num, q;                  
+						// If white check in which quarter is located
+						if (pixel.val[0] == 255)
+						{
+							// If left quarter and not read yet, store state.
+							if (x < image->width/4 && rightHand.isActive == 0)
+							{
+								if (y < image->height/3)
+								{
+									rightHand.currentState = 1;
+									rightHand.isActive = 1;
+								} // if
+								else if (y > image->height*2/3)
+								{
+									rightHand.currentState = -1;
+									rightHand.isActive = 1;
+								} // else if
+								else
+								{
+									rightHand.currentState = 0;
+									rightHand.isActive = 1;
+								} // else
+							} // if
+							// If right quarter and not read yet, store state.
+							if (x > image->width*3/4 && leftHand.isActive == 0)
+							{
+								if (y < image->height/3)
+								{
+									leftHand.currentState = 1;
+									leftHand.isActive = 1;
+								} // if
+								else if (y > image->height*2/3)
+								{
+									leftHand.currentState = -1;
+									leftHand.isActive = 1;
+								} // else if
+								else
+								{
+									leftHand.currentState = 0;
+									leftHand.isActive = 1;
+								} // else
+							} // if
+							// If both hands have been read, stop the loops.
+							if (rightHand.isActive == 1 && leftHand.isActive == 1)
+								break ;
+						} // if
+					} // for
+				} //for
+		
+				// If at the end of the loop one of the hands hasnt been read, 
+				// it current coordinate will change to 0.
+				if (rightHand.isActive == 0)
+					rightHand.currentState = 0;
+				if (leftHand.isActive == 0)
+					leftHand.currentState = 0;
 
-                  // Same with raw, apparently need to set it for each capture, whilst port
-                  // is not enabled
-                  if (state.wantRAW)
-                  {
-                     if (mmal_port_parameter_set_boolean(camera_still_port, MMAL_PARAMETER_ENABLE_RAW_CAPTURE, 1) != MMAL_SUCCESS)
-                     {
-                        vcos_log_error("RAW was requested, but failed to enable");
-                     }
-                  }
-                  
-                  // Enable the encoder output port
-                  encoder_output_port->userdata = (struct MMAL_PORT_USERDATA_T *)&callback_data;
+				// Send a message if the current state is different to the previous state.
+				if (rightHand.currentState != rightHand.previousState)
+				{
+					if (rightHand.currentState == 1)
+						commandRight = "1";
+					else if (rightHand.currentState == -1)
+						commandRight = "-1";
+					else
+						commandRight = "0";
 
-                  if (state.verbose)
-                     fprintf(stderr, "Enabling encoder output port\n");
-                  
-                  // Enable the encoder output port and tell it its callback function
-                  status = mmal_port_enable(encoder_output_port, encoder_buffer_callback);
+					rightHand.previousState = rightHand.currentState;
+				} // if
+				else
+					commandRight = "Do nothing";
 
-                  // Send all the buffers to the encoder output port
-                  num = mmal_queue_length(state.encoder_pool->queue);
-                  
-                  for (q=0;q<num;q++)
-                  {
-                     MMAL_BUFFER_HEADER_T *buffer = mmal_queue_get(state.encoder_pool->queue);
+				if (leftHand.currentState != leftHand.previousState)
+				{
+					if (leftHand.currentState == 1)
+						commandLeft = "1";
+					else if (leftHand.currentState == -1)
+						commandLeft = "-1";
+					else
+						commandLeft = "0";
 
-                     if (!buffer)
-                        vcos_log_error("Unable to get a required buffer %d from pool queue", q);
+					leftHand.previousState = leftHand.currentState;
+				} // if
+				else
+					commandLeft = "Do nothing";	   
 
-                     if (mmal_port_send_buffer(encoder_output_port, buffer)!= MMAL_SUCCESS)
-                        vcos_log_error("Unable to send a buffer to encoder output port (%d)", q);
-                  }
-
-                  if (state.verbose)
-                     fprintf(stderr, "Starting capture %d\n", frame);
-
-                  if (mmal_port_parameter_set_boolean(camera_still_port, MMAL_PARAMETER_CAPTURE, 1) != MMAL_SUCCESS)
-                  {
-                     vcos_log_error("%s: Failed to start capture", __func__);
-                  }
-                  else
-                  {
-                     // Wait for capture to complete
-                     // For some reason using vcos_semaphore_wait_timeout sometimes 
-                     // returns immediately with bad parameter error
-                     // even though it appears to be all correct, so reverting to untimed 
-                     // one until figure out why its erratic
-                     vcos_semaphore_wait(&callback_data.complete_semaphore);
-                     if (state.verbose)
-                        fprintf(stderr, "Finished capture %d\n", frame);
-                  }
-
-                  // Ensure we don't die if get callback with no open file
-                  callback_data.file_handle = NULL;
-
-                  if (output_file != stdout)
-                     fclose(output_file);
-
-                  // Disable encoder output port
-                  status = mmal_port_disable(encoder_output_port);
-               } 
-               
-            } // end while (frame)            
-               
-            vcos_semaphore_delete(&callback_data.complete_semaphore);
-         }
+				// Show the images
+				cvShowImage("Normal feed", image);
+				cvShowImage("Robot movement", canny);
+				cvWaitKey(1);
+		
+				// *** TODO: Implement with client
+				// Return the command
+				//return commandRight + "_" + commandLeft;
+		
+				// *** TEST: while client is not working, so it is possible to check
+				// if the program works.
+				fprintf(stdout, "%s %s \n", commandRight, commandLeft);
+				fflush(stdout);				
+			} // if
+		} // end while 
+		
+		vcos_semaphore_delete(&callback_data.complete_semaphore);
+         
       }
       else
       {
