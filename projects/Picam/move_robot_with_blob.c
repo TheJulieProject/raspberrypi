@@ -313,8 +313,6 @@ static void encoder_buffer_callback(MMAL_PORT_T *port, MMAL_BUFFER_HEADER_T *buf
 	// *** MODIFICATION: OpenCV modifications
 	if(!executed)
 	{
-		// Indexs for later loops.
-		int x, y;
 		
 		// Create an empty matrix with the size of the buffer.
 		CvMat* buf = cvCreateMat(1,buffer->length,CV_8UC1);
@@ -323,92 +321,7 @@ static void encoder_buffer_callback(MMAL_PORT_T *port, MMAL_BUFFER_HEADER_T *buf
 		buf->data.ptr = buffer->data;
    
 		// Decode the image and display it.
-		IplImage* image = cvDecodeImage(buf, CV_LOAD_IMAGE_COLOR);		
-		
-		// View for the final image
-		// *** USER: set the name of the window.
-		cvNamedWindow("Move robot with blob", CV_WINDOW_AUTOSIZE);
-		
-		// x and y position accumulators
-		int acc_x = 0;
-		int acc_y = 0;
-
-		// number of pixels accumulated
-		int acc_count = 0;
-		
-		// Current coordinate. Initially it is 5 as it represents the centre
-		// of the grid, which means "do nothing".
-		int coordinate = 5;
-
-		// iterate over ever pixel in the image by iterating 
-		// over each row and column
-		for (y = 0; y < image->height; ++y)
-		{		
-			for(x = 0; x < image->width; ++x)
-			{
-				CvScalar s = cvGet2D(image, y, x);
-				
-				// Color channels stored indiviually.
-				int blue = s.val[0];
-				int green = s.val[1];
-				int red = s.val[2];
-				
-				// check if the intensities are near to white color
-				// *** USER: vary the intensities in order to look for another color.
-				if (blue > green && blue > red && blue > 180 && green > 60)      		 
-				{
-					// add x and y to accumulators
-					acc_x += x;
-					acc_y += y;
-					
-					// increment accumulated pixels count
-					acc_count += 1;					
-				} // if
-			} // for
-		} //for
-		
-		// check the count accumulator is greater than zero, to avoid dividing by zero
-		if (acc_count > 0)
-		{
-			// calculate the mean x and y positions
-			int mean_x = acc_x / acc_count;
-			int mean_y = acc_y / acc_count;
-
-			// Calculate where is the centre of the object in our grid.
-			// Check if the point is in the first column.
-			if (mean_x < image->width / 3)
-			{
-				if (mean_y < image->height / 3)
-					coordinate = 1;
-				else if (mean_y < image->height * 2 / 3)
-					coordinate = 4;
-				else
-					coordinate = 7;
-				} // if
-			// Check the second column
-			else if (mean_x < image->width * 2 / 3)
-			{
-				if (mean_y < image->height / 3)
-					coordinate = 2;
-				else if (mean_y < image->height * 2 / 3)
-					coordinate = 5;
-				else
-					coordinate = 8;
-			} // else if
-			// Finally the third column
-			else
-			{
-				if (mean_y < image->height / 3)
-					coordinate = 3;
-				else if (mean_y < image->height * 2 / 3)
-					coordinate = 6;
-				else
-					coordinate = 9;	
-			} // else
-		} // if
-		
-		// Calculate the command corresponding to the coordinate and print it.
-		fprintf(stdout, "%s\n", calc_command(coordinate));
+		IplImage* image = cvDecodeImage(buf, CV_LOAD_IMAGE_COLOR);
    
 		executed = 1;
 	} // if
@@ -848,11 +761,11 @@ int main(int argc, const char **argv)
    bcm_host_init();
 
    // Register our application with the logging system
-   vcos_log_register("camcv", VCOS_LOG_CATEGORY);
+   vcos_log_register("fast", VCOS_LOG_CATEGORY);
 
    signal(SIGINT, signal_handler);
 
-   default_status(&state);    
+   default_status(&state);     
    
    if (state.verbose)
    {
@@ -941,141 +854,171 @@ int main(int argc, const char **argv)
             vcos_log_error("Failed to setup encoder output");
             goto error;
          }
+         
+         FILE *output_file = NULL;
+         
+         int frame = 1;
+         
+         // Enable the encoder output port
+         encoder_output_port->userdata = (struct MMAL_PORT_USERDATA_T *)&callback_data;
+         
+         if (state.verbose)
+			fprintf(stderr, "Enabling encoder output port\n");
+			
+		// Enable the encoder output port and tell it its callback function
+		status = mmal_port_enable(encoder_output_port, encoder_buffer_callback);
+		
+		// Create an empty matrix with the size of the buffer.
+		CvMat* buf = cvCreateMat(1,60000,CV_8UC1);
+		
+		// Keep buffer that gets frames from queue.
+		MMAL_BUFFER_HEADER_T *buffer;
+		
+		// *** USER: change name of the window.
+		cvNamedWindow("Camera feed", CV_WINDOW_AUTOSIZE);
+		
+		// Image to be displayed.
+		IplImage* image;
+		
+		// Keep number of buffers and index for the loop.
+		int num, q; 
+		
+		// Indices for later loops.
+		int x, y;		
+		
+		// View for the final image
+		// *** USER: set the name of the window.
+		cvNamedWindow("Move robot with blob", CV_WINDOW_AUTOSIZE);
+		
+		// x and y position accumulators
+		int acc_x = 0;
+		int acc_y = 0;
 
-         if (state.demoMode)
-         {
-            // Run for the user specific time..
-            int num_iterations = state.timeout / state.demoInterval;
-            int i;
-            for (i=0;i<num_iterations;i++)
-            {
-               raspicamcontrol_cycle_test(state.camera_component);
-               vcos_sleep(state.demoInterval);
-            }
-         }         
-         else
-         {			 
-			 FILE *output_file = NULL;
-            
-            int frame = 0; 
-            
-            while(1==1)           
-            {
-				// *** MODIFICATION: Set up OpenCV code as not executed yet.
-                executed = 0;
-                
-				if (state.timelapse)
-                  vcos_sleep(state.timelapse);
-                else
-                  vcos_sleep(state.timeout);
+		// number of pixels accumulated
+		int acc_count = 0;
+		
+		// Current coordinate. Initially it is 5 as it represents the centre
+		// of the grid, which means "do nothing".
+		int coordinate = 5;
+		
+		// Keep pixel values.
+		CvScalar s;
+		
+		// Keep color channels values.
+		int red, green, blue;
+		
+		while(1) 
+		{
+			// Send all the buffers to the encoder output port
+			num = mmal_queue_length(state.encoder_pool->queue);
+			
+			for (q=0;q<num;q++)
+			{
+				buffer = mmal_queue_get(state.encoder_pool->queue);
+				
+				if (!buffer)
+					vcos_log_error("Unable to get a required buffer %d from pool queue", q);
+					
+				if (mmal_port_send_buffer(encoder_output_port, buffer)!= MMAL_SUCCESS)
+					vcos_log_error("Unable to send a buffer to encoder output port (%d)", q);
+			} // for
+			
+			if (mmal_port_parameter_set_boolean(camera_still_port, MMAL_PARAMETER_CAPTURE, 1) != MMAL_SUCCESS)
+				vcos_log_error("%s: Failed to start capture", __func__);
+			
+			else
+			{
+				// Wait for capture to complete
+				// For some reason using vcos_semaphore_wait_timeout sometimes returns immediately with bad parameter error
+				// even though it appears to be all correct, so reverting to untimed one until figure out why its erratic
+				vcos_semaphore_wait(&callback_data.complete_semaphore);
+				if (state.verbose)
+					fprintf(stderr, "Finished capture %d\n", frame);
+			} // else
+			
+			// Copy buffer from camera to matrix.
+			buf->data.ptr = buffer->data;
+			
+			// This workaround is needed for the code to work
+			// *** TODO: investigate why.
+			printf("Until here works\n");
+			
+			// Decode the image and display it.
+			image = cvDecodeImage(buf, CV_LOAD_IMAGE_COLOR);
 
-               // Open the file
-               if (state.filename)
-               {
-		            if (state.filename[0] == '-')
-    		         {
-		               output_file = stdout;
+		// iterate over ever pixel in the image by iterating 
+		// over each row and column
+		for (y = 0; y < image->height; ++y)
+		{		
+			for(x = 0; x < image->width; ++x)
+			{
+				s = cvGet2D(image, y, x);
+				
+				// Color channels stored indiviually.
+				blue = s.val[0];
+				green = s.val[1];
+				red = s.val[2];
+				
+				// check if the intensities are near to white color
+				// *** USER: vary the intensities in order to look for another color.
+				if (blue > green && blue > red && blue > 180 && green > 60)      		 
+				{
+					// add x and y to accumulators
+					acc_x += x;
+					acc_y += y;
+					
+					// increment accumulated pixels count
+					acc_count += 1;					
+				} // if
+			} // for
+		} //for
+		
+		// check the count accumulator is greater than zero, to avoid dividing by zero
+		if (acc_count > 0)
+		{
+			// calculate the mean x and y positions
+			int mean_x = acc_x / acc_count;
+			int mean_y = acc_y / acc_count;
 
-		               // Ensure we don't upset the output stream with diagnostics/info
-		               state.verbose = 0;
-    		         }
-                  else
-                  {
-                     char *use_filename = state.filename;
-	
-	                  if (state.timelapse)
-	                     asprintf(&use_filename, state.filename, frame);
-	
-	                  if (state.verbose)
-	                     fprintf(stderr, "Opening output file %s\n", use_filename);
-	
-	                  output_file = fopen(use_filename, "wb");
-	
-	                  if (!output_file)
-	                  {
-	                     // Notify user, carry on but discarding encoded output buffers
-	                     vcos_log_error("%s: Error opening output file: %s\nNo output file will be generated\n", __func__, use_filename);
-	                  }
-
-	                  // asprintf used in timelapse mode allocates its own memory which we need to free
-	                  if (state.timelapse)
-	                     free(use_filename);
-                  }
-									
-                  callback_data.file_handle = output_file;
-               }
-
-               // We only capture if a filename was specified and it opened
-               if (output_file)
-               {
-                  int num, q;                  
-
-                  // Same with raw, apparently need to set it for each capture, whilst port
-                  // is not enabled
-                  if (state.wantRAW)
-                  {
-                     if (mmal_port_parameter_set_boolean(camera_still_port, MMAL_PARAMETER_ENABLE_RAW_CAPTURE, 1) != MMAL_SUCCESS)
-                     {
-                        vcos_log_error("RAW was requested, but failed to enable");
-                     }
-                  }
-                  
-                  // Enable the encoder output port
-                  encoder_output_port->userdata = (struct MMAL_PORT_USERDATA_T *)&callback_data;
-
-                  if (state.verbose)
-                     fprintf(stderr, "Enabling encoder output port\n");
-                  
-                  // Enable the encoder output port and tell it its callback function
-                  status = mmal_port_enable(encoder_output_port, encoder_buffer_callback);
-
-                  // Send all the buffers to the encoder output port
-                  num = mmal_queue_length(state.encoder_pool->queue);
-                  
-                  for (q=0;q<num;q++)
-                  {
-                     MMAL_BUFFER_HEADER_T *buffer = mmal_queue_get(state.encoder_pool->queue);
-
-                     if (!buffer)
-                        vcos_log_error("Unable to get a required buffer %d from pool queue", q);
-
-                     if (mmal_port_send_buffer(encoder_output_port, buffer)!= MMAL_SUCCESS)
-                        vcos_log_error("Unable to send a buffer to encoder output port (%d)", q);
-                  }
-
-                  if (state.verbose)
-                     fprintf(stderr, "Starting capture %d\n", frame);
-
-                  if (mmal_port_parameter_set_boolean(camera_still_port, MMAL_PARAMETER_CAPTURE, 1) != MMAL_SUCCESS)
-                  {
-                     vcos_log_error("%s: Failed to start capture", __func__);
-                  }
-                  else
-                  {
-                     // Wait for capture to complete
-                     // For some reason using vcos_semaphore_wait_timeout sometimes 
-                     // returns immediately with bad parameter error
-                     // even though it appears to be all correct, so reverting to untimed 
-                     // one until figure out why its erratic
-                     vcos_semaphore_wait(&callback_data.complete_semaphore);
-                     if (state.verbose)
-                        fprintf(stderr, "Finished capture %d\n", frame);
-                  }
-
-                  // Ensure we don't die if get callback with no open file
-                  callback_data.file_handle = NULL;
-
-                  if (output_file != stdout)
-                     fclose(output_file);
-
-                  // Disable encoder output port
-                  status = mmal_port_disable(encoder_output_port);
-               } 
-               
-            } // end while (frame)            
-               
-            vcos_semaphore_delete(&callback_data.complete_semaphore);
-         }
+			// Calculate where is the centre of the object in our grid.
+			// Check if the point is in the first column.
+			if (mean_x < image->width / 3)
+			{
+				if (mean_y < image->height / 3)
+					coordinate = 1;
+				else if (mean_y < image->height * 2 / 3)
+					coordinate = 4;
+				else
+					coordinate = 7;
+				} // if
+			// Check the second column
+			else if (mean_x < image->width * 2 / 3)
+			{
+				if (mean_y < image->height / 3)
+					coordinate = 2;
+				else if (mean_y < image->height * 2 / 3)
+					coordinate = 5;
+				else
+					coordinate = 8;
+			} // else if
+			// Finally the third column
+			else
+			{
+				if (mean_y < image->height / 3)
+					coordinate = 3;
+				else if (mean_y < image->height * 2 / 3)
+					coordinate = 6;
+				else
+					coordinate = 9;	
+			} // else
+		} // if
+		
+		// Calculate the command corresponding to the coordinate and print it.
+		fprintf(stdout, "%s\n", calc_command(coordinate));
+		} // end while 
+		
+		vcos_semaphore_delete(&callback_data.complete_semaphore);
+         
       }
       else
       {
